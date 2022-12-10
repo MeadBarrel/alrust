@@ -49,7 +49,7 @@ impl<G, F, C, A> GeneticAlgorithm<G, F, C, A>
         }
     }
 
-    pub fn advance(&mut self) -> Result<()> {
+    pub fn advance_evolution(&mut self) -> Result<()> {
         let ranked_individuals = RankedIndividuals
             ::from_population(self.population.clone(), self.advantage_function.as_ref());
         let matings = self.select.select_from(ranked_individuals)?;
@@ -72,5 +72,21 @@ impl<G, F, C, A> GeneticAlgorithm<G, F, C, A>
             .reinsert(future_individuals)?;
         
         Ok(())
+    }
+}
+
+
+impl<G, F, C, A> Iterator for GeneticAlgorithm<G, F, C, A> 
+    where
+        G: Genotype,
+        F: Fitness,
+        C: Constraint,
+        A: Advantage
+{
+    type Item = Individuals<G, F, C>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.advance_evolution().unwrap();
+        Some(self.population.clone())
     }
 }

@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use crate::alias::*;
 use crate::genetic::*;
 

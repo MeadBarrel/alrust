@@ -88,3 +88,4 @@ impl<G, F, C> Population for Individuals<G, F, C>
         self.iter().map(|x| &x.fitness).collect()
     }
 }
+
