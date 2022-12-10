@@ -7,7 +7,7 @@ use crate::alias::*;
 pub trait MutateOperator<G> 
     where G: Genotype
 {
-    fn mutate(&mut self, genome: &mut G) -> Result<G>;
+    fn mutate(&mut self, genome: &mut G) -> Result<()>;
 }
 
 
