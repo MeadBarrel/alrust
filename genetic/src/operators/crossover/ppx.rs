@@ -1,3 +1,5 @@
+use std::cell::*;
+
 use rand::Rng;
 use error_stack::*;
 
@@ -10,7 +12,7 @@ use crate::error::Result;
 
 
 pub struct PrecedencePreservativeCrossover<R: Rng> {
-    rng: R,
+    rng: RefCell<R>,
     num_children: usize,
 }
 
@@ -82,16 +84,8 @@ impl<L> CrossoverStateTrait for CrossoverState<L>
 }
 
 
-
-fn selection_table<R>(rng: &mut R, num_cols: usize, num_rows: usize) -> SelectionTable
-    where R: Rng
-{
-    (0..num_cols).map(|_| rng.gen_range(0..num_rows)).collect()
-}
-
-
 impl<R: Rng> PrecedencePreservativeCrossover<R>  {
-    pub fn new(num_children: usize, rng: R) -> Self {
+    pub fn new(num_children: usize, rng: RefCell<R>) -> Self {
         Self {
             num_children,
             rng,
@@ -153,10 +147,17 @@ impl<L, R> CrossoverOperator<VectorEncoded<L>> for PrecedencePreservativeCrossov
         let dna_size = parents[0].len();
         let num_parents = parents.len();
 
-        let selection_table = selection_table(&mut self.rng, dna_size, num_parents);
+        let selection_table = selection_table(&self.rng, dna_size, num_parents);
         self.crossover_with_table(parents, selection_table)
     }
 
+}
+
+
+fn selection_table<R>(rng: &RefCell<R>, num_cols: usize, num_rows: usize) -> SelectionTable
+    where R: Rng
+{
+    (0..num_cols).map(|_| rng.borrow_mut().gen_range(0..num_rows)).collect()
 }
 
 
@@ -169,7 +170,7 @@ mod tests {
     #[test]
     fn test_precedence_preservative_crossover() {
         let rng = rand::thread_rng();
-        let mut op = PrecedencePreservativeCrossover::new(1, rng);
+        let mut op = PrecedencePreservativeCrossover::new(1, RefCell::new(rng));
 
         let parents = vec![
             vec![0, 5, 9, 2, 6, 3, 4],
