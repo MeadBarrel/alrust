@@ -17,13 +17,8 @@ pub struct ParettoAdvantage {
     crowding_distance: NotNan<f64>,
 }
 
+#[derive(Default)]
 pub struct ParettoAdvantageFunction {}
-
-impl Default for ParettoAdvantageFunction {
-    fn default() -> Self {
-        ParettoAdvantageFunction {}
-    }
-}
 
 impl Advantage for ParettoAdvantage {}
 
