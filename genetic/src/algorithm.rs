@@ -1,10 +1,7 @@
-use std::marker::PhantomData;
-
 use crate::alias::*;
 use crate::error::*;
 use crate::genetic::*;
 use crate::population::*;
-use crate::op::*;
 
 
 pub trait Types<G, F, C, A> {
