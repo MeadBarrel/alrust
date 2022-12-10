@@ -111,14 +111,14 @@ impl<R: Rng> PrecedencePreservativeCrossover<R>  {
         Ok(children)
     }
 
-    fn create_child<L>(&mut self, parents: &<VectorEncoded<L>>, selection_table: &SelectionTable) -> Result<VectorEncoded<L>>
+    fn create_child<L>(&mut self, parents: &[VectorEncoded<L>], selection_table: &SelectionTable) -> Result<VectorEncoded<L>>
         where L: Locus + Eq
     {
         let mut child: VectorEncoded<L> = VectorEncoded::default();
 
         let dna_size = parents[0].len();
 
-        let mut crossover_state = CrossoverState::from_genes(parents.clone());        
+        let mut crossover_state = CrossoverState::from_genes(parents.to_vec());        
 
         for i in 0..dna_size {
             let maybe_gene = crossover_state.select_with_table(selection_table, i);
@@ -168,7 +168,7 @@ mod tests {
 
     #[test]
     fn test_precedence_preservative_crossover() {
-        let mut rng = rand::thread_rng();
+        let rng = rand::thread_rng();
         let mut op = PrecedencePreservativeCrossover::new(1, rng);
 
         let parents = vec![
