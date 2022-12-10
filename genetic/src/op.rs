@@ -24,7 +24,7 @@ pub trait CrossoverOperator<G>
 }
 
 
-pub trait ReinsertOperator<G, F, C, A>
+pub trait ReinsertOperator<G, F, C>
 {
-    fn reinsert(&mut self, individuals: Individuals<G, F, C>, advantage_function: &AdvantageFunctionAlias<F, A>) -> Result<Individuals<G, F, C>>;
+    fn reinsert(&mut self, individuals: Individuals<G, F, C>) -> Result<Individuals<G, F, C>>;
 }

@@ -15,7 +15,7 @@ pub struct GeneticAlgorithm<G, F, C, A> {
     mutate: Box<MutateOperatorAlias<G>>,
     crossover: Box<CrossoverOperatorAlias<G>>,
     select: Box<SelectOperatorAlias<G, F, C, A>>,
-    reinsert: Box<ReinsertOperatorAlias<G, F, C, A>>,
+    reinsert: Box<ReinsertOperatorAlias<G, F, C>>,
 
     population: Individuals<G, F, C>,
 }
@@ -34,7 +34,7 @@ impl<G, F, C, A> GeneticAlgorithm<G, F, C, A>
         mutate: Box<MutateOperatorAlias<G>>,
         crossover: Box<CrossoverOperatorAlias<G>>,
         select: Box<SelectOperatorAlias<G, F, C, A>>,
-        reinsert: Box<ReinsertOperatorAlias<G, F, C, A>>,
+        reinsert: Box<ReinsertOperatorAlias<G, F, C>>,
         initial_pool: Vec<G>,
     ) -> Self {
         let population = Individuals::from_genomes(initial_pool, fitness_function.as_ref());
@@ -69,7 +69,7 @@ impl<G, F, C, A> GeneticAlgorithm<G, F, C, A>
         future_individuals.extend(self.population.clone());
 
         self.population = self.reinsert
-            .reinsert(future_individuals, self.advantage_function.as_ref())?;
+            .reinsert(future_individuals)?;
         
         Ok(())
     }
