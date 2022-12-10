@@ -1,6 +1,6 @@
 pub trait Genotype: Clone {}
 pub trait Fitness: Clone {}
-pub trait Constraint: Clone  {}
+pub trait Constraint: Clone + Ord {}
 pub trait Advantage: Clone + Ord {}
 
 pub trait FitnessFunction {

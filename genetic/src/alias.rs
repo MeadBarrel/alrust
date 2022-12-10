@@ -15,5 +15,5 @@ pub type RankedIndividuals<G, F, C, A> = Vec<RankedIndividual<G, F, C, A>>;
 
 pub type MutateOperatorAlias<G> = dyn MutateOperator<G>;
 pub type CrossoverOperatorAlias<G> = dyn CrossoverOperator<G>;
-pub type SelectOperatorAlias<F, G, C, A> = dyn SelectOperator<G, F, C, A>;
+pub type SelectOperatorAlias<G, F, C, A> = dyn SelectOperator<G, F, C, A>;
 pub type ReinsertOperatorAlias<G, F, C, A> = dyn ReinsertOperator<G, F, C, A>;

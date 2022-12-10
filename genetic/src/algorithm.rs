@@ -1,15 +1,15 @@
 use crate::alias::*;
 use crate::error::*;
 use crate::genetic::*;
-use crate::population::Population;
-use crate::population::RankedPopulation;
+use crate::population;
+use crate::population::*;
 
 pub struct GeneticAlgorithm<G, F, C, A> {
     fitness_function: Box<FitnessFunctionAlias<G, F, C>>,
     advantage_function: Box<AdvantageFunctionAlias<F, A>>,
     mutate: Box<MutateOperatorAlias<G>>,
     crossover: Box<CrossoverOperatorAlias<G>>,
-    select: Box<SelectOperatorAlias<F, G, C, A>>,
+    select: Box<SelectOperatorAlias<G, F, C, A>>,
     reinsert: Box<ReinsertOperatorAlias<G, F, C, A>>,
 
     population: Individuals<G, F, C>,
@@ -28,10 +28,11 @@ impl<G, F, C, A> GeneticAlgorithm<G, F, C, A>
         advantage_function: Box<AdvantageFunctionAlias<F, A>>,
         mutate: Box<MutateOperatorAlias<G>>,
         crossover: Box<CrossoverOperatorAlias<G>>,
-        select: Box<SelectOperatorAlias<F, G, C, A>>,
+        select: Box<SelectOperatorAlias<G, F, C, A>>,
         reinsert: Box<ReinsertOperatorAlias<G, F, C, A>>,
-        population: Individuals<G, F, C>,
+        initial_pool: Vec<G>,
     ) -> Self {
+        let population = Individuals::from_genomes(initial_pool, fitness_function.as_ref());
         Self {
             fitness_function,
             advantage_function,
