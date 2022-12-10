@@ -45,7 +45,7 @@ impl<G, F, C, A> GeneticAlgorithm<G, F, C, A>
 
     pub fn advance(&mut self) -> Result<()> {
         let ranked_individuals = RankedIndividuals
-            ::from_population(self.population.clone(), &self.advantage_function);
+            ::from_population(self.population.clone(), self.advantage_function.as_ref());
         let matings = self.select.select_from(ranked_individuals)?;
 
         let mut offspring = Vec::new();
@@ -58,10 +58,12 @@ impl<G, F, C, A> GeneticAlgorithm<G, F, C, A>
             self.mutate.mutate(child)?;
         }
 
-        let mut future_individuals = Individuals::from_genomes(offspring, &self.fitness_function);
+        let mut future_individuals = 
+            Individuals::from_genomes(offspring, self.fitness_function.as_ref());
         future_individuals.extend(self.population.clone());
 
-        self.population = self.reinsert.reinsert(future_individuals, &self.advantage_function)?;
+        self.population = self.reinsert
+            .reinsert(future_individuals, self.advantage_function.as_ref())?;
         
         Ok(())
     }

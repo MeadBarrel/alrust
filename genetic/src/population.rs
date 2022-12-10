@@ -26,9 +26,7 @@ pub trait RankedPopulation {
 
     fn from_population(
         population: Individuals<Self::Genotype, Self::Fitness, Self::Constraint>, 
-        advantage_function: 
-            &Box<dyn AdvantageFunction<Fitness = Self::Fitness, Advantage = Self::Advantage>>)
-            -> Self;
+        advantage_function: &AdvantageFunctionAlias<Self::Fitness, Self::Advantage>) -> Self;
 
     fn best(&self) -> Option<&Self::Item>;
     fn to_individuals(self) -> Individuals<Self::Genotype, Self::Fitness, Self::Constraint>;
@@ -54,9 +52,7 @@ impl<G, F, C, A> RankedPopulation for RankedIndividuals<G, F, C, A>
 
     fn from_population(
             population: Individuals<Self::Genotype, Self::Fitness, Self::Constraint>, 
-            advantage_function: 
-                &Box<dyn AdvantageFunction<Fitness = Self::Fitness, Advantage = Self::Advantage>>)
-                -> Self {
+            advantage_function: &AdvantageFunctionAlias<Self::Fitness, Self::Advantage>) -> Self {
         let fitnesses = population.fitnesses();
         let advantages = advantage_function.call(fitnesses);
         population.into_iter().zip(advantages.into_iter())
