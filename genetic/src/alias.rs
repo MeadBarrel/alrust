@@ -1,15 +1,19 @@
 use crate::genetic::*;
 use crate::op::*;
+use crate::individual::*;
 
+pub type Parents<G> = Vec<G>;
+pub type Children<G> = Vec<G>;
+pub type Matings<G> = Vec<Parents<G>>;
+pub type Offspring<G> = Vec<Children<G>>;
 
-pub type FitnessFunctionAlias<F, P> = dyn FitnessFunction<Fitness = F, Phenotype = P>;
-pub type ConstraintFunctionAlias<C, P> = dyn ConstraintFunction<Constraint = C, Phenotype = P>;
-pub type AdvantageFunctionAlias<F, A> = dyn AdvantageFunction<Fitness = F, Advantage = A>;
+pub type FitnessFunctionAlias<G, F, C> = Box<dyn FitnessFunction<Genotype = G, Fitness = F, Constraint = C>>;
+pub type AdvantageFunctionAlias<F, A> = Box<dyn AdvantageFunction<Fitness = F, Advantage = A>>;
 
-pub type IndividualAlias<F, G, C> = dyn Individual<Fitness = F, Genotype = G, Constraint = C>;
-pub type RankedIndividualAlias<I, A> = dyn RankedIndividual<Individual = I, Advantage = A>;
+pub type Individuals<G, F, C> = Vec<Individual<G, F, C>>;
+pub type RankedIndividuals<G, F, C, A> = Vec<RankedIndividual<G, F, C, A>>;
 
-pub type IncubatorAlias<G, P> = dyn Incubator<Genotype = G, Phenotype = P>;
-pub type MutateOperatorAlias<G> = dyn MutateOperator<G>;
-pub type CrossoverOperatorAlias<G> = dyn CrossoverOperator<G>;
-pub type SelectOperatorAlias<F, G, C> = IndividualAlias<F, G, C>;
+pub type MutateOperatorAlias<G> = Box<dyn MutateOperator<G>>;
+pub type CrossoverOperatorAlias<G> = Box<dyn CrossoverOperator<G>>;
+pub type SelectOperatorAlias<F, G, C, A> = Box<dyn SelectOperator<G, F, C, A>>;
+pub type ReinsertOperatorAlias<G, F, C, A> = Box<dyn ReinsertOperator<G, F, C, A>>;

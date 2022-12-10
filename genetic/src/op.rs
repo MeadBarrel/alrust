@@ -1,17 +1,17 @@
 use crate::genetic::*;
 use crate::error::*;
+use crate::alias::*;
 
 pub trait MutateOperator<G> 
     where G: Genotype
 {
-    fn mutate(&mut self, genome: G) -> Result<G>;
+    fn mutate(&mut self, genome: &mut G) -> Result<G>;
 }
 
 
-pub trait SelectOperator<I>
-    where I: RankedIndividual
+pub trait SelectOperator<G, F, C, A>
 {
-    fn select_from(&mut self, individuals: Vec<I>) -> Result<Vec<I>>;
+    fn select_from(&mut self, individuals: RankedIndividuals<G, F, C, A>) -> Result<Matings<G>>;
 }
 
 
@@ -22,8 +22,7 @@ pub trait CrossoverOperator<G>
 }
 
 
-pub trait ReinsertOperator<I>
-    where I: Individual
+pub trait ReinsertOperator<G, F, C, A>
 {
-    fn reinsert(&mut self, individuals: Vec<I>) -> Result<Vec<I>>;
+    fn reinsert(&mut self, individuals: Individuals<G, F, C>, advantage_function: &AdvantageFunctionAlias<F, A>) -> Result<Individuals<G, F, C>>;
 }
