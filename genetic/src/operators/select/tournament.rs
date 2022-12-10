@@ -17,7 +17,7 @@ pub struct IndexedRank<A: Advantage> {
     pub advantage: A
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 #[serde(default)]
 pub struct TournamentConfig {
     tournament_size: usize,

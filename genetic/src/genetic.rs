@@ -1,14 +1,20 @@
-use serde::Serialize;
+use std::fmt::Debug;
 
-pub trait Genotype: Clone {}
-pub trait Fitness: Clone {}
-pub trait Constraint: Clone + Ord {}
-pub trait Advantage: Clone + Ord + Serialize {}
-pub trait Locus: Clone {}
+use serde::Serialize;
+use ordered_float::NotNan;
+
+pub trait Genotype: Clone + Debug {}
+pub trait Fitness: Clone + Debug {}
+pub trait Constraint: Clone + Debug + Ord {}
+pub trait Advantage: Clone + Debug + Ord + Serialize {}
+pub trait Locus: Clone + Debug {}
 
 pub type VectorEncoded<L> = Vec<L>;
 impl<L: Locus> Genotype for VectorEncoded<L> {}
 
+
+impl Constraint for NotNan<f64> {}
+impl Constraint for Vec<NotNan<f64>> {}
 
 pub trait FitnessFunction {
     type Genotype: Genotype;

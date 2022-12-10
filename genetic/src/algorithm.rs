@@ -66,10 +66,9 @@ impl<G, F, C, A> GeneticAlgorithm<G, F, C, A>
 
         let mut future_individuals = 
             Individuals::from_genomes(offspring, self.fitness_function.as_ref());
-        future_individuals.extend(self.population.clone());
 
         self.population = self.reinsert
-            .reinsert(future_individuals)?;
+            .reinsert(self.population.clone(), future_individuals)?;
         
         Ok(())
     }

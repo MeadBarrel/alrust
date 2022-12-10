@@ -12,7 +12,7 @@ pub trait Incubator {
     type Genotype: Genotype;
     type Phenotype: Serialize;
 
-    fn grow(&self, genome: Self::Genotype) -> Self::Phenotype;
+    fn grow(&self, genome: &Self::Genotype) -> Self::Phenotype;
 }
 
 
@@ -44,42 +44,4 @@ pub trait PopulationSerializer<A, S>
 
 pub trait PopulationHandler<G, F, C> {
     fn handle(&mut self, population: Individuals<G, F, C>, generation: usize) -> Result<()>;
-}
-
-
-
-pub struct PopulationToPrintable<G, F, C, A, I> 
-{
-    incubator: I,
-    genotype: PhantomData<G>,
-    phenotype: PhantomData<F>,
-    fitness: PhantomData<C>,
-    advantage: PhantomData<A>
-}
-
-
-impl<G, F, C, A, I> PopulationToPrintable<G, F, C, A, I> 
-    where
-        G: Genotype,
-        F: Fitness,
-        C: Constraint,
-        A: Advantage,
-        I: Incubator<Genotype = G>,
-{
-    pub fn new(incubator: I) -> Self {
-        Self {
-            incubator,
-            genotype: PhantomData,
-            phenotype: PhantomData,
-            fitness: PhantomData,
-            advantage: PhantomData,
-        }
-    }
-
-    pub fn grow(&self, population: &RankedIndividuals<G, F, C, A>) -> Vec<PrintableIndividual<A, I::Phenotype>> {
-        population.iter().map(
-            |x| PrintableIndividual::new(self.incubator.grow(x.individual.genotype.clone()), x.advantage.clone())
-        ).collect()
-    }
-
 }

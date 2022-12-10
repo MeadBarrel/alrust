@@ -1,5 +1,5 @@
-pub mod genetic;
-pub mod algorithm;
+mod genetic;
+mod algorithm;
 
 
 pub use genetic::*;

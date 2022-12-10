@@ -1,0 +1,6 @@
+output_every: 1000
+db_name: "../db.sqlite"
+
+desired_effects:
+   - MaximizeHOT
+   - MaximizeHL

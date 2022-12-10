@@ -24,5 +24,8 @@ pub trait CrossoverOperator<G>
 
 pub trait ReinsertOperator<G, F, C>
 {
-    fn reinsert(&mut self, individuals: Individuals<G, F, C>) -> Result<Individuals<G, F, C>>;
+    fn reinsert(
+        &mut self, 
+        current: Individuals<G, F, C>, 
+        offspring: Individuals<G, F, C>) -> Result<Individuals<G, F, C>>;
 }
