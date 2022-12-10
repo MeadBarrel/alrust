@@ -2,6 +2,11 @@ pub trait Genotype: Clone {}
 pub trait Fitness: Clone {}
 pub trait Constraint: Clone + Ord {}
 pub trait Advantage: Clone + Ord {}
+pub trait Locus: Clone {}
+
+pub type VectorEncoded<L> = Vec<L>;
+impl<L: Locus> Genotype for VectorEncoded<L> {}
+
 
 pub trait FitnessFunction {
     type Genotype: Genotype;

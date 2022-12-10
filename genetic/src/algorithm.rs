@@ -1,10 +1,18 @@
+use std::marker::PhantomData;
+
 use crate::alias::*;
 use crate::error::*;
 use crate::genetic::*;
-use crate::population;
 use crate::population::*;
+use crate::op::*;
+
+
+pub trait Types<G, F, C, A> {
+    type FitnessFunction: FitnessFunction<Genotype = G, Fitness = F, Constraint = C>;
+}
 
 pub struct GeneticAlgorithm<G, F, C, A> {
+
     fitness_function: Box<FitnessFunctionAlias<G, F, C>>,
     advantage_function: Box<AdvantageFunctionAlias<F, A>>,
     mutate: Box<MutateOperatorAlias<G>>,

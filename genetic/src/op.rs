@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::genetic::*;
 use crate::error::*;
 use crate::alias::*;

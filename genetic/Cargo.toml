@@ -10,6 +10,7 @@ serde = {version = "1.0.149", features = ["derive"]}
 thiserror = "1.0.37"
 error-stack = "0.2.4"
 ordered-float = "3.4.0"
+rand = {version="0.8.5", features=["small_rng"]}
 
 
 [dev-dependencies]
