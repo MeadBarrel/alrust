@@ -106,12 +106,10 @@ impl GAConfig {
 
 
     pub fn build(&self, grimoire: OptimizedGrimoir) -> Result<Box<dyn Algorithm<Item=Vec<AlchemyIndividual>>>> {
-        let mut rng_ = thread_rng();
-        let rng = RefCell::new(thread_rng());
+        let mut rng = thread_rng();
 
         let mutate = AlchemyMutator::new(
-            rng.clone(), 
-            grimoire.ingredients.len(), 
+            grimoire.ingredients.len(),
             self.mutate.amount_grow_ratio, 
             self.mutate.min_amount_grow,
             self.mutate.num_mutations_amt,
@@ -131,14 +129,14 @@ impl GAConfig {
             vec![constraint_function],
         );
 
-        let crossover = PrecedencePreservativeCrossover::new(self.num_children, rng.clone());
-        let select = TournamentSelector::new(self.tournament.clone(), rng.clone());
+        let crossover = PrecedencePreservativeCrossover::new(self.num_children);
+        let select = TournamentSelector::new(self.tournament.clone());
         let reinsert = ElitistReinserter::new(Box::new(ParettoAdvantageFunction::default()));
 
         let initial_pool = (0..self.population_size).into_iter()
-            .map(|_| random_genome(&mut rng_, &grimoire)).collect();
+            .map(|_| random_genome(&mut rng, &grimoire)).collect();
 
-        Ok(Box::new(create_alchemy_ga(fitness_function, mutate, crossover, select, reinsert, initial_pool)))
+        Ok(Box::new(create_alchemy_ga(fitness_function, mutate, crossover, select, reinsert, rng.clone(), initial_pool)))
     }
     fn scenario_from_de(&self, desired_effect: DesiredEffects) -> Box<dyn Scenario> {
         match desired_effect {

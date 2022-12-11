@@ -11,8 +11,7 @@ use crate::{
 use crate::error::Result;
 
 
-pub struct PrecedencePreservativeCrossover<R: Rng> {
-    rng: RefCell<R>,
+pub struct PrecedencePreservativeCrossover {
     num_children: usize,
 }
 
@@ -84,11 +83,10 @@ impl<L> CrossoverStateTrait for CrossoverState<L>
 }
 
 
-impl<R: Rng> PrecedencePreservativeCrossover<R>  {
-    pub fn new(num_children: usize, rng: RefCell<R>) -> Self {
+impl PrecedencePreservativeCrossover  {
+    pub fn new(num_children: usize) -> Self {
         Self {
             num_children,
-            rng,
         }
     }
 
@@ -138,26 +136,27 @@ impl<R: Rng> PrecedencePreservativeCrossover<R>  {
 }
 
 
-impl<L, R> CrossoverOperator<VectorEncoded<L>> for PrecedencePreservativeCrossover<R>
+impl<L> CrossoverOperator<VectorEncoded<L>> for PrecedencePreservativeCrossover
     where 
         L: Locus + Clone + Eq,
-        R: Rng
-{  
-    fn crossover(&mut self, parents: Vec<VectorEncoded<L>>) -> Result<Vec<VectorEncoded<L>>> {
+{
+    fn crossover<R: Rng>(
+        &mut self, parents: Vec<VectorEncoded<L>>, rng: &mut R) -> Result<Vec<VectorEncoded<L>>>
+    {
         let dna_size = parents[0].len();
         let num_parents = parents.len();
 
-        let selection_table = selection_table(&self.rng, dna_size, num_parents);
+        let selection_table = selection_table(rng, dna_size, num_parents);
         self.crossover_with_table(parents, selection_table)
     }
 
 }
 
 
-fn selection_table<R>(rng: &RefCell<R>, num_cols: usize, num_rows: usize) -> SelectionTable
+fn selection_table<R: Rng>(rng: &mut R, num_cols: usize, num_rows: usize) -> SelectionTable
     where R: Rng
 {
-    (0..num_cols).map(|_| rng.borrow_mut().gen_range(0..num_rows)).collect()
+    (0..num_cols).map(|_| rng.gen_range(0..num_rows)).collect()
 }
 
 
@@ -170,7 +169,7 @@ mod tests {
     #[test]
     fn test_precedence_preservative_crossover() {
         let rng = rand::thread_rng();
-        let mut op = PrecedencePreservativeCrossover::new(1, RefCell::new(rng));
+        let mut op = PrecedencePreservativeCrossover::new(1);
 
         let parents = vec![
             vec![0, 5, 9, 2, 6, 3, 4],

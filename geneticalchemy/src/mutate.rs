@@ -5,8 +5,7 @@ use crate::genetic::*;
 use genetic::{prelude::*, op::MutateOperator};
 
 
-pub struct AlchemyMutator<R: Rng> {
-    rng: RefCell<R>,
+pub struct AlchemyMutator {
     grimoire_size: usize,
     amount_grow_ratio: f64,
     min_amount_grow: u64,
@@ -15,10 +14,9 @@ pub struct AlchemyMutator<R: Rng> {
 }
 
 
-impl<R:Rng> AlchemyMutator<R> {
+impl AlchemyMutator {
     pub fn new(
-        rng: RefCell<R>, 
-        grimoire_size: usize, 
+        grimoire_size: usize,
         amount_grow_ratio: f64, 
         min_amount_grow: u64,
         num_mutations_amt: usize,
@@ -26,7 +24,6 @@ impl<R:Rng> AlchemyMutator<R> {
     ) -> Self 
     {
         Self {
-            rng,
             grimoire_size,
             amount_grow_ratio,
             min_amount_grow,
@@ -35,26 +32,26 @@ impl<R:Rng> AlchemyMutator<R> {
         }    
     }
 
-    fn mutate_ingredients(&mut self, genome: &mut AlchemyGenome) {
+    fn mutate_ingredients<R: Rng>(&mut self, genome: &mut AlchemyGenome, rng: &mut R) {
         let indices_to_mutate = (0..genome.len()).choose_multiple(
-            &mut *self.rng.borrow_mut(), self.num_mutations_ing);
+            rng, self.num_mutations_ing);
         for index in indices_to_mutate {
-            let new_ingredient = self.rng.borrow_mut().gen_range(0..self.grimoire_size);
+            let new_ingredient = rng.gen_range(0..self.grimoire_size);
             if genome.iter().any(|x| x.ingredient_index == new_ingredient) { continue; }
             genome[index].ingredient_index = new_ingredient;
         }
     }
 
-    fn mutate_amounts(&mut self, genome: &mut AlchemyGenome) {
+    fn mutate_amounts<R: Rng>(&mut self, genome: &mut AlchemyGenome, rng: &mut R) {
         let mut genes_to_mutate = genome.iter_mut().choose_multiple(
-            &mut *self.rng.borrow_mut(), self.num_mutations_amt);
+            rng, self.num_mutations_amt);
         for gene in genes_to_mutate {
             let current_amt = gene.amount;
             let delta: u64 = max(
                 self.min_amount_grow as u64, 
-                ((self.rng.borrow_mut().gen::<f64>() * current_amt as f64) * self.amount_grow_ratio) as u64
+                ((rng.gen::<f64>() * current_amt as f64) * self.amount_grow_ratio) as u64
             );
-            let reverse = self.rng.borrow_mut().gen_bool(0.5);
+            let reverse = rng.gen_bool(0.5);
             if reverse { gene.amount = gene.amount - min(gene.amount, delta) }
             else { gene.amount += delta }
         }        
@@ -62,10 +59,10 @@ impl<R:Rng> AlchemyMutator<R> {
 }
 
 
-impl<R:Rng> MutateOperator<AlchemyGenome> for AlchemyMutator<R> {
-    fn mutate(&mut self, genome: &mut AlchemyGenome) -> Result<()> {
-        self.mutate_ingredients(genome);
-        self.mutate_amounts(genome);
+impl MutateOperator<AlchemyGenome> for AlchemyMutator {
+    fn mutate<R: Rng>(&mut self, genome: &mut AlchemyGenome, rng: &mut R) -> Result<()> {
+        self.mutate_ingredients(genome, rng);
+        self.mutate_amounts(genome, rng);
         Ok(())
     }
 }

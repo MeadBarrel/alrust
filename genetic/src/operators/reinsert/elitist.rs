@@ -1,3 +1,4 @@
+use rand::Rng;
 use crate::{
     op::*,
     genetic::*,
@@ -27,10 +28,12 @@ impl<I, A> ReinsertOperator<I> for ElitistReinserter<I::Fitness, A>
         I: Individual,
         A: Advantage,
 {
-    fn reinsert(
+    fn reinsert<R: Rng>(
             &mut self, 
             mut current: Individuals<I>,
-            offspring: Individuals<I>) -> Result<Individuals<I>> {
+            offspring: Individuals<I>,
+            _: &mut R
+    ) -> Result<Individuals<I>> {
         let target_len = current.len();
         current.extend(offspring);
         let mut individuals_ranked= RankedIndividuals::<RankedIndividualStruct<I, A>>::from_population(
