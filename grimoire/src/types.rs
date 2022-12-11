@@ -2,7 +2,7 @@ use strum::EnumCount;
 use strum_macros::{EnumIter, EnumCount as EnumCountMacro};
 
 
-#[derive(Debug, Clone, Copy, EnumIter, EnumCountMacro)]
+#[derive(Debug, Clone, Copy, EnumIter, EnumCountMacro, Eq, PartialEq)]
 pub enum Property {
     DirectHealing = 0,
     DirectPoison = 1,

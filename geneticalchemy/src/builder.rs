@@ -18,6 +18,8 @@ use crate::fitness::*;
 use crate::genetic::*;
 use crate::mutate::*;
 use crate::incubator::*;
+use crate::scenario;
+use crate::scenario::*;
 
 
 
@@ -117,9 +119,11 @@ impl GAConfig {
         );
 
         let constraint_function = Box::new(DesiredVolumeConstraint::new(self.desired_volume));
-        let fitness_elements = self.desired_effects.iter().map(
-            |x| self.fitness_element_from_de(x.clone())
-        ).collect();
+        // let fitness_elements = self.desired_effects.iter().map(
+        //     |x| self.fitness_element_from_de(x.clone())
+        // ).collect();
+
+        let fitness_elements = self.create_scenarios().fitness_functions();
 
         let fitness_function = AlchemyFitnessFunction::new(
             grimoire.clone(),
@@ -136,21 +140,24 @@ impl GAConfig {
 
         Ok(create_alchemy_ga(fitness_function, mutate, crossover, select, reinsert, initial_pool))
     }
-
-    fn fitness_element_from_de(&self, desired_effect: DesiredEffects) -> Box<dyn AlchemyFitnessElement> {
+    fn scenario_from_de(&self, desired_effect: DesiredEffects) -> Box<dyn Scenario> {
         match desired_effect {
-            DesiredEffects::MaximizeDH => Box::new(AlchemyEffectFitness::new(Property::DirectHealing, false)),
-            DesiredEffects::MaximizeDP => Box::new(AlchemyEffectFitness::new(Property::DirectPoison, false)),
-            DesiredEffects::MaximizeHOT => Box::new(AlchemyEffectFitness::new(Property::HealingOverTime, false)),
-            DesiredEffects::MaximizePOT => Box::new(AlchemyEffectFitness::new(Property::PoisonOverTime, false)),
-            DesiredEffects::MaximizeHL => Box::new(AlchemyEffectFitness::new(Property::HealingLength, false)),
-            DesiredEffects::MaximizePL => Box::new(AlchemyEffectFitness::new(Property::PoisonLength, false)),
-            DesiredEffects::MaximizeA => Box::new(AlchemyEffectFitness::new(Property::Alcohol, false)),
+            DesiredEffects::MaximizeDH => Box::new(EffectScenario::new(Property::DirectHealing)),
+            DesiredEffects::MaximizeDP => Box::new(EffectScenario::new(Property::DirectPoison)),
+            DesiredEffects::MaximizeHOT => Box::new(EffectScenario::new(Property::HealingOverTime)),
+            DesiredEffects::MaximizeHL => Box::new(EffectScenario::new(Property::HealingLength)),
+            DesiredEffects::MaximizePOT => Box::new(EffectScenario::new(Property::PoisonOverTime)),
+            DesiredEffects::MaximizePL => Box::new(EffectScenario::new(Property::PoisonLength)),
+            DesiredEffects::MaximizeA => Box::new(EffectScenario::new(Property::Alcohol)),
         }
     }
 
     pub fn run(&self) -> Result<()> {
-        let grimoire_long = load_from_db(Path::new(&self.db_name).to_str().unwrap())?;
+        let mut grimoire_long = load_from_db(Path::new(&self.db_name).to_str().unwrap())?;
+        let scenarios = self.create_scenarios();
+        grimoire_long.ingredients.retain(|_, x| scenarios.should_include_ingredient(x));
+        // grimoire_long.ingredients = grimoire_long.ingredients.into_iter()
+        //     .filter(|(_, x)| scenarios.should_include_ingredient(x)).collect();
         let character = &grimoire_long.characters[&self.character_name];
         let grimoire = grimoire_long.create_reference(character);
 
@@ -161,7 +168,7 @@ impl GAConfig {
         create_dir_all("output")?;
 
         for (i, population) in ga.enumerate() {
-            if !(i % self.output_every == 0) { continue; }
+            if i % self.output_every != 0 { continue; }
             println!("{}", i);
 
             let mut ranked = RankedIndividuals::from_population(population, &advantage_function);
@@ -175,12 +182,18 @@ impl GAConfig {
                 )
             ).collect();
             
-            let mut folder = Path::new(&self.output_folder);
+            let folder = Path::new(&self.output_folder);
             let filename = format!("{}.yaml", i);
             let mut file = File::create(folder.join(&filename))?;
             to_writer(&mut file, &printable)?;
         };
 
         Ok(())
+    }
+
+    fn create_scenarios(&self) -> Scenarios {
+        Scenarios::new(
+            self.desired_effects.iter().map(|x| self.scenario_from_de(x.clone())).collect()
+        )
     }
 }
