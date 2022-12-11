@@ -105,7 +105,7 @@ impl GAConfig {
     }
 
 
-    pub fn build(&self, grimoire: OptimizedGrimoir) -> Result<AlchemyGA> {
+    pub fn build(&self, grimoire: OptimizedGrimoir) -> Result<Box<dyn Algorithm<Item=Vec<AlchemyIndividual>>>> {
         let mut rng_ = thread_rng();
         let rng = RefCell::new(thread_rng());
 
@@ -138,7 +138,7 @@ impl GAConfig {
         let initial_pool = (0..self.population_size).into_iter()
             .map(|_| random_genome(&mut rng_, &grimoire)).collect();
 
-        Ok(create_alchemy_ga(fitness_function, mutate, crossover, select, reinsert, initial_pool))
+        Ok(Box::new(create_alchemy_ga(fitness_function, mutate, crossover, select, reinsert, initial_pool)))
     }
     fn scenario_from_de(&self, desired_effect: DesiredEffects) -> Box<dyn Scenario> {
         match desired_effect {

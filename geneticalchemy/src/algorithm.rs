@@ -8,7 +8,9 @@ use genetic::prelude::*;
 
 
 //pub type AlchemyGA = GeneticAlgorithm<AlchemyGenome, ParettoFitness, AlchemyConstraint, ParettoAdvantage>;
-pub type AlchemyGA = GeneticAlgorithm<ParettoRankedIndividual<AlchemyGenome, AlchemyConstraint>>;
+pub type AlchemyIndividual = ParettoIndividual<AlchemyGenome, AlchemyConstraint>;
+pub type AlchemyRankedIndividual = ParettoRankedIndividual<AlchemyGenome, AlchemyConstraint>;
+pub type AlchemyGA<C, S, R, Rn> = ParettoGA<AlchemyRankedIndividual, AlchemyFitnessFunction, AlchemyMutator<Rn>, C, S, R>;
 
 pub fn create_alchemy_ga<C, S, R, Rn>
 (
@@ -18,19 +20,19 @@ pub fn create_alchemy_ga<C, S, R, Rn>
     select: S,
     reinsert: R,
     initial_pool: Vec<AlchemyGenome>,
-) -> AlchemyGA
+) -> AlchemyGA<C, S, R, Rn>
     where
         C: CrossoverOperator<AlchemyGenome> + 'static,
-        S: SelectOperator<ParettoRankedIndividual<AlchemyGenome, AlchemyConstraint>> + 'static,
-        R: ReinsertOperator<ParettoIndividual<AlchemyGenome, AlchemyConstraint>> + 'static,
+        S: SelectOperator<AlchemyRankedIndividual> + 'static,
+        R: ReinsertOperator<AlchemyIndividual> + 'static,
         Rn: Rng + 'static,
 {
     create_paretto_algorithm(
-        Box::new(fitness_function), 
-        Box::new(mutate), 
-        Box::new(crossover), 
-        Box::new(select), 
-        Box::new(reinsert), 
+        fitness_function,
+        mutate,
+        crossover,
+        select,
+        reinsert,
         initial_pool
     )
 }
