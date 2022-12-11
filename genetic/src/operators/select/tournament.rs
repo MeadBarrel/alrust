@@ -9,6 +9,7 @@ use crate::{
 
 use rand::prelude::*;
 use serde::Deserialize;
+use crate::prelude::{Individual, RankedIndividual};
 
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -91,21 +92,17 @@ impl<R: Rng> TournamentSelector<R>
 }
 
 
-impl<G, F, C, A, R> SelectOperator<G, F, C, A> for TournamentSelector<R>
-    where G: Genotype,
-          A: Advantage,
-          F: Fitness,
-          A: Advantage,
-          C: Constraint,
+impl<I, R> SelectOperator<I> for TournamentSelector<R>
+    where I: RankedIndividual,
           R: Rng
 {
-    fn select_from(&mut self, individuals: RankedIndividuals<G, F, C, A>) -> Result<Matings<G>> {
+    fn select_from(&mut self, individuals: RankedIndividuals<I>) -> Result<Matings<I::Genotype>> {
         let mut result = Vec::with_capacity(self.config.num_matings);
-        let mut indices_ranked: Vec<(usize, &A, &C)> = individuals
-            .iter().enumerate().map(|(i, c)| (i, &c.advantage, &c.individual.constraints)).collect();
+        let mut indices_ranked: Vec<(usize, &I::Advantage, &I::Constraint)> = individuals
+            .iter().enumerate().map(|(i, c)| (i, c.advantage(), c.individual().constraint())).collect();
 
         for _ in 0..self.config.num_matings {
-            let mut sample: Vec<&(usize, &A, &C)> = indices_ranked
+            let mut sample: Vec<&(usize, &I::Advantage, &I::Constraint)> = indices_ranked
                 .choose_multiple::<R>(&mut self.rng.borrow_mut(), self.config.tournament_size)
                 .collect();
 
@@ -119,7 +116,7 @@ impl<G, F, C, A, R> SelectOperator<G, F, C, A> for TournamentSelector<R>
             let parents = chosen_parents.into_iter().map(
                 |i| {
                     if self.config.remove_selected { indices_ranked.retain(|x| x.0 != i); };
-                    individuals[i].individual.genotype.clone()
+                    individuals[i].individual().genotype().clone()
                 }
             ).collect();
 

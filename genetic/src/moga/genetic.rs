@@ -10,7 +10,7 @@ pub type ParettoFitness = Features;
 impl Fitness for ParettoFitness {}
 
 
-#[derive(PartialEq, Eq, Clone, Debug, Serialize)]
+#[derive(Serialize, PartialEq, Eq, Clone, Debug)]
 pub struct ParettoAdvantage {
     rank: u64,
     #[serde(skip)]

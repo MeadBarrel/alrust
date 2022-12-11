@@ -4,6 +4,8 @@ use crate::{
     error::*,
     population::*, alias::{Individuals, AdvantageFunctionAlias, RankedIndividuals},
 };
+use crate::individual::{Individual, RankedIndividual, RankedIndividualStruct};
+use crate::prelude::IndividualStruct;
 
 
 pub struct ElitistReinserter<F, A> {
@@ -20,22 +22,20 @@ impl<F, A> ElitistReinserter<F, A> {
 }
 
 
-impl<G, F, C, A> ReinsertOperator<G, F, C> for ElitistReinserter<F, A>
+impl<I, A> ReinsertOperator<I> for ElitistReinserter<I::Fitness, A>
     where
-        G: Genotype,
-        F: Fitness,
-        C: Constraint,
+        I: Individual,
         A: Advantage,
 {
     fn reinsert(
             &mut self, 
-            mut current: Individuals<G, F, C>, 
-            offspring: Individuals<G, F, C>) -> Result<Individuals<G, F, C>> {
+            mut current: Individuals<I>,
+            offspring: Individuals<I>) -> Result<Individuals<I>> {
         let target_len = current.len();
         current.extend(offspring);
-        let mut individuals_ranked = RankedIndividuals::from_population(
+        let mut individuals_ranked= RankedIndividuals::<RankedIndividualStruct<I, A>>::from_population(
             current, self.advantage_function.as_ref());
-        individuals_ranked.sort_by_key(|x| (x.individual.constraints.clone(), x.advantage.clone()));
+        individuals_ranked.sort_by_key(|x| (x.individual().constraint().clone(), x.advantage.clone()));
         individuals_ranked.reverse();
         individuals_ranked.truncate(target_len);
         Ok(individuals_ranked.into_iter().map(|x| x.individual).collect())

@@ -42,6 +42,6 @@ pub trait PopulationSerializer<A, S>
 }
 
 
-pub trait PopulationHandler<G, F, C> {
-    fn handle(&mut self, population: Individuals<G, F, C>, generation: usize) -> Result<()>;
+pub trait PopulationHandler<I> {
+    fn handle(&mut self, population: Individuals<I>, generation: usize) -> Result<()>;
 }

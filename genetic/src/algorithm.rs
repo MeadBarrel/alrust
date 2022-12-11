@@ -1,41 +1,38 @@
 use crate::alias::*;
 use crate::error::*;
 use crate::genetic::*;
+use crate::individual::{Individual, RankedIndividual};
 use crate::population::*;
 
 
-pub trait Types<G, F, C, A> {
-    type FitnessFunction: FitnessFunction<Genotype = G, Fitness = F, Constraint = C>;
-}
-
-pub struct GeneticAlgorithm<G, F, C, A> {
-
-    fitness_function: Box<FitnessFunctionAlias<G, F, C>>,
-    advantage_function: Box<AdvantageFunctionAlias<F, A>>,
-    mutate: Box<MutateOperatorAlias<G>>,
-    crossover: Box<CrossoverOperatorAlias<G>>,
-    select: Box<SelectOperatorAlias<G, F, C, A>>,
-    reinsert: Box<ReinsertOperatorAlias<G, F, C>>,
-
-    population: Individuals<G, F, C>,
-}
-
-
-impl<G, F, C, A> GeneticAlgorithm<G, F, C, A> 
+pub struct GeneticAlgorithm<I>
     where
-        G: Genotype,
-        F: Fitness,
-        C: Constraint,
-        A: Advantage
+        I: RankedIndividual,
+{
+
+    fitness_function: Box<FitnessFunctionAlias<I::Genotype, I::Fitness, I::Constraint>>,
+    advantage_function: Box<AdvantageFunctionAlias<I::Fitness, I::Advantage>>,
+    mutate: Box<MutateOperatorAlias<I::Genotype>>,
+    crossover: Box<CrossoverOperatorAlias<I::Genotype>>,
+    select: Box<SelectOperatorAlias<I>>,
+    reinsert: Box<ReinsertOperatorAlias<I::Individual>>,
+
+    population: Individuals<I::Individual>,
+}
+
+
+impl<I> GeneticAlgorithm<I>
+    where
+        I: RankedIndividual,
 {
     pub fn new(
-        fitness_function: Box<FitnessFunctionAlias<G, F, C>>,
-        advantage_function: Box<AdvantageFunctionAlias<F, A>>,
-        mutate: Box<MutateOperatorAlias<G>>,
-        crossover: Box<CrossoverOperatorAlias<G>>,
-        select: Box<SelectOperatorAlias<G, F, C, A>>,
-        reinsert: Box<ReinsertOperatorAlias<G, F, C>>,
-        initial_pool: Vec<G>,
+        fitness_function: Box<FitnessFunctionAlias<I::Genotype, I::Fitness, I::Constraint>>,
+        advantage_function: Box<AdvantageFunctionAlias<I::Fitness, I::Advantage>>,
+        mutate: Box<MutateOperatorAlias<I::Genotype>>,
+        crossover: Box<CrossoverOperatorAlias<I::Genotype>>,
+        select: Box<SelectOperatorAlias<I>>,
+        reinsert: Box<ReinsertOperatorAlias<I::Individual>>,
+        initial_pool: Vec<I::Genotype>,
     ) -> Self {
         let population = Individuals::from_genomes(initial_pool, fitness_function.as_ref());
         Self {
@@ -75,14 +72,11 @@ impl<G, F, C, A> GeneticAlgorithm<G, F, C, A>
 }
 
 
-impl<G, F, C, A> Iterator for GeneticAlgorithm<G, F, C, A> 
+impl<I> Iterator for GeneticAlgorithm<I>
     where
-        G: Genotype,
-        F: Fitness,
-        C: Constraint,
-        A: Advantage
+        I: RankedIndividual,
 {
-    type Item = Individuals<G, F, C>;
+    type Item = Individuals<I::Individual>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.advance_evolution().unwrap();

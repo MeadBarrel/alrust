@@ -171,8 +171,8 @@ impl GAConfig {
             if i % self.output_every != 0 { continue; }
             println!("{}", i);
 
-            let mut ranked = RankedIndividuals::from_population(population, &advantage_function);
-            ranked.sort_by_key(|x| x.advantage.clone());
+            let mut ranked = RankedIndividuals::<ParettoRankedIndividual<AlchemyGenome, AlchemyConstraint>>::from_population(population, &advantage_function);
+            ranked.sort_by_key(|x| x.advantage().clone());
             ranked.reverse();
             println!("{:?}", ranked[0].clone());
             println!("{:?}", incubator.grow(&ranked[0].individual.genotype));
