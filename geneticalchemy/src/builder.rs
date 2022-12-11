@@ -5,7 +5,7 @@ use std::borrow::BorrowMut;
 use std::cmp::min;
 use std::cell::RefCell;
 use std::fs::create_dir_all;
-use genetic::alias::RankedIndividuals;
+use genetic::alias::{Individuals, RankedIndividuals};
 use rand::prelude::*;
 use anyhow::Result;
 use serde_yaml::{from_reader, to_writer};
@@ -165,11 +165,14 @@ impl GAConfig {
 
         create_dir_all("output")?;
 
+        //let z: Vec<Individuals<ParettoIndividual<AlchemyGenome, AlchemyConstraint>>> = ga.map(|x| x.clone()).collect();
+        //for i in ga.cloned().rank(ParettoAdvantageFunction::default()) {};
         for (i, population) in ga.enumerate() {
             if i % self.output_every != 0 { continue; }
             println!("{}", i);
 
-            let mut ranked = RankedIndividuals::<ParettoRankedIndividual<AlchemyGenome, AlchemyConstraint>>::from_population(population, &advantage_function);
+            //let mut ranked = RankedIndividuals::<ParettoRankedIndividual<AlchemyGenome, AlchemyConstraint>>::from_population(population, &advantage_function);
+            let mut ranked = population.ranked(&advantage_function);
             ranked.sort_by_key(|x| x.advantage().clone());
             ranked.reverse();
             println!("{:?}", ranked[0].clone());
