@@ -1,7 +1,7 @@
 //! The PrecedencePreservativeCrossover struct is a type of genetic operator that is used to combine
 //! the genetic material of multiple parent individuals to produce new offspring.
 //! `num_children` specifies the number of children that will be produced by the crossover operation.
-//! The algorithm  that the resulting child's genome will have non-repeating genes.
+//! The algorithm ensures that the resulting child's genome will have non-repeating genes.
 //!
 //! This is accomplished by first creating a selection_table that specifies which parent's genetic
 //! material should be used at each position in the child's genome.
