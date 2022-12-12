@@ -40,6 +40,18 @@ pub struct Character {
 }
 
 
+impl Default for Character {
+    fn default() -> Self {
+        Self {
+            name: "noname".to_string(),
+            lore_values: HashMap::default(),
+            advanced_potion_making: 100,
+            alvarin_clade: true,
+        }
+    }
+}
+
+
 impl Character {
     pub fn get_lore_value(&self, name: &str) -> u8 {
         let default = 0;

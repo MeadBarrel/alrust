@@ -26,6 +26,7 @@ impl Incubator for AlchemyIncubator {
                 gene.amount
             )).collect(),
             advanced_potion_making_mod: self.grimoire.advanced_potion_making_mod,
+            alvarin_clade: false,
         };
 
         PotionSerializable::from_mix(&mix)

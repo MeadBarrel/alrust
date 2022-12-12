@@ -7,7 +7,23 @@ use crate::types::*;
 #[derive(Debug, Clone)]
 pub struct Mix {
     pub ingredients: Vec<(Ingredient, u64)>,
-    pub advanced_potion_making_mod: f64
+    pub advanced_potion_making_mod: f64,
+    pub alvarin_clade: bool,
+}
+
+
+impl Mix {
+    pub fn new(
+        advanced_potion_making_mod: f64,
+        alvarin_clade: bool,
+        ingredients: Vec<(Ingredient, u64)>
+    ) -> Self {
+        Self {
+            advanced_potion_making_mod,
+            alvarin_clade,
+            ingredients
+        }
+    }
 }
 
 
@@ -56,7 +72,7 @@ mod tests {
     #[test]
     fn test_mix_dh() {
         let reference = load_data();
-        let mix = Mix { advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
+        let mix = Mix { alvarin_clade:false, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
 
         let expected = 6.5;
         let actual = mix_effect(&mix, Property::DirectHealing);
@@ -67,7 +83,7 @@ mod tests {
     #[test]
     fn test_mix_effects() {
         let reference = load_data();
-        let mix = Mix { advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
+        let mix = Mix { alvarin_clade: false, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
         let actual = mix_effects(&mix);
 
         assert!( approx_eq!(f64, actual[Property::DirectHealing as usize], 6.5, epsilon=0.01) );
@@ -85,7 +101,7 @@ mod tests {
     ]
     fn test_mix_volume() {
         let reference = load_data();
-        let mix = Mix { advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
+        let mix = Mix { alvarin_clade: false, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
         let actual = mix_volume(&mix);
 
         assert!( approx_eq!(f64, actual, 10., epsilon=0.01) );

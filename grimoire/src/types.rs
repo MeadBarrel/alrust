@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use strum::EnumCount;
 use strum_macros::{EnumIter, EnumCount as EnumCountMacro};
 
@@ -32,6 +33,29 @@ pub fn create_modifier_map(modifiers: &Vec<(Property, Modifier)>) -> ModifierMap
     }
 
     modifier_map
+}
+
+
+pub fn take_modifier(modifiers: &mut Vec<(Property, Modifier)>, property: Property) -> Modifier {
+    let found = modifiers.into_iter().enumerate().find(|(i, m)| m.0 == property);
+    match found {
+        Some((i,x)) => modifiers.remove(i).1,
+        None => Modifier::default()
+    }
+}
+
+
+pub fn replace_modifier_mod(modifiers: &mut Vec<(Property, Modifier)>, property: Property, modifier: f64) {
+    let mut old = take_modifier(modifiers, property);
+    old.modifier = modifier;
+    modifiers.push((property, old));
+}
+
+
+pub fn replace_modifier_mul(modifiers: &mut Vec<(Property, Modifier)>, property: Property, multiplier: f64) {
+    let mut old = take_modifier(modifiers, property);
+    old.multiplier = multiplier;
+    modifiers.push((property, old));
 }
 
 
