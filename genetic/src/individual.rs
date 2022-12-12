@@ -1,6 +1,3 @@
-use std::marker::PhantomData;
-use serde::Serialize;
-
 use crate::alias::*;
 use crate::genetic::*;
 
@@ -190,7 +187,6 @@ impl<I, A> RankedIndividual for RankedIndividualStruct<I, A>
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    use crate::genetic::*;
 
     impl Constraint for Vec<u32> {}
     impl Fitness for u32 {}
@@ -221,11 +217,11 @@ pub mod tests {
         let fitness = 10;
         let constraints = vec![1, 0, 1];
 
-        let individual = IndividualStruct::new(genotype.clone(), fitness.clone(), constraints.clone());
+        let individual = IndividualStruct::new(genotype.clone(), fitness, constraints.clone());
 
-        assert_eq!(individual.genotype.clone(), genotype);
-        assert_eq!(individual.fitness.clone(), fitness);
-        assert_eq!(individual.constraints.clone(), constraints);
+        assert_eq!(individual.genotype, genotype);
+        assert_eq!(individual.fitness, fitness);
+        assert_eq!(individual.constraints, constraints);
     }
 
     #[test]
@@ -234,7 +230,7 @@ pub mod tests {
         let fitness = 10;
         let constraints = vec![1, 0, 1];
         let fitness_function = TestFitnessFunction {
-            expected_fitness: fitness.clone(),
+            expected_fitness: fitness,
             expected_constraints: constraints.clone(),
         };
 

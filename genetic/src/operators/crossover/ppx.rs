@@ -171,16 +171,22 @@ mod tests {
         let rng = rand::thread_rng();
         let mut op = PrecedencePreservativeCrossover::new(1);
 
+        // Create two parent sequences
         let parents = vec![
             vec![0, 5, 9, 2, 6, 3, 4],
             vec![0, 1, 2, 5, 4, 7, 6],
         ];
 
+        // Create a selection table indicating which parent element to choose at each index
         let selection_table = vec![0, 1, 1, 0, 1, 1, 0];
 
+        // Calculate the expected output sequence
         let expected = vec![0, 1, 2, 9, 4, 7, 3];
+
+        // Perform the crossover operation and retrieve the resulting sequence
         let actual = op.crossover_with_table(parents, selection_table).unwrap().remove(0);
-        
+
+        // Check that the expected and actual sequences match
         assert_eq!( expected, actual );
     }
 
