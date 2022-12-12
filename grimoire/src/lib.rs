@@ -3,6 +3,7 @@ pub mod optimized;
 pub mod types;
 pub mod mix;
 pub mod sqlite;
+pub mod serializable;
 
 
 pub mod prelude {
@@ -11,4 +12,5 @@ pub mod prelude {
     pub use super::types::*;
     pub use super::mix::*;
     pub use super::sqlite::*;
+    pub use super::serializable::*;
 }

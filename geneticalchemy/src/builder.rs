@@ -172,7 +172,7 @@ impl GAConfig {
             ranked.reverse();
             println!("{:?}", ranked[0].clone());
             println!("{:?}", incubator.grow(&ranked[0].individual.genotype));
-            let printable: Vec<PrintableIndividual<ParettoAdvantage, AlchemyPhenotype>> = ranked.into_iter().map(
+            let printable: Vec<PrintableIndividual<ParettoAdvantage, PotionSerializable>> = ranked.into_iter().map(
                 |x| PrintableIndividual::new(
                     incubator.grow(&x.individual.genotype), x.advantage.clone()
                 )

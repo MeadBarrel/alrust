@@ -11,6 +11,7 @@ error-stack = "0.2.4"
 strum = "0.24.1"
 strum_macros = "0.24.3"
 rusqlite = { version = "0.28.0", features = ["bundled"] }
+serde = {version = "1.0.149", features = ["derive"]}
 
 [dev-dependencies]
 float-cmp = "0.9.0"
