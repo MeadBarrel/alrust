@@ -39,6 +39,7 @@ desired_effects:
 ```
 
 The list of possible objectives are:
+
     - MaximizeDH
     - MaximizeDP
     - MaximizeHOT
