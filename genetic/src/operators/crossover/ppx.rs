@@ -1,3 +1,29 @@
+//! The PrecedencePreservativeCrossover struct is a type of genetic operator that is used to combine
+//! the genetic material of multiple parent individuals to produce new offspring.
+//! `num_children` specifies the number of children that will be produced by the crossover operation.
+//! The algorithm  that the resulting child's genome will have non-repeating genes.
+//!
+//! This is accomplished by first creating a selection_table that specifies which parent's genetic
+//! material should be used at each position in the child's genome.
+//!
+//! The selection_table is created by randomly selecting a parent for each position in the child's
+//! genome. Once the selection_table has been created, the crossover method iterates over each
+//! position in the child's genome and uses the select_gene method to select the genetic material
+//! to be used at that position. The select_gene method uses the selection_table to determine which
+//! parent's genetic material should be used at the current position, and then selects the gene from
+//! that parent using a precedence-preserving crossover strategy. This means that the select_gene
+//! method will prioritize selecting genetic material from the parent specified in the
+//! selection_table for the current position, but if that parent does not have any genetic material
+//! available at that position (because the gene has already been used in the child's genome), the
+//! select_gene method will search to the left in the selection_table to find another parent that
+//! does have genetic material available at that position. This process continues until a gene is
+//! found, and that gene is then used in the child's genome. This process is repeated for each
+//! position in the child's genome, resulting in a new child individual with a genome that is a
+//! combination of the genetic material of the parent individuals, and where each gene in the
+//! child's genome is unique and not repeated.
+//!
+//! Note: Each parent must have non-repeating genes, otherwise the algorithm will likely fail.
+
 use std::cell::*;
 
 use rand::Rng;
@@ -12,7 +38,10 @@ use crate::error::Result;
 
 
 pub struct PrecedencePreservativeCrossover {
+
+    /// Number of children produced by the algorithm
     num_children: usize,
+
 }
 
 
