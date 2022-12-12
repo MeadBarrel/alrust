@@ -154,8 +154,6 @@ impl GAConfig {
         let mut grimoire_long = load_from_db(Path::new(&self.db_name).to_str().unwrap())?;
         let scenarios = self.create_scenarios();
         grimoire_long.ingredients.retain(|_, x| scenarios.should_include_ingredient(x));
-        // grimoire_long.ingredients = grimoire_long.ingredients.into_iter()
-        //     .filter(|(_, x)| scenarios.should_include_ingredient(x)).collect();
         let character = &grimoire_long.characters[&self.character_name];
         let grimoire = grimoire_long.create_reference(character);
 
@@ -165,13 +163,10 @@ impl GAConfig {
 
         create_dir_all("output")?;
 
-        //let z: Vec<Individuals<ParettoIndividual<AlchemyGenome, AlchemyConstraint>>> = ga.map(|x| x.clone()).collect();
-        //for i in ga.cloned().rank(ParettoAdvantageFunction::default()) {};
         for (i, population) in ga.enumerate() {
             if i % self.output_every != 0 { continue; }
             println!("{}", i);
 
-            //let mut ranked = RankedIndividuals::<ParettoRankedIndividual<AlchemyGenome, AlchemyConstraint>>::from_population(population, &advantage_function);
             let mut ranked = population.ranked(&advantage_function);
             ranked.sort_by_key(|x| x.advantage().clone());
             ranked.reverse();
