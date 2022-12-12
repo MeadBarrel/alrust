@@ -185,3 +185,65 @@ impl<I, A> RankedIndividual for RankedIndividualStruct<I, A>
     }
 
 }
+
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+    use crate::genetic::*;
+
+    impl Constraint for Vec<u32> {}
+    impl Fitness for u32 {}
+    impl Locus for u32 {}
+
+    struct TestFitnessFunction {
+        expected_fitness: u32,
+        expected_constraints: Vec<u32>,
+    }
+
+    impl FitnessFunction for TestFitnessFunction {
+        type Genotype = Vec<u32>;
+        type Constraint = Vec<u32>;
+        type Fitness = u32;
+        
+        fn fitness(&self, _genome: &Vec<u32>) -> u32 {
+            self.expected_fitness
+        }
+
+        fn constraint(&self, _genome: &Vec<u32>) -> Vec<u32> {
+            self.expected_constraints.clone()
+        }
+    }
+
+    #[test]
+    fn test_individual_struct_new() {
+        let genotype = vec![1, 2, 3];
+        let fitness = 10;
+        let constraints = vec![1, 0, 1];
+
+        let individual = IndividualStruct::new(genotype.clone(), fitness.clone(), constraints.clone());
+
+        assert_eq!(individual.genotype.clone(), genotype);
+        assert_eq!(individual.fitness.clone(), fitness);
+        assert_eq!(individual.constraints.clone(), constraints);
+    }
+
+    #[test]
+    fn test_individual_struct_from_genome() {
+        let genotype = vec![1, 2, 3];
+        let fitness = 10;
+        let constraints = vec![1, 0, 1];
+        let fitness_function = TestFitnessFunction {
+            expected_fitness: fitness.clone(),
+            expected_constraints: constraints.clone(),
+        };
+
+        let individual = IndividualStruct::from_genome(
+            genotype.clone(), &fitness_function);
+
+        assert_eq!(individual.genotype, genotype);
+        assert_eq!(individual.fitness, fitness);
+        assert_eq!(individual.constraints, constraints);
+    }
+
+}
