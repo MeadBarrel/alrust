@@ -105,7 +105,7 @@ impl Compendium {
     pub fn get_lore_multiplier(&self, character: &Character, lore: &str) -> f64 {
         let lore_effectiveness = match self.lores.get(lore) {
             Some(x) => x.effectiveness,
-            None => 1.66666,
+            None => 0.66666,
         };
         1. + lore_effectiveness * self.get_lore_value(character, &lore) as f64 / 100.
     }

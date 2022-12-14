@@ -5,6 +5,7 @@ use std::borrow::BorrowMut;
 use std::cmp::min;
 use std::cell::RefCell;
 use std::fs::create_dir_all;
+use error_stack::ResultExt;
 use genetic::alias::{Individuals, RankedIndividuals};
 use rand::prelude::*;
 use anyhow::Result;
@@ -61,7 +62,7 @@ pub struct GAConfig {
     pub db_name: String,
     pub character_name: String,
     pub mutate: MutatorConfig,
-    pub tournament: TournamentConfig,
+    pub tournament: TournamentSelector,
     pub population_size: u64,
     pub output_every: usize,
     pub output_folder: String,
@@ -77,7 +78,7 @@ impl Default for GAConfig {
             db_name: "db.sqlite".to_string(),
             character_name: "default".to_string(),
             mutate: MutatorConfig::default(),
-            tournament: TournamentConfig::default(),
+            tournament: TournamentSelector::default(),
             population_size: 100,
             output_every: 1000,
             output_folder: "output".to_string(),
@@ -105,7 +106,7 @@ impl GAConfig {
     }
 
 
-    pub fn build(&self, grimoire: OptimizedGrimoir) -> Result<Box<dyn Algorithm<Item=Vec<AlchemyIndividual>>>> {
+    pub fn build(&self, grimoire: OptimizedGrimoir) -> Result<Box<dyn Algorithm<Population=ParettoPopulation<AlchemyIndividual>>>> {
         let mut rng = thread_rng();
 
         let mutate = AlchemyMutator::new(
@@ -116,7 +117,6 @@ impl GAConfig {
             self.mutate.num_mutations_ing,
         );
 
-        let constraint_function = Box::new(DesiredVolumeConstraint::new(self.desired_volume));
         // let fitness_elements = self.desired_effects.iter().map(
         //     |x| self.fitness_element_from_de(x.clone())
         // ).collect();
@@ -126,17 +126,16 @@ impl GAConfig {
         let fitness_function = AlchemyFitnessFunction::new(
             grimoire.clone(),
             fitness_elements,
-            vec![constraint_function],
+            self.desired_volume,
         );
 
         let crossover = PrecedencePreservativeCrossover::new(self.num_children);
-        let select = TournamentSelector::new(self.tournament.clone());
-        let reinsert = ElitistReinserter::new(Box::new(ParettoAdvantageFunction::default()));
+        let reinsert = ElitistReinserter::default();
 
         let initial_pool = (0..self.population_size).into_iter()
             .map(|_| random_genome(&mut rng, &grimoire)).collect();
 
-        Ok(Box::new(create_alchemy_ga(fitness_function, mutate, crossover, select, reinsert, rng.clone(), initial_pool)))
+        Ok(Box::new(create_alchemy_ga(fitness_function, mutate, crossover, self.tournament.clone(), reinsert, rng.clone(), initial_pool)))
     }
     fn scenario_from_de(&self, desired_effect: DesiredEffects) -> Box<dyn Scenario> {
         match desired_effect {
@@ -157,34 +156,33 @@ impl GAConfig {
         let character = &grimoire_long.characters[&self.character_name];
         let grimoire = grimoire_long.create_reference(character);
 
-        let ga = self.build(grimoire.clone())?;
-        let advantage_function = ParettoAdvantageFunction::default();
+        let mut ga = self.build(grimoire.clone())?;
         let incubator = AlchemyIncubator::new(grimoire);
 
         create_dir_all("output")?;
 
-        for (i, population) in ga.enumerate() {
+        let mut i = 0;
+
+        loop {
+            i += 1;
+            ga.advance_evolution().unwrap();
+
             if i % self.output_every != 0 { continue; }
             println!("{}", i);
-
-            let mut ranked = population.ranked(&advantage_function);
-            ranked.sort_by_key(|x| x.advantage().clone());
-            ranked.reverse();
-            println!("{:?}", ranked[0].clone());
-            println!("{:?}", incubator.grow(&ranked[0].individual.genotype));
-            let printable: Vec<PrintableIndividual<ParettoAdvantage, PotionSerializable>> = ranked.into_iter().map(
-                |x| PrintableIndividual::new(
-                    incubator.grow(&x.individual.genotype), x.advantage.clone()
-                )
-            ).collect();
             
+            let mut population = ga.last_population();
+            population.sort();
+
+            let phenotypes: Vec<PotionSerializable> = population.into_iter().map(|i| incubator.grow(i.genotype())).collect();
+
             let folder = Path::new(&self.output_folder);
             let filename = format!("{}.yaml", i);
             let mut file = File::create(folder.join(&filename))?;
-            to_writer(&mut file, &printable)?;
-        };
+            to_writer(&mut file, &phenotypes)?;            
+        }   
 
         Ok(())
+
     }
 
     fn create_scenarios(&self) -> Scenarios {

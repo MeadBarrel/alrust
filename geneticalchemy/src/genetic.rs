@@ -1,3 +1,4 @@
+use grimoire::prelude::mix_volume;
 use ordered_float::NotNan;
 
 use genetic::prelude::*;
@@ -37,7 +38,7 @@ pub trait AlchemyFitnessElement {
 
 pub struct AlchemyFitnessFunction {
     elements: Vec<Box<dyn AlchemyFitnessElement>>,
-    constraints: Vec<Box<dyn AlchemyFitnessElement>>,
+    desired_volume: f64,
     grimoire: OptimizedGrimoir,
 }
 
@@ -46,9 +47,9 @@ impl AlchemyFitnessFunction {
     pub fn new(
         grimoire: OptimizedGrimoir,
         elements: Vec<Box<dyn AlchemyFitnessElement>>,
-        constraints: Vec<Box<dyn AlchemyFitnessElement>>,
+        desired_volume: f64,
     ) -> Self {
-        Self { grimoire, elements, constraints }
+        Self { grimoire, elements, desired_volume }
     }
 
     fn get_mix(&self, genome: &AlchemyGenome) -> Mix {
@@ -67,16 +68,16 @@ impl AlchemyFitnessFunction {
 impl FitnessFunction for AlchemyFitnessFunction {
     type Genotype = AlchemyGenome;
     type Fitness = AlchemyFitness;
-    type Constraint = AlchemyConstraint;
 
     fn fitness(&self, genome: &Self::Genotype) -> Self::Fitness {
         let mix = self.get_mix(genome);
-        self.elements.iter().map(|element| element.fitness(&mix)).collect()
+        self.elements.iter().map(
+            |element| NotNan::new(element.fitness(&mix)).unwrap()
+        ).collect()
     }
 
-    fn constraint(&self, genome: &Self::Genotype) -> Self::Constraint {
+    fn constraint(&self, genome: &Self::Genotype) -> Constraint {
         let mix = self.get_mix(genome);
-        self.constraints.iter().map(
-            |element| element.fitness(&mix)).map(|x| NotNan::new(x).unwrap()).collect()
+        NotNan::new(-(mix_volume(&mix) - self.desired_volume).abs()).unwrap()
     }
 }

@@ -3,7 +3,7 @@ use rand::prelude::Rng;
 use crate::genetic::*;
 use crate::error::*;
 use crate::alias::*;
-use crate::individual::{Individual, RankedIndividual};
+use crate::population::Population;
 
 
 /// The trait defines a type of interface for types that can mutate a `Genotype`.
@@ -30,32 +30,27 @@ pub trait MutateOperator<G>
 }
 
 
-pub trait SelectOperator<I>
-    where
-        I: RankedIndividual,
+pub trait SelectOperator
 {
-    fn select_from<R: Rng>(
-        &mut self, individuals: RankedIndividuals<I>, rng: &mut R) -> Result<Matings<I::Genotype>>;
+    fn select_from<P: Population, R: Rng>(
+        &mut self, population: P, rng: &mut R) -> Result<Matings<P::Genotype>>;
 }
 
 
-pub trait CrossoverOperator<G>
-    where G: Genotype
+pub trait CrossoverOperator<G: Genotype>
 {
     fn crossover<R: Rng>(&mut self, genomes: Vec<G>, rng: &mut R) -> Result<Vec<G>>;
 }
 
 
-pub trait ReinsertOperator<I>
-    where
-        I: Individual
+pub trait ReinsertOperator
 {
-    fn reinsert<R>(
+    fn reinsert<R, P: Population>(
         &mut self, 
-        current: Individuals<I>,
-        offspring: Individuals<I>,
+        current: P,
+        offspring: P,
         rng: &mut R,
-    ) -> Result<Individuals<I>>
+    ) -> Result<P>
     where
         R: Rng,
     ;

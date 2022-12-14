@@ -1,6 +1,5 @@
-mod genetic;
 mod algorithm;
+mod population;
 
-
-pub use genetic::*;
 pub use algorithm::*;
+pub use population::*;

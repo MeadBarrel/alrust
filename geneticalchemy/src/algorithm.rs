@@ -7,10 +7,9 @@ use genetic::op::SelectOperator;
 use genetic::prelude::*;
 
 
-//pub type AlchemyGA = GeneticAlgorithm<AlchemyGenome, ParettoFitness, AlchemyConstraint, ParettoAdvantage>;
-pub type AlchemyIndividual = ParettoIndividual<AlchemyGenome, AlchemyConstraint>;
-pub type AlchemyRankedIndividual = ParettoRankedIndividual<AlchemyGenome, AlchemyConstraint>;
-pub type AlchemyGA<C, S, R, RNG> = ParettoGA<AlchemyRankedIndividual, AlchemyFitnessFunction, AlchemyMutator, C, S, R, RNG>;
+pub type AlchemyIndividual = ParettoIndividual<AlchemyGenome>;
+pub type AlchemyGA<C, S, R, RNG> = ParettoGA<AlchemyIndividual, AlchemyFitnessFunction, AlchemyMutator, C, S, R, RNG>;
+
 
 pub fn create_alchemy_ga<C, S, R, RNG>
 (
@@ -24,8 +23,8 @@ pub fn create_alchemy_ga<C, S, R, RNG>
 ) -> AlchemyGA<C, S, R, RNG>
     where
         C: CrossoverOperator<AlchemyGenome> + 'static,
-        S: SelectOperator<AlchemyRankedIndividual> + 'static,
-        R: ReinsertOperator<AlchemyIndividual> + 'static,
+        S: SelectOperator + 'static,
+        R: ReinsertOperator + 'static,
         RNG: Rng + 'static,
 {
     create_paretto_algorithm(
