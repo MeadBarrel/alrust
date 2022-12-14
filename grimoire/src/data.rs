@@ -31,6 +31,17 @@ pub struct Ingredient {
 }
 
 
+impl Ingredient {
+    pub fn get_modifier(&self, property: Property) -> Modifier {
+        let modifier = self.modifiers.iter().find(|(x, _)| *x == property);
+        match modifier {
+            Some((_, m)) => *m,
+            None => Modifier { modifier: 0., multiplier: 0. }
+        }
+    }
+}
+
+
 #[derive(Debug, Clone)]
 pub struct Character {
     pub name: String,

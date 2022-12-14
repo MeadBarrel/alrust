@@ -9,5 +9,7 @@ mutate:
    num_mutations_ing: 2
 
 desired_effects:
-   - MaximizeHOT
-   - MaximizeHL
+   - hot
+   - hl
+
+include_ingredients: hot > 0 || mhot > 0 || hl > 0 || mhl > 0
