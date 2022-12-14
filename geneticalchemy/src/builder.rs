@@ -24,8 +24,6 @@ use crate::fitness::*;
 use crate::genetic::*;
 use crate::mutate::*;
 use crate::incubator::*;
-use crate::scenario;
-use crate::scenario::*;
 use crate::genetic::*;
 
 
@@ -156,17 +154,6 @@ impl GAConfig {
                 )
             )
         )
-    }
-    fn scenario_from_de(&self, desired_effect: DesiredEffects) -> Box<dyn Scenario> {
-        match desired_effect {
-            DesiredEffects::MaximizeDH => Box::new(EffectScenario::new(Property::DirectHealing)),
-            DesiredEffects::MaximizeDP => Box::new(EffectScenario::new(Property::DirectPoison)),
-            DesiredEffects::MaximizeHOT => Box::new(EffectScenario::new(Property::HealingOverTime)),
-            DesiredEffects::MaximizeHL => Box::new(EffectScenario::new(Property::HealingLength)),
-            DesiredEffects::MaximizePOT => Box::new(EffectScenario::new(Property::PoisonOverTime)),
-            DesiredEffects::MaximizePL => Box::new(EffectScenario::new(Property::PoisonLength)),
-            DesiredEffects::MaximizeA => Box::new(EffectScenario::new(Property::Alcohol)),
-        }
     }
 
     pub fn should_include_ingredient(&self, ingredient: &Ingredient) -> Result<bool> {

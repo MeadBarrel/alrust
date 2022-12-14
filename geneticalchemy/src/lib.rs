@@ -4,7 +4,6 @@ pub mod fitness;
 pub mod algorithm;
 pub mod builder;
 pub mod incubator;
-pub mod scenario;
 pub mod eexpr;
 
 
@@ -15,6 +14,5 @@ pub mod prelude {
     pub use super::algorithm::*;
     pub use super::builder::*;
     pub use super::incubator::*;
-    pub use super::scenario::*;
     pub use super::eexpr;
 }
