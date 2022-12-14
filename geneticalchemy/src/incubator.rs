@@ -1,5 +1,3 @@
-use serde::Serialize;
-
 pub use crate::genetic::*;
 pub use genetic::prelude::*;
 pub use grimoire::prelude::*;

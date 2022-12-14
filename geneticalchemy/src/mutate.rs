@@ -1,4 +1,3 @@
-use std::cell::RefCell;
 use std::cmp::{max, min};
 use rand::prelude::*;
 use crate::genetic::*;
@@ -43,7 +42,7 @@ impl AlchemyMutator {
     }
 
     fn mutate_amounts<R: Rng>(&mut self, genome: &mut AlchemyGenome, rng: &mut R) {
-        let mut genes_to_mutate = genome.iter_mut().choose_multiple(
+        let genes_to_mutate = genome.iter_mut().choose_multiple(
             rng, self.num_mutations_amt);
         for gene in genes_to_mutate {
             let current_amt = gene.amount;

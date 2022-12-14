@@ -1,15 +1,9 @@
-use std::borrow::Borrow;
-use std::fmt::format;
 use std::fs::File;
 use std::path::Path;
-use std::borrow::BorrowMut;
 use std::cmp::min;
-use std::cell::RefCell;
 use std::fs::create_dir_all;
-use error_stack::ResultExt;
 use evalexpr::Node;
 use evalexpr::context_map;
-use genetic::alias::{Individuals, RankedIndividuals};
 use rand::prelude::*;
 use anyhow::Result;
 use serde_yaml::{from_reader, to_writer};
@@ -20,11 +14,9 @@ use grimoire::prelude::*;
 use grimoire::data::Ingredient;
 use crate::eexpr::*;
 use crate::algorithm::*;
-use crate::fitness::*;
 use crate::genetic::*;
 use crate::mutate::*;
 use crate::incubator::*;
-use crate::genetic::*;
 
 
 
@@ -218,7 +210,6 @@ impl GAConfig {
             to_writer(&mut file, &phenotypes)?;            
         }   
 
-        Ok(())
 
     }
 

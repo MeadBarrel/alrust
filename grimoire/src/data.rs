@@ -66,7 +66,7 @@ impl Default for Character {
 impl Character {
     pub fn get_lore_value(&self, name: &str) -> u8 {
         let default = 0;
-        self.lore_values.get(name).unwrap_or(&default).clone()
+        *self.lore_values.get(name).unwrap_or(&default)
     }
 }
 
