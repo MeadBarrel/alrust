@@ -1,0 +1,5 @@
+db: ../db.sqlite
+
+mix:
+  Sea Dew Leaves: 1000
+  Muse Fruit: 1000

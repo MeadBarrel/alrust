@@ -3,6 +3,7 @@ use serde_yaml::to_writer;
 use std::io::stdout;
 
 mod experiment;
+mod guess;
 
 use geneticalchemy;
 use grimoire::serializable::PotionSerializable;
@@ -34,6 +35,9 @@ fn main() {
                     arg!(--config <VALUE>).required(true)
                 )
         )
+        .subcommand(
+            Command::new("guess")
+        )
         .get_matches();
     
     match matches.subcommand() {
@@ -45,6 +49,7 @@ fn main() {
             let config_fn = args.get_one::<String>("config").unwrap();
             run_experiment(config_fn);
         }
+        Some(("guess", args)) => { guess::greet() }
         Some((_, _)) => {}
         None => {}
     }
