@@ -26,6 +26,17 @@ impl Display for LoadError {
 impl Context for LoadError {}
 
 
+#[derive(Debug, Default)]
+pub struct SaveError {}
+
+impl Display for SaveError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Could not save grimoire")
+    }
+}
+
+impl Context for SaveError {}
+
 #[derive(Deserialize, Default)]
 #[serde(default)]
 pub struct GrimoireConfig {
@@ -36,6 +47,14 @@ pub struct GrimoireConfig {
 }
 
 impl GrimoireConfig {
+    pub fn load(filename: &str) -> Result<Self, LoadError> {
+        use serde_yaml::from_reader;
+        use std::fs::File;
+
+        let file = File::open(filename).into_report().change_context(LoadError::default())?;
+        from_reader(file).into_report().change_context(LoadError::default())
+    }
+
     pub fn build(&self) -> Result<Compendium, LoadError> {
         use grimoire::types::{replace_modifier_mod, replace_modifier_mul, Property};
 
@@ -48,7 +67,7 @@ impl GrimoireConfig {
             let mut lore = grimoire.lores.entry(name.clone())
                 .or_insert_with(|| data::Lore::named_default(name));
             if let Some(x) = &conf.parent { lore.parent_name = Some(x.clone()); }
-            if let Some(x) = conf.effectiveness { lore.effectiveness = x }
+            if let Some(x) = conf.effectiveness { lore.effectiveness = Some(x) }
         }
 
         for (name, conf) in &self.characters {
@@ -186,7 +205,7 @@ pub struct IngredientConfig {
 }
 
 
-fn run_migrations(connection: &mut SqliteConnection) -> Result<(), LoadError> {
+pub fn run_migrations(connection: &mut SqliteConnection) -> Result<(), LoadError> {
     let result = connection.run_pending_migrations(MIGRATIONS);
     match result {
         Ok(_) => Ok(()),

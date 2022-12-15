@@ -6,13 +6,13 @@ use crate::optimized;
 #[derive(Debug, Clone)]
 pub struct Lore {
     pub name: String,
-    pub effectiveness: f64,
+    pub effectiveness: Option<f64>,
     pub parent_name: Option<String>
 }
 
 
 impl Lore {
-    pub fn new(name: &str, effectiveness: f64, parent_name: Option<String>) -> Self {
+    pub fn new(name: &str, effectiveness: Option<f64>, parent_name: Option<String>) -> Self {
         Self {
             name: name.to_string(),
             effectiveness,
@@ -23,7 +23,7 @@ impl Lore {
     pub fn named_default(name: &str) -> Self {
         Self {
             name: name.to_string(),
-            effectiveness: 1.666666,
+            effectiveness: None,
             parent_name: None
         }
     }
@@ -156,9 +156,9 @@ impl Compendium {
     pub fn get_lore_multiplier(&self, character: &Character, lore: &str) -> f64 {
         let lore_effectiveness = match self.lores.get(lore) {
             Some(x) => x.effectiveness,
-            None => 0.66666,
+            None => Some(0.66666),
         };
-        1. + lore_effectiveness * self.get_lore_value(character, &lore) as f64 / 100.
+        1. + lore_effectiveness.unwrap_or(0.66666) * self.get_lore_value(character, &lore) as f64 / 100.
     }
 
     /// Return character's effective lore value.
@@ -195,9 +195,9 @@ mod tests {
 
     fn create_test_data() -> Compendium {
         let lores = vec![
-            Lore {name: "Steel Lore".to_owned(), effectiveness: 0.66666, parent_name: Some("Iron-based Alloys".to_owned())},
-            Lore {name: "Iron-based Alloys".to_owned(), effectiveness: 0.66666, parent_name: Some("Metallurgy".to_owned())},
-            Lore {name: "Metallurgy".to_owned(), effectiveness: 0.66666, parent_name: None},
+            Lore {name: "Steel Lore".to_owned(), effectiveness: Some(0.66666), parent_name: Some("Iron-based Alloys".to_owned())},
+            Lore {name: "Iron-based Alloys".to_owned(), effectiveness: Some(0.66666), parent_name: Some("Metallurgy".to_owned())},
+            Lore {name: "Metallurgy".to_owned(), effectiveness: Some(0.66666), parent_name: None},
         ];
         let ingredients = Vec::<Ingredient>::default();
         let lore_values = vec![

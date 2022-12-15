@@ -20,6 +20,24 @@ impl PlayerCharacter {
         PlayerCharacter::table().load(conn)
     }
 
+    pub fn from_grimoire(src: &data::Character) -> Self {
+        Self {
+            name: src.name.clone(),
+            advanced_potion_making: src.advanced_potion_making as i32,
+            alvarin_clade: src.alvarin_clade,
+        }
+    }
+
+    pub fn lores_from_grimoire(src: &data::Character) -> Vec<PlayerCharacterLore> {
+        src.lore_values.iter().map(
+            |(name, &value)| PlayerCharacterLore {
+                character: src.name.clone(),
+                lore: name.clone(),
+                value: value.into()
+            }
+        ).collect()
+    }
+
     pub fn to_grimoire(&self, lores: &Vec<PlayerCharacterLore>) -> data::Character {
         data::Character {
             name: self.name.clone(),

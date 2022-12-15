@@ -18,10 +18,18 @@ impl Lore {
         Lore::table().load(conn)
     }
 
+    pub fn from_grimoire(src: &data::Lore) -> Self {
+        Self {
+            name: src.name.clone(),
+            effectiveness: src.effectiveness,
+            parent: src.parent_name.clone(),
+        }
+    }    
+
     pub fn to_grimoire(&self) -> data::Lore {
         data::Lore {
             name: self.name.clone(),
-            effectiveness: self.effectiveness.unwrap_or(1.6666666),
+            effectiveness: self.effectiveness,
             parent_name: self.parent.clone()
         }
     }

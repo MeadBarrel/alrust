@@ -208,8 +208,8 @@ mod tests {
             ].into_iter().collect())
         ];
         let lores = vec![
-            data::Lore::new("Herbology", 0.66666, None),
-            data::Lore::new("Petrology", 0.66666, None),
+            data::Lore::new("Herbology", Some(0.66666), None),
+            data::Lore::new("Petrology", Some(0.66666), None),
         ];
         let characters = vec![
             data::Character::new(

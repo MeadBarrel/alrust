@@ -34,6 +34,39 @@ impl Ingredient {
         Ingredient::table().load(conn)
     }
 
+    pub fn from_grimoire(src: &data::Ingredient) -> Self {
+        use grimoire::types::Property;
+
+        Self {
+            name: src.name.clone(),
+            lore: src.name.clone(),
+            al_weight: src.alchemical_weight as i32,
+
+            dh: src.modifiers.get(&Property::DirectHealing).cloned().unwrap_or_default().modifier,
+            mdh: src.modifiers.get(&Property::DirectHealing).cloned().unwrap_or_default().multiplier,
+
+            dp: src.modifiers.get(&Property::DirectPoison).cloned().unwrap_or_default().modifier,
+            mdp: src.modifiers.get(&Property::DirectPoison).cloned().unwrap_or_default().multiplier,
+
+            hot: src.modifiers.get(&Property::HealingOverTime).cloned().unwrap_or_default().modifier,
+            mhot: src.modifiers.get(&Property::HealingOverTime).cloned().unwrap_or_default().multiplier,
+
+            pot: src.modifiers.get(&Property::PoisonOverTime).cloned().unwrap_or_default().modifier,
+            mpot: src.modifiers.get(&Property::PoisonOverTime).cloned().unwrap_or_default().multiplier,
+
+            hl: src.modifiers.get(&Property::HealingLength).cloned().unwrap_or_default().modifier,
+            mhl: src.modifiers.get(&Property::HealingLength).cloned().unwrap_or_default().multiplier,
+
+            pl: src.modifiers.get(&Property::PoisonLength).cloned().unwrap_or_default().modifier,
+            mpl: src.modifiers.get(&Property::PoisonLength).cloned().unwrap_or_default().multiplier,
+
+            a: src.modifiers.get(&Property::Alcohol).cloned().unwrap_or_default().modifier,
+            ma: src.modifiers.get(&Property::Alcohol).cloned().unwrap_or_default().multiplier,
+
+            notes: None,
+        }
+    }
+
     pub fn to_grimoire(&self) -> data::Ingredient {
         use grimoire::types::{Modifier, Property};
 
