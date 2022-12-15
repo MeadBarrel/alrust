@@ -1,4 +1,7 @@
-db: ../db.sqlite
+grimoire:
+  db: ../new.sqlite
+
+character: default
 
 mix:
   Sea Dew Leaves: 1000

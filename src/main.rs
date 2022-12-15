@@ -21,7 +21,7 @@ fn run_genetic(config: &str) {
 
 
 fn run_experiment(config: &str) {
-    let mix = experiment::ExperimentConfig::from_file(config).unwrap().mix().unwrap();
+    let mix = experiment::ExperimentConfig::load(config).unwrap().mix().unwrap();
     let potion = PotionSerializable::from_mix(&mix);
     to_writer(stdout(), &potion).unwrap();
 }
