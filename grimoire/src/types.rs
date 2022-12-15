@@ -5,7 +5,7 @@ use strum_macros::{EnumIter, EnumCount as EnumCountMacro};
 use crate::prelude::EffectResult;
 
 
-#[derive(Debug, Clone, Copy, EnumIter, EnumCountMacro, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, EnumIter, EnumCountMacro, Eq, PartialEq, Hash)]
 pub enum Property {
     DirectHealing = 0,
     DirectPoison = 1,
@@ -35,7 +35,7 @@ pub type ModifierMap = [Modifier; Property::COUNT];
 pub type EffectsMap = [EffectResult; Property::COUNT];
 
 
-pub fn create_modifier_map(modifiers: &Vec<(Property, Modifier)>) -> ModifierMap {
+pub fn create_modifier_map(modifiers: &HashMap<Property, Modifier>) -> ModifierMap {
     let mut modifier_map = ModifierMap::default();
     for (property, modifiers) in modifiers.iter() {
         modifier_map[property.to_owned() as usize] = modifiers.to_owned();
@@ -55,24 +55,20 @@ pub fn take_modifier(modifiers: &mut Vec<(Property, Modifier)>, property: Proper
 
 
 pub fn replace_modifier_mod(
-    modifiers: &mut Vec<(Property, Modifier)>, 
+    modifiers: &mut HashMap<Property, Modifier>, 
     property: Property, 
     modifier: Option<f64>
 ) {
-    let mut old = take_modifier(modifiers, property);
-    old.modifier = modifier;
-    modifiers.push((property, old));
+    modifiers.entry(property).or_default().modifier = modifier
 }
 
 
 pub fn replace_modifier_mul(
-    modifiers: &mut Vec<(Property, Modifier)>, 
+    modifiers: &mut HashMap<Property, Modifier>, 
     property: Property, 
     multiplier: Option<f64>
 ) {
-    let mut old = take_modifier(modifiers, property);
-    old.multiplier = multiplier;
-    modifiers.push((property, old));
+    modifiers.entry(property).or_default().multiplier = multiplier
 }
 
 
@@ -95,7 +91,7 @@ mod tests {
             (props[0], expected[0].clone()),
             (props[3], expected[3].clone()),
             (props[4], expected[4].clone())
-        ];
+        ].into_iter().collect();
         let actual = create_modifier_map(&source_vec);
         assert!(actual.iter().zip(expected.iter()).all(|(a, b)| a==b));
     }

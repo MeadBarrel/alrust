@@ -35,12 +35,12 @@ pub struct Ingredient {
     pub name: String,
     pub alchemical_weight: u8,
     pub lore_name: String,
-    pub modifiers: Vec<(Property, Modifier)>,
+    pub modifiers: HashMap<Property, Modifier>,
 }
 
 
 impl Ingredient {
-    pub fn new(name: &str, alchemical_weight: u8, lore_name: &str, modifiers: Vec<(Property, Modifier)>) -> Self{
+    pub fn new(name: &str, alchemical_weight: u8, lore_name: &str, modifiers: HashMap<Property, Modifier>) -> Self{
         Self {
             name: name.to_string(),
             lore_name: lore_name.to_string(),
@@ -54,16 +54,12 @@ impl Ingredient {
             name: name.to_string(),
             alchemical_weight: 0,
             lore_name: "default".to_string(),
-            modifiers: Vec::default(),
+            modifiers: HashMap::default(),
         }
     }
 
     pub fn get_modifier(&self, property: Property) -> Modifier {
-        let modifier = self.modifiers.iter().find(|(x, _)| *x == property);
-        match modifier {
-            Some((_, m)) => *m,
-            None => Modifier { modifier: None, multiplier: None }
-        }
+        self.modifiers.get(&property).cloned().unwrap_or_default()
     }
 }
 

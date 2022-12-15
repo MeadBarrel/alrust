@@ -1,5 +1,8 @@
 grimoire:
   db: ../new.sqlite
+  ingredients:
+    Sea Dew Leaves:
+      mdh: 0
 
 character: default
 

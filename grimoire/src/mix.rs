@@ -195,17 +195,17 @@ mod tests {
         let ingredients = vec![
             data::Ingredient::new("Sea Dew Leaves", 1, "Herbology", vec![
                 (Property::DirectHealing, Modifier::new(Some(1.2), Some(0.0)))
-            ]),
+            ].into_iter().collect()),
             data::Ingredient::new("Argus Sponge", 1, "Herbology", vec![
                 (Property::DirectHealing, Modifier::new(Some(0.), Some(0.96))),
                 (Property::DirectPoison, Modifier::new(Some(0.979), Some(-0.75)))
-            ]),
+            ].into_iter().collect()),
             data::Ingredient::new("Skadite", 0, "Petrology", vec![
                 (Property::DirectHealing, Modifier::new(Some(0.), Some(0.96)))
-            ]),
+            ].into_iter().collect()),
             data::Ingredient::new("Unknownium", 0, "Petrology", vec![
                 (Property::DirectHealing, Modifier::new(None, None))
-            ])
+            ].into_iter().collect())
         ];
         let lores = vec![
             data::Lore::new("Herbology", 0.66666, None),

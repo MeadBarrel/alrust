@@ -70,7 +70,7 @@ impl Ingredient {
                     Property::Alcohol, 
                     Modifier::new(self.a, self.ma)
                 ),
-            ]
+            ].into_iter().collect()
         }
     }
 }
