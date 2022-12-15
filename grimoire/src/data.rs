@@ -32,6 +32,15 @@ pub struct Ingredient {
 
 
 impl Ingredient {
+    pub fn named_default(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            alchemical_weight: 0,
+            lore_name: "default".to_string(),
+            modifiers: Vec::default(),
+        }
+    }
+
     pub fn get_modifier(&self, property: Property) -> Modifier {
         let modifier = self.modifiers.iter().find(|(x, _)| *x == property);
         match modifier {
@@ -51,10 +60,21 @@ pub struct Character {
 }
 
 
+impl Character {
+    pub fn named_default(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            lore_values: HashMap::default(),
+            advanced_potion_making: 100,
+            alvarin_clade: true,            
+        }
+    }
+}
+
 impl Default for Character {
     fn default() -> Self {
         Self {
-            name: "noname".to_string(),
+            name: "default".to_string(),
             lore_values: HashMap::default(),
             advanced_potion_making: 100,
             alvarin_clade: true,
@@ -71,7 +91,7 @@ impl Character {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Compendium {
     pub characters: HashMap<String, Character>,
     pub lores: HashMap<String, Lore>,

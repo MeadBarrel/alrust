@@ -22,6 +22,13 @@ pub struct Modifier {
 }
 
 
+impl Modifier {
+    pub fn new(modifier: f64, multiplier: f64) -> Self {
+        Self { modifier, multiplier }
+    }
+}
+
+
 pub type ModifierMap = [Modifier; Property::COUNT];
 pub type EffectsMap = [f64; Property::COUNT];
 

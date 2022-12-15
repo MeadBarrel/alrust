@@ -4,6 +4,7 @@ pub mod types;
 pub mod mix;
 pub mod sqlite;
 pub mod serializable;
+pub mod error;
 
 
 pub mod prelude {

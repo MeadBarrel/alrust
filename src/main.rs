@@ -1,16 +1,22 @@
 use clap::*;
+use genetic::op;
 use serde_yaml::to_writer;
 use std::io::stdout;
 
 mod experiment;
 mod guess;
+mod grimoiredb;
+mod models;
+mod schema;
+mod optimization;
 
 use geneticalchemy;
 use grimoire::serializable::PotionSerializable;
 
 
 fn run_genetic(config: &str) {
-    geneticalchemy::builder::GAConfig::load(config).run().unwrap();
+    // geneticalchemy::builder::GAConfig::load(config).run().unwrap();
+    optimization::build::Optimizator::load(config).unwrap().run().unwrap();
 }
 
 
@@ -18,6 +24,13 @@ fn run_experiment(config: &str) {
     let mix = experiment::ExperimentConfig::from_file(config).unwrap().mix().unwrap();
     let potion = PotionSerializable::from_mix(&mix);
     to_writer(stdout(), &potion).unwrap();
+}
+
+
+fn run_db(filename: &str) {
+    use grimoiredb::load_grimoire_from_db;
+
+    load_grimoire_from_db(filename).unwrap();
 }
 
 
@@ -38,6 +51,12 @@ fn main() {
         .subcommand(
             Command::new("guess")
         )
+        .subcommand(
+            Command::new("db")
+                .arg(
+                    arg!(--filename <VALUE>).required(true)
+                )
+        )
         .get_matches();
     
     match matches.subcommand() {
@@ -50,6 +69,10 @@ fn main() {
             run_experiment(config_fn);
         }
         Some(("guess", args)) => { guess::greet() }
+        Some(("db", args)) => { 
+            let filename = args.get_one::<String>("filename").unwrap();
+            run_db(filename);
+        }
         Some((_, _)) => {}
         None => {}
     }

@@ -1,3 +1,6 @@
+use rand::prelude::*;
+use std::cmp::min;
+
 use grimoire::prelude::mix_volume;
 use ordered_float::NotNan;
 
@@ -29,6 +32,14 @@ impl PartialEq for AlchemyGene {
 pub type AlchemyGenome = VectorEncoded<AlchemyGene>;
 pub type AlchemyFitness = ParettoFitness;
 
+
+pub fn random_genome<R:Rng>(rng: &mut R, grimoire: &OptimizedGrimoir) -> AlchemyGenome {
+    let genome_len = min(grimoire.ingredients.len(), 16);
+    let grimoire_size = grimoire.ingredients.len();
+    let selected_ingredients = (0..genome_len).choose_multiple(rng, grimoire_size);
+    selected_ingredients.into_iter().map(
+        |x| AlchemyGene { amount: rng.gen_range(0..10), ingredient_index: x} ).collect()
+}
 
 pub trait AlchemyFitnessElement {
     fn fitness(&self, mix: &Mix) -> f64;

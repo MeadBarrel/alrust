@@ -1,6 +1,9 @@
 population_size: 100
-output_every: 10000
-db_name: "../db.sqlite"
+output_every: 5000
+character: default
+
+grimoire:
+   db: new.sqlite
 
 mutate:
    amount_grow_ratio: 0.25
@@ -8,7 +11,7 @@ mutate:
    num_mutations_amt: 8
    num_mutations_ing: 2
 
-desired_effects:
+effects:
    - hot
    - hl
 
