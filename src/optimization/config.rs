@@ -23,6 +23,8 @@ pub struct OptimizatorConfig {
     pub volume: f64,
     pub effects: Vec<Node>,
     pub include_ingredients: Option<Node>,
+    pub unknown_multiplier: f64,
+
     pub num_children: usize,
 }
 
@@ -42,6 +44,8 @@ impl Default for OptimizatorConfig {
             volume: 40.,
             effects: Vec::default(),
             include_ingredients: None,
+            unknown_multiplier: 1.,
+
             num_children: 2,
         }
     }

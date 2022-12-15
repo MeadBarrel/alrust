@@ -3,7 +3,7 @@ output_every: 5000
 character: default
 
 grimoire:
-   db: new.sqlite
+   db: ../new.sqlite
 
 mutate:
    amount_grow_ratio: 0.25

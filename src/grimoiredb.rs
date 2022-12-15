@@ -71,52 +71,52 @@ impl GrimoireConfig {
             if let Some(x) = &conf.lore { ingredient.lore_name = x.clone() };
 
             if let Some(x) = conf.dh {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::DirectHealing, x)
+                replace_modifier_mod(&mut ingredient.modifiers, Property::DirectHealing, Some(x))
             }
             if let Some(x) = conf.mdh {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::DirectHealing, x)
+                replace_modifier_mul(&mut ingredient.modifiers, Property::DirectHealing, Some(x))
             }
 
             if let Some(x) = conf.dp {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::DirectPoison, x)
+                replace_modifier_mod(&mut ingredient.modifiers, Property::DirectPoison, Some(x))
             }
             if let Some(x) = conf.mdp {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::DirectPoison, x)
+                replace_modifier_mul(&mut ingredient.modifiers, Property::DirectPoison, Some(x))
             }
 
             if let Some(x) = conf.hot {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::HealingOverTime, x)
+                replace_modifier_mod(&mut ingredient.modifiers, Property::HealingOverTime, Some(x))
             }
             if let Some(x) = conf.mhot {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::HealingOverTime, x)
+                replace_modifier_mul(&mut ingredient.modifiers, Property::HealingOverTime, Some(x))
             }
 
             if let Some(x) = conf.pot {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::PoisonOverTime, x)
+                replace_modifier_mod(&mut ingredient.modifiers, Property::PoisonOverTime, Some(x))
             }
             if let Some(x) = conf.mpot {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::PoisonOverTime, x)
+                replace_modifier_mul(&mut ingredient.modifiers, Property::PoisonOverTime, Some(x))
             }
             
             if let Some(x) = conf.hl {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::HealingLength, x)
+                replace_modifier_mod(&mut ingredient.modifiers, Property::HealingLength, Some(x))
             }
             if let Some(x) = conf.mhl {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::HealingLength, x)
+                replace_modifier_mul(&mut ingredient.modifiers, Property::HealingLength, Some(x))
             }
 
             if let Some(x) = conf.pl {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::PoisonLength, x)
+                replace_modifier_mod(&mut ingredient.modifiers, Property::PoisonLength, Some(x))
             }
             if let Some(x) = conf.mpl {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::PoisonLength, x)
+                replace_modifier_mul(&mut ingredient.modifiers, Property::PoisonLength, Some(x))
             }
             
             if let Some(x) = conf.a {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::Alcohol, x)
+                replace_modifier_mod(&mut ingredient.modifiers, Property::Alcohol, Some(x))
             }
             if let Some(x) = conf.ma {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::Alcohol, x)
+                replace_modifier_mul(&mut ingredient.modifiers, Property::Alcohol, Some(x))
             }            
 
         };

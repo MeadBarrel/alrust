@@ -32,24 +32,25 @@ impl Error for UnknownIdentifierError {}
 
 #[derive(Deserialize, Clone)]
 pub struct EvalExpressionFitnessElement {
-    expression: Node
+    expression: Node,
+    unknown_multiplier: f64,
 }
 
 
 impl EvalExpressionFitnessElement {
-    pub fn new(expression: Node) -> Self {
-        Self { expression }
+    pub fn new(expression: Node, unknown_multiplier: f64) -> Self {
+        Self { expression, unknown_multiplier }
     }
 
     fn get_identifier_value(&self, identifier: &str, mix: &Mix) -> Result<f64, UnknownIdentifierError> {
         match identifier {
-            "dh" => Ok(mix_effect(mix, Property::DirectHealing)),
-            "dp" => Ok(mix_effect(mix, Property::DirectPoison)),
-            "hot" => Ok(mix_effect(mix, Property::HealingOverTime)),
-            "pot" => Ok(mix_effect(mix, Property::PoisonOverTime)),
-            "hl" => Ok(mix_effect(mix, Property::HealingLength)),
-            "pl" => Ok(mix_effect(mix, Property::PoisonLength)),
-            "a" => Ok(mix_effect(mix, Property::Alcohol)),
+            "dh" => Ok(mix_effect(mix, Property::DirectHealing).known_or(|x| x * self.unknown_multiplier)),
+            "dp" => Ok(mix_effect(mix, Property::DirectPoison).known_or(|x| x * self.unknown_multiplier)),
+            "hot" => Ok(mix_effect(mix, Property::HealingOverTime).known_or(|x| x * self.unknown_multiplier)),
+            "pot" => Ok(mix_effect(mix, Property::PoisonOverTime).known_or(|x| x * self.unknown_multiplier)),
+            "hl" => Ok(mix_effect(mix, Property::HealingLength).known_or(|x| x * self.unknown_multiplier)),
+            "pl" => Ok(mix_effect(mix, Property::PoisonLength).known_or(|x| x * self.unknown_multiplier)),
+            "a" => Ok(mix_effect(mix, Property::Alcohol).known_or(|x| x * self.unknown_multiplier)),
             "volume" => Ok(mix_volume(mix)),
             _ => Err(UnknownIdentifierError::new(identifier))
         }

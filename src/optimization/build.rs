@@ -70,6 +70,7 @@ impl Optimizator {
     pub fn new(config: OptimizatorConfig) -> Result<Self> {
         let mut rng = thread_rng();
         let grimoire = config.grimoire.build().change_context(OptimizationError::LoadError)?;
+
         let character = grimoire.characters.get(&config.character).ok_or_else(
             || Report::new(OptimizationError::LoadError)
                 .attach_printable(format!("Character not found: {}", config.character))
@@ -85,7 +86,7 @@ impl Optimizator {
         );
 
         let fitness_elements = config.effects.iter().map(
-            |x| Box::new(EvalExpressionFitnessElement::new(x.clone())) 
+            |x| Box::new(EvalExpressionFitnessElement::new(x.clone(), config.unknown_multiplier)) 
                     as Box<dyn AlchemyFitnessElement>
         ).collect();
 

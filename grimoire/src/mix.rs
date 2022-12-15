@@ -2,6 +2,8 @@ use strum::IntoEnumIterator;
 
 use crate::optimized::*;
 use crate::types::*;
+use serde::Serialize;
+use std::ops::{Add, Sub, Mul};
 
 
 #[derive(Debug, Clone)]
@@ -27,6 +29,118 @@ impl Mix {
 }
 
 
+#[derive(Serialize, Clone, Debug, Copy)]
+pub enum EffectResult {
+    Known(f64),
+    Unknown(f64),
+}
+
+
+impl EffectResult {
+    #[inline(always)]
+    pub fn inner(&self) -> f64 {
+        match self {
+            Self::Known(x) => *x,
+            Self::Unknown(x) => *x,
+        }
+    }
+
+    pub fn is_known(&self) -> bool {
+        match self {
+            Self::Known(_) => true,
+            Self::Unknown(_) => false
+        }
+    }
+
+    pub fn known_or(&self, or_: impl Fn(f64) -> f64) -> f64 {
+        match self {
+            Self::Known(x) => *x,
+            Self::Unknown(x) => or_(*x)
+        }
+    }
+}
+
+
+impl Default for EffectResult {
+    fn default() -> Self {
+        Self::Known(0.)
+    }
+}
+
+
+impl Add for EffectResult {
+    type Output = EffectResult;
+
+    #[inline(always)]
+    fn add(self, rhs: Self) -> Self::Output {
+        match self {
+            Self::Known(x) => {
+                match rhs {
+                    Self::Known(y) => Self::Known(x + y),
+                    Self::Unknown(y) => Self::Unknown(x + y),
+                }
+            }
+            Self::Unknown(x) => Self::Unknown(x + rhs.inner())
+        }
+    }
+}
+
+
+impl Sub for EffectResult {
+    type Output = EffectResult;
+
+    #[inline(always)]
+    fn sub(self, rhs: Self) -> Self::Output {
+        match self {
+            Self::Known(x) => {
+                match rhs {
+                    Self::Known(y) => Self::Known(x-y),
+                    Self::Unknown(y) => Self::Unknown(x-y)
+                }
+            }
+            Self::Unknown(x) => Self::Unknown(x - rhs.inner())
+        }
+    }
+}
+
+
+impl Mul for EffectResult {
+    type Output = EffectResult;
+
+    #[inline(always)]
+    fn mul(self, rhs: Self) -> Self::Output {
+        match self {
+            Self::Known(x) => {
+                match rhs {
+                    Self::Known(y) => Self::Known(x*y),
+                    Self::Unknown(y) => Self::Unknown(x*y)
+                }
+            }
+            Self::Unknown(x) => Self::Unknown(x * rhs.inner())
+        }
+    }    
+}
+
+
+impl From<Option<f64>> for EffectResult {
+    #[inline(always)]
+    fn from(src: Option<f64>) -> Self {
+        match src {
+            Some(x) => Self::Known(x),
+            None => Self::Unknown(0.)
+        }
+    }
+}
+
+
+impl From<f64> for EffectResult {
+    #[inline(always)]
+    fn from(x: f64) -> Self {
+        Self::Known(x)
+    }
+}
+
+
 pub fn mix_effects(mix: &Mix) -> EffectsMap {
     let mut result = EffectsMap::default();
     for property in Property::iter() {
@@ -43,20 +157,29 @@ pub fn mix_volume(mix: &Mix) -> f64 {
 }
 
 
-pub fn mix_effect(mix: &Mix, property: Property) -> f64 {
+pub fn mix_effect(mix: &Mix, property: Property) -> EffectResult {
     let total_count: u64 = mix.ingredients.iter().map(|(_, count)| count).sum();
 
-    if total_count == 0 { return 0. }
+    if total_count == 0 { return EffectResult::Known(0.) }
 
-    let multiplier: f64 = mix.ingredients.iter().map(
-        |(ingredient, count)| 1. + ingredient.modifiers[property as usize].multiplier * (count.to_owned() as f64 / total_count as f64).sqrt()
-    ).product();
+    let mut multiplier = EffectResult::Known(0.);
 
-    let sum: f64 = mix.ingredients.iter().map(
-        |(ingredient, count)| ingredient.lore_multiplier * ingredient.modifiers[property as usize].modifier * (count.to_owned() as f64 / total_count as f64)
-    ).sum();
+    for (ingredient, count) in &mix.ingredients {
+        multiplier = multiplier *
+            EffectResult::from(ingredient.modifiers[property as usize].multiplier) *
+            EffectResult::from((count.to_owned() as f64 / total_count as f64).sqrt())
+    }
 
-    mix.advanced_potion_making_mod * sum * multiplier
+    let mut sum = EffectResult::Known(0.);
+
+    for (ingredient, count) in &mix.ingredients {
+        sum = sum +
+            EffectResult::from(ingredient.lore_multiplier) *
+            EffectResult::from(ingredient.modifiers[property as usize].modifier) *
+            EffectResult::from(count.to_owned() as f64 / total_count as f64)
+    };
+
+    EffectResult::Known(mix.advanced_potion_making_mod) * sum * multiplier
 }
 
 
@@ -71,14 +194,17 @@ mod tests {
     fn create_compendium() -> data::Compendium {
         let ingredients = vec![
             data::Ingredient::new("Sea Dew Leaves", 1, "Herbology", vec![
-                (Property::DirectHealing, Modifier::new(1.2, 0.0))
+                (Property::DirectHealing, Modifier::new(Some(1.2), Some(0.0)))
             ]),
             data::Ingredient::new("Argus Sponge", 1, "Herbology", vec![
-                (Property::DirectHealing, Modifier::new(0., 0.96)),
-                (Property::DirectPoison, Modifier::new(0.979, -0.75))
+                (Property::DirectHealing, Modifier::new(Some(0.), Some(0.96))),
+                (Property::DirectPoison, Modifier::new(Some(0.979), Some(-0.75)))
             ]),
             data::Ingredient::new("Skadite", 0, "Petrology", vec![
-                (Property::DirectHealing, Modifier::new(0., 0.96))
+                (Property::DirectHealing, Modifier::new(Some(0.), Some(0.96)))
+            ]),
+            data::Ingredient::new("Unknownium", 0, "Petrology", vec![
+                (Property::DirectHealing, Modifier::new(None, None))
             ])
         ];
         let lores = vec![
@@ -105,7 +231,8 @@ mod tests {
         let expected = 3.25;
         let actual = mix_effect(&mix, Property::DirectHealing);
 
-        assert!( approx_eq!(f64, actual, expected, epsilon=0.01) );
+        assert!(actual.is_known());
+        assert!( approx_eq!(f64, actual.inner(), expected, epsilon=0.01) );
     }
 
     #[test]
@@ -114,7 +241,7 @@ mod tests {
         let mix = Mix { alvarin_clade: true, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
         let actual = mix_effects(&mix);
 
-        assert!( approx_eq!(f64, actual[Property::DirectHealing as usize], 3.25, epsilon=0.01) );
+        assert!( approx_eq!(f64, actual[Property::DirectHealing as usize].inner(), 3.25, epsilon=0.01) );
     }
 
 

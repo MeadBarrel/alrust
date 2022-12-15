@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use strum::EnumCount;
 use strum_macros::{EnumIter, EnumCount as EnumCountMacro};
 
+use crate::prelude::EffectResult;
+
 
 #[derive(Debug, Clone, Copy, EnumIter, EnumCountMacro, Eq, PartialEq)]
 pub enum Property {
@@ -17,20 +19,20 @@ pub enum Property {
 
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
 pub struct Modifier {
-    pub modifier: f64,
-    pub multiplier: f64,
+    pub modifier: Option<f64>,
+    pub multiplier: Option<f64>,
 }
 
 
 impl Modifier {
-    pub fn new(modifier: f64, multiplier: f64) -> Self {
+    pub fn new(modifier: Option<f64>, multiplier: Option<f64>) -> Self {
         Self { modifier, multiplier }
     }
 }
 
 
 pub type ModifierMap = [Modifier; Property::COUNT];
-pub type EffectsMap = [f64; Property::COUNT];
+pub type EffectsMap = [EffectResult; Property::COUNT];
 
 
 pub fn create_modifier_map(modifiers: &Vec<(Property, Modifier)>) -> ModifierMap {
@@ -52,14 +54,22 @@ pub fn take_modifier(modifiers: &mut Vec<(Property, Modifier)>, property: Proper
 }
 
 
-pub fn replace_modifier_mod(modifiers: &mut Vec<(Property, Modifier)>, property: Property, modifier: f64) {
+pub fn replace_modifier_mod(
+    modifiers: &mut Vec<(Property, Modifier)>, 
+    property: Property, 
+    modifier: Option<f64>
+) {
     let mut old = take_modifier(modifiers, property);
     old.modifier = modifier;
     modifiers.push((property, old));
 }
 
 
-pub fn replace_modifier_mul(modifiers: &mut Vec<(Property, Modifier)>, property: Property, multiplier: f64) {
+pub fn replace_modifier_mul(
+    modifiers: &mut Vec<(Property, Modifier)>, 
+    property: Property, 
+    multiplier: Option<f64>
+) {
     let mut old = take_modifier(modifiers, property);
     old.multiplier = multiplier;
     modifiers.push((property, old));
@@ -75,9 +85,9 @@ mod tests {
     fn test_create_modifier_map() {
         let mut expected = ModifierMap::default();
 
-        expected[0] = Modifier {modifier: 3.5, multiplier: 1.0};
-        expected[3] = Modifier {modifier: 1.5, multiplier: 0.2};
-        expected[4] = Modifier {modifier: 0.9, multiplier: 0.1};
+        expected[0] = Modifier {modifier: Some(3.5), multiplier: Some(1.0)};
+        expected[3] = Modifier {modifier: Some(1.5), multiplier: Some(0.2)};
+        expected[4] = Modifier {modifier: Some(0.9), multiplier: Some(0.1)};
         
 
         let props: Vec<Property> = Property::iter().collect();

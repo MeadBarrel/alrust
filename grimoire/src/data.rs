@@ -62,7 +62,7 @@ impl Ingredient {
         let modifier = self.modifiers.iter().find(|(x, _)| *x == property);
         match modifier {
             Some((_, m)) => *m,
-            None => Modifier { modifier: 0., multiplier: 0. }
+            None => Modifier { modifier: None, multiplier: None }
         }
     }
 }

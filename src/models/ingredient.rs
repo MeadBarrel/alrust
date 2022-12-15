@@ -44,31 +44,31 @@ impl Ingredient {
             modifiers: vec! [
                 (
                     Property::DirectHealing, 
-                    Modifier::new(self.dh.unwrap_or_default(), self.mdh.unwrap_or_default())
+                    Modifier::new(self.dh, self.mdh)
                 ),
                 (
                     Property::DirectPoison, 
-                    Modifier::new(self.dp.unwrap_or_default(), self.mdp.unwrap_or_default())
+                    Modifier::new(self.dp, self.mdp)
                 ),
                 (
                     Property::HealingOverTime, 
-                    Modifier::new(self.hot.unwrap_or_default(), self.mhot.unwrap_or_default())
+                    Modifier::new(self.hot, self.mhot)
                 ),
                 (
                     Property::PoisonOverTime, 
-                    Modifier::new(self.pot.unwrap_or_default(), self.mpot.unwrap_or_default())
+                    Modifier::new(self.pot, self.mpot)
                 ),
                 (
                     Property::HealingLength, 
-                    Modifier::new(self.hl.unwrap_or_default(), self.mhl.unwrap_or_default())
+                    Modifier::new(self.hl, self.mhl)
                 ),
                 (
                     Property::PoisonLength, 
-                    Modifier::new(self.pl.unwrap_or_default(), self.mpl.unwrap_or_default())
+                    Modifier::new(self.pl, self.mpl)
                 ),
                 (
                     Property::Alcohol, 
-                    Modifier::new(self.a.unwrap_or_default(), self.ma.unwrap_or_default())
+                    Modifier::new(self.a, self.ma)
                 ),
             ]
         }
