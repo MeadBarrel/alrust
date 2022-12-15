@@ -1,4 +1,5 @@
 use error_stack::*;
+use evalexpr::{Node, context_map};
 
 use rand::{
     thread_rng,
@@ -12,8 +13,9 @@ use geneticalchemy::{
 };
 
 use grimoire::{
-    data::Compendium,
+    data::{Compendium, Ingredient},
     optimized::OptimizedGrimoir,
+    types::Property,
 };
 
 use genetic:: {
@@ -24,9 +26,9 @@ use genetic:: {
     }, prelude::Algorithm
 };
 
-use crate::optimization::print::PopulationPrinter;
+use crate::{optimization::print::PopulationPrinter, models::ingredient};
 
-use super::config::OptimizatorConfig;
+use super::config::{OptimizatorConfig, self};
 use super::eexpr::EvalExpressionFitnessElement;
 use super::error::{Result, OptimizationError};
 use super::print::ToYaml;
@@ -69,7 +71,11 @@ impl Optimizator {
 
     pub fn new(config: OptimizatorConfig) -> Result<Self> {
         let mut rng = thread_rng();
-        let grimoire = config.grimoire.build().change_context(OptimizationError::LoadError)?;
+        let mut grimoire = config.grimoire.build().change_context(OptimizationError::LoadError)?;
+
+        if let Some(node) = config.include_ingredients {
+            grimoire.ingredients.retain(|_, ingredient| Self::should_include_ingredient(&node, ingredient).unwrap())
+        }
 
         let character = grimoire.characters.get(&config.character).ok_or_else(
             || Report::new(OptimizationError::LoadError)
@@ -123,5 +129,38 @@ impl Optimizator {
                 config.output_every 
             }
         )
+    }
+
+    fn should_include_ingredient(node: &Node, ingredient: &Ingredient) -> Result<bool> {
+        let context = context_map! {
+            "dh" => ingredient.get_modifier(Property::DirectHealing).modifier.unwrap_or_default(),
+            "mdh" => ingredient.get_modifier(Property::DirectHealing).multiplier.unwrap_or_default(),
+
+            "dp" => ingredient.get_modifier(Property::DirectPoison).modifier.unwrap_or_default(),
+            "mdp" => ingredient.get_modifier(Property::DirectPoison).multiplier.unwrap_or_default(),
+
+            "hot" => ingredient.get_modifier(Property::HealingOverTime).modifier.unwrap_or_default(),
+            "mhot" => ingredient.get_modifier(Property::HealingOverTime).multiplier.unwrap_or_default(),
+
+            "pot" => ingredient.get_modifier(Property::PoisonOverTime).modifier.unwrap_or_default(),
+            "mpot" => ingredient.get_modifier(Property::PoisonOverTime).multiplier.unwrap_or_default(),
+
+            "hl" => ingredient.get_modifier(Property::HealingLength).modifier.unwrap_or_default(),
+            "mhl" => ingredient.get_modifier(Property::HealingLength).multiplier.unwrap_or_default(),
+
+            "pl" => ingredient.get_modifier(Property::PoisonLength).modifier.unwrap_or_default(),
+            "mpl" => ingredient.get_modifier(Property::PoisonLength).multiplier.unwrap_or_default(),
+
+            "a" => ingredient.get_modifier(Property::Alcohol).modifier.unwrap_or_default(),
+            "ma" => ingredient.get_modifier(Property::Alcohol).multiplier.unwrap_or_default(),
+
+            "w" => ingredient.alchemical_weight as i64,
+        }.into_report()
+            .change_context(OptimizationError::LoadError)
+            .attach_printable("Failed to determine wether to include an ingredient")?;
+
+        node.eval_boolean_with_context(&context).into_report()
+            .change_context(OptimizationError::LoadError)
+            .attach_printable("Failed to determine wether to include an ingredient")
     }
 }

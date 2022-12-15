@@ -162,12 +162,12 @@ pub fn mix_effect(mix: &Mix, property: Property) -> EffectResult {
 
     if total_count == 0 { return EffectResult::Known(0.) }
 
-    let mut multiplier = EffectResult::Known(0.);
+    let mut multiplier = EffectResult::Known(1.);
 
     for (ingredient, count) in &mix.ingredients {
         multiplier = multiplier *
-            EffectResult::from(ingredient.modifiers[property as usize].multiplier) *
-            EffectResult::from((count.to_owned() as f64 / total_count as f64).sqrt())
+            (EffectResult::from(1.) + EffectResult::from(ingredient.modifiers[property as usize].multiplier) *
+            EffectResult::from((count.to_owned() as f64 / total_count as f64).sqrt()))
     }
 
     let mut sum = EffectResult::Known(0.);
@@ -232,7 +232,7 @@ mod tests {
         let actual = mix_effect(&mix, Property::DirectHealing);
 
         assert!(actual.is_known());
-        assert!( approx_eq!(f64, actual.inner(), expected, epsilon=0.01) );
+        assert!( approx_eq!(f64, actual.inner(), expected, epsilon=0.01), "actual: {}", actual.inner() );
     }
 
     #[test]
