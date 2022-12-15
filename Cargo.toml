@@ -18,6 +18,7 @@ diesel_migrations = "2.0.0"
 evalexpr = {version="8.1.0", features = ["serde_support"]}
 rand = {version="0.8.5", features=["small_rng"]}
 chrono = "0.4.23"
+rusqlite = { version = "0.28.0", features = ["bundled"] }
 
 genetic = { path="genetic" }
 geneticalchemy = { path="geneticalchemy" }

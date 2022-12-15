@@ -62,19 +62,47 @@ pub fn mix_effect(mix: &Mix, property: Property) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
     use float_cmp::approx_eq;
 
     use super::*;
-    use crate::sqlite::load_from_db;
+    use crate::data;
+
+
+    fn create_compendium() -> data::Compendium {
+        let ingredients = vec![
+            data::Ingredient::new("Sea Dew Leaves", 1, "Herbology", vec![
+                (Property::DirectHealing, Modifier::new(1.2, 0.0))
+            ]),
+            data::Ingredient::new("Argus Sponge", 1, "Herbology", vec![
+                (Property::DirectHealing, Modifier::new(0., 0.96)),
+                (Property::DirectPoison, Modifier::new(0.979, -0.75))
+            ]),
+            data::Ingredient::new("Skadite", 0, "Petrology", vec![
+                (Property::DirectHealing, Modifier::new(0., 0.96))
+            ])
+        ];
+        let lores = vec![
+            data::Lore::new("Herbology", 0.66666, None),
+            data::Lore::new("Petrology", 0.66666, None),
+        ];
+        let characters = vec![
+            data::Character::new(
+                "default", 
+                vec![("Herbology".to_string(), 100u8), ("Petrology".to_string(), 100u8)].into_iter().collect(), 
+                100, 
+                true,
+            )
+        ];
+        data::Compendium::create_from_vecs(characters, lores, ingredients)
+    }
 
 
     #[test]
     fn test_mix_dh() {
         let reference = load_data();
-        let mix = Mix { alvarin_clade:false, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
+        let mix = Mix { alvarin_clade:true, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
 
-        let expected = 6.5;
+        let expected = 3.25;
         let actual = mix_effect(&mix, Property::DirectHealing);
 
         assert!( approx_eq!(f64, actual, expected, epsilon=0.01) );
@@ -83,35 +111,26 @@ mod tests {
     #[test]
     fn test_mix_effects() {
         let reference = load_data();
-        let mix = Mix { alvarin_clade: false, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
+        let mix = Mix { alvarin_clade: true, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
         let actual = mix_effects(&mix);
 
-        assert!( approx_eq!(f64, actual[Property::DirectHealing as usize], 6.5, epsilon=0.01) );
+        assert!( approx_eq!(f64, actual[Property::DirectHealing as usize], 3.25, epsilon=0.01) );
     }
 
 
-    #[test
-    
-    
-    
-    
-    
-    
-    
-    ]
+    #[test]
     fn test_mix_volume() {
         let reference = load_data();
-        let mix = Mix { alvarin_clade: false, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
+        let mix = Mix { alvarin_clade: true, advanced_potion_making_mod: 1.2, ingredients: reference.ingredients_from_names(ingredients()).unwrap() };
         let actual = mix_volume(&mix);
 
-        assert!( approx_eq!(f64, actual, 10., epsilon=0.01) );
+        assert!( approx_eq!(f64, actual, 7.3, epsilon=0.01) );
     }
 
     fn load_data() -> OptimizedGrimoir {
-        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        d.push("../testdb.sqlite");
-        let compendium = load_from_db(d.to_str().unwrap()).unwrap();
-        compendium.create_reference(&compendium.characters["default"])
+        let compendium = create_compendium();
+        let character = &compendium.characters["default"];
+        compendium.create_reference(character)
     }
 
     fn ingredients() -> Vec<(String, u64)> {
@@ -119,19 +138,6 @@ mod tests {
             ("Sea Dew Leaves".to_owned(), 67),
             ("Argus Sponge".to_owned(), 7),
             ("Skadite".to_owned(), 6),
-            ("Gold".to_owned(), 4),
-            ("Calxfish".to_owned(), 4),
-            ("Nitre Queen Carcass".to_owned(), 4),
-            ("Jadeite".to_owned(), 4),
-            ("Great Horn".to_owned(), 4),
-            ("Clothos Maiden Queen Carcass".to_owned(), 4),
-            ("Green Jambura Juice".to_owned(), 3),
-            ("Pirum Juice".to_owned(), 3),
-            ("Electrum".to_owned(), 3),
-            ("Muse Fruit".to_owned(), 3),
-            ("Pirum".to_owned(), 2),
-            ("Basileus".to_owned(), 2),
-            ("White Bear Carcass".to_owned(), 2)
         ]
     }
 

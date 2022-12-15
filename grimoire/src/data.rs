@@ -12,6 +12,14 @@ pub struct Lore {
 
 
 impl Lore {
+    pub fn new(name: &str, effectiveness: f64, parent_name: Option<String>) -> Self {
+        Self {
+            name: name.to_string(),
+            effectiveness,
+            parent_name
+        }
+    }
+
     pub fn named_default(name: &str) -> Self {
         Self {
             name: name.to_string(),
@@ -32,6 +40,15 @@ pub struct Ingredient {
 
 
 impl Ingredient {
+    pub fn new(name: &str, alchemical_weight: u8, lore_name: &str, modifiers: Vec<(Property, Modifier)>) -> Self{
+        Self {
+            name: name.to_string(),
+            lore_name: lore_name.to_string(),
+            alchemical_weight,
+            modifiers
+        }
+    }
+
     pub fn named_default(name: &str) -> Self {
         Self {
             name: name.to_string(),
@@ -60,17 +77,6 @@ pub struct Character {
 }
 
 
-impl Character {
-    pub fn named_default(name: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            lore_values: HashMap::default(),
-            advanced_potion_making: 100,
-            alvarin_clade: true,            
-        }
-    }
-}
-
 impl Default for Character {
     fn default() -> Self {
         Self {
@@ -84,6 +90,24 @@ impl Default for Character {
 
 
 impl Character {
+    pub fn new(name: &str, lore_values: HashMap<String, u8>, advanced_potion_making: u8, alvarin_clade: bool) -> Self {
+        Self {
+            name: name.to_string(),
+            lore_values,
+            advanced_potion_making,
+            alvarin_clade,
+        }
+    }
+
+    pub fn named_default(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            lore_values: HashMap::default(),
+            advanced_potion_making: 100,
+            alvarin_clade: true,            
+        }
+    }
+
     pub fn get_lore_value(&self, name: &str) -> u8 {
         let default = 0;
         *self.lore_values.get(name).unwrap_or(&default)
