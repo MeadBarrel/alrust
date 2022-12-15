@@ -63,7 +63,7 @@ impl EffectResult {
 
 impl Default for EffectResult {
     fn default() -> Self {
-        Self::Known(0.)
+        Self::Unknown(0.)
     }
 }
 
