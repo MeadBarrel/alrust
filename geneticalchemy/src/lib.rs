@@ -3,7 +3,6 @@ pub mod genetic;
 pub mod fitness;
 pub mod algorithm;
 pub mod incubator;
-pub mod eexpr;
 
 
 pub mod prelude {
@@ -12,5 +11,4 @@ pub mod prelude {
     pub use super::fitness::*;
     pub use super::algorithm::*;
     pub use super::incubator::*;
-    pub use super::eexpr;
 }
