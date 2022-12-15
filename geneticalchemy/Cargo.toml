@@ -6,13 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = {version = "1.0.149", features = ["derive"]}
-serde_yaml = "0.9.14"
-error-stack = "0.2.4"
 ordered-float = "3.4.0"
 rand = {version="0.8.5", features=["small_rng"]}
-anyhow = "1.0.66"
-evalexpr = {version="8.1.0", features = ["serde_support"]}
 
 grimoire = { path="../grimoire" }
 genetic = { path="../genetic" }

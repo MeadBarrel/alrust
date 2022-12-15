@@ -319,15 +319,10 @@ dependencies = [
 name = "geneticalchemy"
 version = "0.1.0"
 dependencies = [
- "anyhow",
- "error-stack",
- "evalexpr",
  "genetic",
  "grimoire",
  "ordered-float",
  "rand",
- "serde",
- "serde_yaml",
 ]
 
 [[package]]
