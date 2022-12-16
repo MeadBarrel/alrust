@@ -45,7 +45,7 @@ pub fn mix_volume(mix: &Mix) -> f64 {
 }
 
 
-pub fn mix_effect(mix: &Mix, property: Property) -> Theoretical {
+pub fn mix_effect(mix: &Mix, property: Property) -> Theoretical<f64> {
     let total_count: u64 = mix.ingredients.iter().map(|(_, count)| count).sum();
 
     if total_count == 0 { return Theoretical::from(0.) }

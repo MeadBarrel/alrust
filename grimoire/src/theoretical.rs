@@ -3,15 +3,17 @@ use std::ops::{Add, Sub, Mul};
 
 
 #[derive(Serialize, Clone, Debug, Copy)]
-pub enum Theoretical {
-    Known(f64),
-    Unknown(f64),
+pub enum Theoretical<T> {
+    Known(T),
+    Unknown(T),
 }
 
 
-impl Theoretical {
+impl<T> Theoretical<T> 
+    where T: Copy
+{
     #[inline(always)]
-    pub fn inner(&self) -> f64 {
+    pub fn inner(&self) -> T {
         match self {
             Self::Known(x) => *x,
             Self::Unknown(x) => *x,
@@ -25,7 +27,7 @@ impl Theoretical {
         }
     }
 
-    pub fn known_or(&self, or_: impl Fn(f64) -> f64) -> f64 {
+    pub fn known_or(&self, or_: impl Fn(T) -> T) -> T {
         match self {
             Self::Known(x) => *x,
             Self::Unknown(x) => or_(*x)
@@ -34,15 +36,19 @@ impl Theoretical {
 }
 
 
-impl Default for Theoretical {
+impl<T> Default for Theoretical<T> 
+    where T: Default
+{
     fn default() -> Self {
-        Self::Unknown(0.)
+        Self::Unknown(T::default())
     }
 }
 
 
-impl Add for Theoretical {
-    type Output = Theoretical;
+impl<T> Add for Theoretical<T> 
+    where T: Add<Output=T> + Copy
+{
+    type Output = Theoretical<T>;
 
     #[inline(always)]
     fn add(self, rhs: Self) -> Self::Output {
@@ -59,8 +65,10 @@ impl Add for Theoretical {
 }
 
 
-impl Sub for Theoretical {
-    type Output = Theoretical;
+impl<T> Sub for Theoretical<T> 
+    where T: Sub<Output=T> + Copy
+{
+    type Output = Theoretical<T>;
 
     #[inline(always)]
     fn sub(self, rhs: Self) -> Self::Output {
@@ -77,8 +85,10 @@ impl Sub for Theoretical {
 }
 
 
-impl Mul for Theoretical {
-    type Output = Theoretical;
+impl<T> Mul for Theoretical<T> 
+    where T: Mul<Output=T> + Copy
+{
+    type Output = Theoretical<T>;
 
     #[inline(always)]
     fn mul(self, rhs: Self) -> Self::Output {
@@ -95,20 +105,22 @@ impl Mul for Theoretical {
 }
 
 
-impl From<Option<f64>> for Theoretical {
+impl<T> From<Option<T>> for Theoretical<T> 
+    where T: Default
+{
     #[inline(always)]
-    fn from(src: Option<f64>) -> Self {
+    fn from(src: Option<T>) -> Self {
         match src {
             Some(x) => Self::Known(x),
-            None => Self::Unknown(0.)
+            None => Self::Unknown(T::default())
         }
     }
 }
 
 
-impl From<f64> for Theoretical {
+impl<T> From<T> for Theoretical<T> {
     #[inline(always)]
-    fn from(x: f64) -> Self {
+    fn from(x: T) -> Self {
         Self::Known(x)
     }
 }

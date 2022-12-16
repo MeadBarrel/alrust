@@ -32,7 +32,7 @@ impl Modifier {
 
 
 pub type ModifierMap = [Modifier; Property::COUNT];
-pub type EffectsMap = [Theoretical; Property::COUNT];
+pub type EffectsMap = [Theoretical<f64>; Property::COUNT];
 
 
 pub fn create_modifier_map(modifiers: &HashMap<Property, Modifier>) -> ModifierMap {

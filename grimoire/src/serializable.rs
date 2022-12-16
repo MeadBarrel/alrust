@@ -7,22 +7,22 @@ use crate::types::Property;
 
 #[derive(Serialize, Clone, Debug)]
 pub struct AlchemyEffectTotal {
-    direct: Theoretical,
-    over_time: Theoretical,
-    per_second: Theoretical,
-    length: Theoretical,
+    direct: Theoretical<f64>,
+    over_time: Theoretical<f64>,
+    per_second: Theoretical<f64>,
+    length: Theoretical<f64>,
 }
 
 
 #[derive(Serialize, Clone, Debug)]
 pub struct AlchemyEffects {
-    dh: Theoretical,
-    dp: Theoretical,
-    hot: Theoretical,
-    hl: Theoretical,
-    pot: Theoretical,
-    pl: Theoretical,
-    a: Theoretical,
+    dh: Theoretical<f64>,
+    dp: Theoretical<f64>,
+    hot: Theoretical<f64>,
+    hl: Theoretical<f64>,
+    pot: Theoretical<f64>,
+    pl: Theoretical<f64>,
+    a: Theoretical<f64>,
 }
 
 
