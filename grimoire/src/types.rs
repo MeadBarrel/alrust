@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use strum::EnumCount;
 use strum_macros::{EnumIter, EnumCount as EnumCountMacro};
 
-use crate::prelude::EffectResult;
+use crate::prelude::Theoretical;
 
 
 #[derive(Debug, Clone, Copy, EnumIter, EnumCountMacro, Eq, PartialEq, Hash)]
@@ -32,7 +32,7 @@ impl Modifier {
 
 
 pub type ModifierMap = [Modifier; Property::COUNT];
-pub type EffectsMap = [EffectResult; Property::COUNT];
+pub type EffectsMap = [Theoretical; Property::COUNT];
 
 
 pub fn create_modifier_map(modifiers: &HashMap<Property, Modifier>) -> ModifierMap {

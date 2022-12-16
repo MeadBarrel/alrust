@@ -1,27 +1,28 @@
 use serde::Serialize;
 
 use crate::mix::*;
+use crate::theoretical::*;
 use crate::types::Property;
 
 
 #[derive(Serialize, Clone, Debug)]
 pub struct AlchemyEffectTotal {
-    direct: EffectResult,
-    over_time: EffectResult,
-    per_second: EffectResult,
-    length: EffectResult,
+    direct: Theoretical,
+    over_time: Theoretical,
+    per_second: Theoretical,
+    length: Theoretical,
 }
 
 
 #[derive(Serialize, Clone, Debug)]
 pub struct AlchemyEffects {
-    dh: EffectResult,
-    dp: EffectResult,
-    hot: EffectResult,
-    hl: EffectResult,
-    pot: EffectResult,
-    pl: EffectResult,
-    a: EffectResult,
+    dh: Theoretical,
+    dp: Theoretical,
+    hot: Theoretical,
+    hl: Theoretical,
+    pot: Theoretical,
+    pl: Theoretical,
+    a: Theoretical,
 }
 
 
@@ -52,16 +53,16 @@ impl PotionSerializable {
 
         let healing = AlchemyEffectTotal {
             direct: effects.dh,
-            per_second: effects.hot * EffectResult::from(volume.sqrt()),
-            over_time: effects.hot * effects.hl * EffectResult::from(volume),
-            length: effects.hl * EffectResult::from(volume.sqrt()),
+            per_second: effects.hot * Theoretical::from(volume.sqrt()),
+            over_time: effects.hot * effects.hl * Theoretical::from(volume),
+            length: effects.hl * Theoretical::from(volume.sqrt()),
         };
 
         let poison = AlchemyEffectTotal {
             direct: effects.dp,
-            per_second: effects.pot * EffectResult::from(volume.sqrt()),
-            over_time: effects.pot * effects.pl * EffectResult::from(volume),
-            length: effects.hl * EffectResult::from(volume.sqrt()),
+            per_second: effects.pot * Theoretical::from(volume.sqrt()),
+            over_time: effects.pot * effects.pl * Theoretical::from(volume),
+            length: effects.hl * Theoretical::from(volume.sqrt()),
         };
 
         let ingredients = mix.ingredients.iter().map(|x| (x.0.name.clone(), x.1)).collect();

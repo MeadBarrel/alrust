@@ -2,8 +2,7 @@ use strum::IntoEnumIterator;
 
 use crate::optimized::*;
 use crate::types::*;
-use serde::Serialize;
-use std::ops::{Add, Sub, Mul};
+use crate::theoretical::*;
 
 
 #[derive(Debug, Clone)]
@@ -29,117 +28,6 @@ impl Mix {
 }
 
 
-#[derive(Serialize, Clone, Debug, Copy)]
-pub enum EffectResult {
-    Known(f64),
-    Unknown(f64),
-}
-
-
-impl EffectResult {
-    #[inline(always)]
-    pub fn inner(&self) -> f64 {
-        match self {
-            Self::Known(x) => *x,
-            Self::Unknown(x) => *x,
-        }
-    }
-
-    pub fn is_known(&self) -> bool {
-        match self {
-            Self::Known(_) => true,
-            Self::Unknown(_) => false
-        }
-    }
-
-    pub fn known_or(&self, or_: impl Fn(f64) -> f64) -> f64 {
-        match self {
-            Self::Known(x) => *x,
-            Self::Unknown(x) => or_(*x)
-        }
-    }
-}
-
-
-impl Default for EffectResult {
-    fn default() -> Self {
-        Self::Unknown(0.)
-    }
-}
-
-
-impl Add for EffectResult {
-    type Output = EffectResult;
-
-    #[inline(always)]
-    fn add(self, rhs: Self) -> Self::Output {
-        match self {
-            Self::Known(x) => {
-                match rhs {
-                    Self::Known(y) => Self::Known(x + y),
-                    Self::Unknown(y) => Self::Unknown(x + y),
-                }
-            }
-            Self::Unknown(x) => Self::Unknown(x + rhs.inner())
-        }
-    }
-}
-
-
-impl Sub for EffectResult {
-    type Output = EffectResult;
-
-    #[inline(always)]
-    fn sub(self, rhs: Self) -> Self::Output {
-        match self {
-            Self::Known(x) => {
-                match rhs {
-                    Self::Known(y) => Self::Known(x-y),
-                    Self::Unknown(y) => Self::Unknown(x-y)
-                }
-            }
-            Self::Unknown(x) => Self::Unknown(x - rhs.inner())
-        }
-    }
-}
-
-
-impl Mul for EffectResult {
-    type Output = EffectResult;
-
-    #[inline(always)]
-    fn mul(self, rhs: Self) -> Self::Output {
-        match self {
-            Self::Known(x) => {
-                match rhs {
-                    Self::Known(y) => Self::Known(x*y),
-                    Self::Unknown(y) => Self::Unknown(x*y)
-                }
-            }
-            Self::Unknown(x) => Self::Unknown(x * rhs.inner())
-        }
-    }    
-}
-
-
-impl From<Option<f64>> for EffectResult {
-    #[inline(always)]
-    fn from(src: Option<f64>) -> Self {
-        match src {
-            Some(x) => Self::Known(x),
-            None => Self::Unknown(0.)
-        }
-    }
-}
-
-
-impl From<f64> for EffectResult {
-    #[inline(always)]
-    fn from(x: f64) -> Self {
-        Self::Known(x)
-    }
-}
-
 
 pub fn mix_effects(mix: &Mix) -> EffectsMap {
     let mut result = EffectsMap::default();
@@ -157,29 +45,29 @@ pub fn mix_volume(mix: &Mix) -> f64 {
 }
 
 
-pub fn mix_effect(mix: &Mix, property: Property) -> EffectResult {
+pub fn mix_effect(mix: &Mix, property: Property) -> Theoretical {
     let total_count: u64 = mix.ingredients.iter().map(|(_, count)| count).sum();
 
-    if total_count == 0 { return EffectResult::Known(0.) }
+    if total_count == 0 { return Theoretical::from(0.) }
 
-    let mut multiplier = EffectResult::Known(1.);
+    let mut multiplier = Theoretical::from(1.);
 
     for (ingredient, count) in &mix.ingredients {
         multiplier = multiplier *
-            (EffectResult::from(1.) + EffectResult::from(ingredient.modifiers[property as usize].multiplier) *
-            EffectResult::from((count.to_owned() as f64 / total_count as f64).sqrt()))
+            (Theoretical::from(1.) + Theoretical::from(ingredient.modifiers[property as usize].multiplier) *
+            Theoretical::from((count.to_owned() as f64 / total_count as f64).sqrt()))
     }
 
-    let mut sum = EffectResult::Known(0.);
+    let mut sum = Theoretical::from(0.);
 
     for (ingredient, count) in &mix.ingredients {
         sum = sum +
-            EffectResult::from(ingredient.lore_multiplier) *
-            EffectResult::from(ingredient.modifiers[property as usize].modifier) *
-            EffectResult::from(count.to_owned() as f64 / total_count as f64)
+            Theoretical::from(ingredient.lore_multiplier) *
+            Theoretical::from(ingredient.modifiers[property as usize].modifier) *
+            Theoretical::from(count.to_owned() as f64 / total_count as f64)
     };
 
-    EffectResult::Known(mix.advanced_potion_making_mod) * sum * multiplier
+    Theoretical::from(mix.advanced_potion_making_mod) * sum * multiplier
 }
 
 
