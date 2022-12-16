@@ -10,6 +10,7 @@ pub struct Lore {
     pub name: String,
     pub effectiveness: Option<f64>,
     pub parent: Option<String>,
+    pub parent2: Option<String>
 }
 
 
@@ -23,6 +24,7 @@ impl Lore {
             name: src.name.clone(),
             effectiveness: src.effectiveness,
             parent: src.parent_name.clone(),
+            parent2: src.parent_2_name.clone(),
         }
     }    
 
@@ -30,7 +32,8 @@ impl Lore {
         data::Lore {
             name: self.name.clone(),
             effectiveness: self.effectiveness,
-            parent_name: self.parent.clone()
+            parent_name: self.parent.clone(),
+            parent_2_name: self.parent2.clone(),
         }
     }
 }

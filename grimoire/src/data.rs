@@ -7,16 +7,18 @@ use crate::optimized;
 pub struct Lore {
     pub name: String,
     pub effectiveness: Option<f64>,
-    pub parent_name: Option<String>
+    pub parent_name: Option<String>,
+    pub parent_2_name: Option<String>,
 }
 
 
 impl Lore {
-    pub fn new(name: &str, effectiveness: Option<f64>, parent_name: Option<String>) -> Self {
+    pub fn new(name: &str, effectiveness: Option<f64>, parent_name: Option<String>, parent_2_name: Option<String>) -> Self {
         Self {
             name: name.to_string(),
             effectiveness,
-            parent_name
+            parent_name,
+            parent_2_name,
         }
     }
 
@@ -24,7 +26,8 @@ impl Lore {
         Self {
             name: name.to_string(),
             effectiveness: None,
-            parent_name: None
+            parent_name: None,
+            parent_2_name: None,
         }
     }
 }
@@ -195,9 +198,9 @@ mod tests {
 
     fn create_test_data() -> Compendium {
         let lores = vec![
-            Lore {name: "Steel Lore".to_owned(), effectiveness: Some(0.66666), parent_name: Some("Iron-based Alloys".to_owned())},
-            Lore {name: "Iron-based Alloys".to_owned(), effectiveness: Some(0.66666), parent_name: Some("Metallurgy".to_owned())},
-            Lore {name: "Metallurgy".to_owned(), effectiveness: Some(0.66666), parent_name: None},
+            Lore {name: "Steel Lore".to_owned(), effectiveness: Some(0.66666), parent_name: Some("Iron-based Alloys".to_owned()), parent_2_name: None},
+            Lore {name: "Iron-based Alloys".to_owned(), effectiveness: Some(0.66666), parent_name: Some("Metallurgy".to_owned()), parent_2_name: None},
+            Lore {name: "Metallurgy".to_owned(), effectiveness: Some(0.66666), parent_name: None, parent_2_name: None},
         ];
         let ingredients = Vec::<Ingredient>::default();
         let lore_values = vec![

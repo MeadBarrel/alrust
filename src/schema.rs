@@ -28,6 +28,7 @@ diesel::table! {
         name -> Text,
         effectiveness -> Nullable<Double>,
         parent -> Nullable<Text>,
+        parent2 -> Nullable<Text>,
     }
 }
 
@@ -47,6 +48,7 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(ingredients -> lores (lore));
 diesel::joinable!(player_character_lores -> lores (lore));
 diesel::joinable!(player_character_lores -> player_characters (character));
 
