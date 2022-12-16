@@ -1,7 +1,7 @@
-use diesel::{sqlite::SqliteConnection, QueryResult, associations::HasTable, RunQueryDsl};
+use diesel::{sqlite::SqliteConnection, QueryResult, RunQueryDsl, sql_query};
 use geneticalchemy::prelude::Compendium;
 
-pub type Connection = SqliteConnection;
+pub type Conn = SqliteConnection;
 
 pub mod ingredient;
 pub mod lore;
@@ -9,9 +9,12 @@ pub mod player_character;
 pub mod player_character_lore;
 
 
-pub fn write_compendium(connection: &mut Connection, grimoire: &Compendium) -> QueryResult<()> {
+pub fn write_compendium(connection: &mut Conn, grimoire: &Compendium) -> QueryResult<()> {
     use crate::schema::*;
     use diesel::{delete, insert_into};
+
+    //connection.execute("PRAGMA foreign_keys = off")?;
+    sql_query("PRAGMA foreign_keys = off;").execute(connection);
 
     delete(ingredients::table).execute(connection)?;
     delete(player_character_lores::table).execute(connection)?;
@@ -42,5 +45,6 @@ pub fn write_compendium(connection: &mut Connection, grimoire: &Compendium) -> Q
     insert_into(player_character_lores::table)
         .values(character_lores_to_insert).execute(connection)?;
 
+    sql_query("PRAGMA foreign_keys = on").execute(connection);
     Ok(())
 }

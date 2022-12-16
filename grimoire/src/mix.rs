@@ -62,7 +62,7 @@ pub fn mix_effect(mix: &Mix, property: Property) -> Theoretical<f64> {
 
     for (ingredient, count) in &mix.ingredients {
         sum = sum +
-            Theoretical::from(ingredient.lore_multiplier) *
+            ingredient.lore_multiplier *
             Theoretical::from(ingredient.modifiers[property as usize].modifier) *
             Theoretical::from(count.to_owned() as f64 / total_count as f64)
     };

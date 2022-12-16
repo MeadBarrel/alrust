@@ -1,5 +1,5 @@
 use diesel::{prelude::*, associations::HasTable};
-use super::Connection;
+use super::Conn;
 use super::player_character::PlayerCharacter;
 use crate::schema::*;
 
@@ -14,11 +14,11 @@ pub struct PlayerCharacterLore {
 
 
 impl PlayerCharacterLore {
-    pub fn load(conn: &mut Connection) -> QueryResult<Vec<PlayerCharacterLore>> {
+    pub fn load(conn: &mut Conn) -> QueryResult<Vec<PlayerCharacterLore>> {
         PlayerCharacterLore::table().load(conn)
     }
 
-    pub fn load_for_character(conn: &mut Connection, character_name: &str) -> QueryResult<Vec<PlayerCharacterLore>> {
+    pub fn load_for_character(conn: &mut Conn, character_name: &str) -> QueryResult<Vec<PlayerCharacterLore>> {
         use crate::schema::player_character_lores::dsl::*;
 
         player_character_lores.filter(character.eq(character_name)).load(conn)

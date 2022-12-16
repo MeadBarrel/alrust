@@ -1,5 +1,5 @@
 use diesel::{prelude::*, associations::HasTable};
-use super::Connection;
+use super::Conn;
 use crate::schema::*;
 use super::player_character_lore::PlayerCharacterLore;
 use grimoire::data;
@@ -16,7 +16,7 @@ pub struct PlayerCharacter {
 
 
 impl PlayerCharacter {
-    pub fn load(conn: &mut Connection) -> QueryResult<Vec<PlayerCharacter>> {
+    pub fn load(conn: &mut Conn) -> QueryResult<Vec<PlayerCharacter>> {
         PlayerCharacter::table().load(conn)
     }
 

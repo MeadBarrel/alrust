@@ -1,7 +1,8 @@
 use diesel::{prelude::*, associations::HasTable};
-use super::Connection;
+use super::Conn;
 use crate::schema::*;
 use grimoire::data;
+use grimoire::theoretical::*;
 
 
 #[derive(Debug, Clone, Queryable, Insertable, AsChangeset, Identifiable)]
@@ -15,7 +16,7 @@ pub struct Lore {
 
 
 impl Lore {
-    pub fn load(conn: &mut Connection) -> QueryResult<Vec<Lore>> {
+    pub fn load(conn: &mut Conn) -> QueryResult<Vec<Lore>> {
         Lore::table().load(conn)
     }
 
@@ -31,7 +32,10 @@ impl Lore {
     pub fn to_grimoire(&self) -> data::Lore {
         data::Lore {
             name: self.name.clone(),
-            effectiveness: self.effectiveness.into(),
+            effectiveness: match self.effectiveness {
+                Some(x) => Theoretical::Known(x),
+                None => Theoretical::Unknown(0.66666),
+            },
             parent_name: self.parent.clone(),
             parent_2_name: self.parent2.clone(),
         }

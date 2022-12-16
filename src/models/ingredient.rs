@@ -1,5 +1,5 @@
 use diesel::{prelude::*, associations::HasTable};
-use super::Connection;
+use super::Conn;
 use crate::schema::*;
 use grimoire::data;
 
@@ -30,7 +30,7 @@ pub struct Ingredient {
 
 
 impl Ingredient {
-    pub fn load(conn: &mut Connection) -> QueryResult<Vec<Ingredient>> {
+    pub fn load(conn: &mut Conn) -> QueryResult<Vec<Ingredient>> {
         Ingredient::table().load(conn)
     }
 
@@ -39,7 +39,7 @@ impl Ingredient {
 
         Self {
             name: src.name.clone(),
-            lore: src.name.clone(),
+            lore: src.lore_name.clone(),
             al_weight: src.alchemical_weight as i32,
 
             dh: src.modifiers.get(&Property::DirectHealing).cloned().unwrap_or_default().modifier,
