@@ -22,7 +22,7 @@ impl Lore {
     pub fn from_grimoire(src: &data::Lore) -> Self {
         Self {
             name: src.name.clone(),
-            effectiveness: src.effectiveness,
+            effectiveness: src.effectiveness.into(),
             parent: src.parent_name.clone(),
             parent2: src.parent_2_name.clone(),
         }
@@ -31,7 +31,7 @@ impl Lore {
     pub fn to_grimoire(&self) -> data::Lore {
         data::Lore {
             name: self.name.clone(),
-            effectiveness: self.effectiveness,
+            effectiveness: self.effectiveness.into(),
             parent_name: self.parent.clone(),
             parent_2_name: self.parent2.clone(),
         }

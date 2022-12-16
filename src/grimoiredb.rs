@@ -9,6 +9,7 @@ use serde::Deserialize;
 use geneticalchemy::prelude::Compendium;
 
 use crate::models;
+use grimoire::theoretical::Theoretical;
 use grimoire::data;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
@@ -67,7 +68,7 @@ impl GrimoireConfig {
             let mut lore = grimoire.lores.entry(name.clone())
                 .or_insert_with(|| data::Lore::named_default(name));
             if let Some(x) = &conf.parent { lore.parent_name = Some(x.clone()); }
-            if let Some(x) = conf.effectiveness { lore.effectiveness = Some(x) }
+            if let Some(x) = conf.effectiveness { lore.effectiveness = Theoretical::from(x) }
         }
 
         for (name, conf) in &self.characters {

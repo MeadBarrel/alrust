@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use crate::types::*;
+use crate::theoretical::Theoretical;
 use std::{fmt, error::Error};
 use error_stack::{Result};
 
@@ -24,7 +25,7 @@ impl Error for UnknownIngredientError {}
 pub struct Ingredient {
     pub name: String,
     pub alchemical_weight: u8,
-    pub lore_multiplier: f64,
+    pub lore_multiplier: Theoretical<f64>,
     pub modifiers: ModifierMap,
 }
 

@@ -36,6 +36,17 @@ impl<T> Theoretical<T>
 }
 
 
+impl<T> From<Theoretical<T>> for Option<T> {
+    fn from(src: Theoretical<T>) -> Self {
+        match src {
+            Theoretical::Known(x) => Some(x),
+            Theoretical::Unknown(_) => None,
+        }
+    }
+}
+
+
+
 impl<T> Default for Theoretical<T> 
     where T: Default
 {

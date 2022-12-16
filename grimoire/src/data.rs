@@ -1,19 +1,20 @@
 use std::cmp::min;
 use std::collections::HashMap;
+use crate::prelude::Theoretical;
 use crate::types::*;
 use crate::optimized;
 
 #[derive(Debug, Clone)]
 pub struct Lore {
     pub name: String,
-    pub effectiveness: Option<f64>,
+    pub effectiveness: Theoretical<f64>,
     pub parent_name: Option<String>,
     pub parent_2_name: Option<String>,
 }
 
 
 impl Lore {
-    pub fn new(name: &str, effectiveness: Option<f64>, parent_name: Option<String>, parent_2_name: Option<String>) -> Self {
+    pub fn new(name: &str, effectiveness: Theoretical<f64>, parent_name: Option<String>, parent_2_name: Option<String>) -> Self {
         Self {
             name: name.to_string(),
             effectiveness,
@@ -25,7 +26,7 @@ impl Lore {
     pub fn named_default(name: &str) -> Self {
         Self {
             name: name.to_string(),
-            effectiveness: None,
+            effectiveness: Theoretical::Unknown(0.66666),
             parent_name: None,
             parent_2_name: None,
         }
@@ -156,12 +157,12 @@ impl Compendium {
 
 
     /// Get caracter's effective lore multiplier for the specified lore
-    pub fn get_lore_multiplier(&self, character: &Character, lore: &str) -> f64 {
+    pub fn get_lore_multiplier(&self, character: &Character, lore: &str) -> Theoretical<f64> {
         let lore_effectiveness = match self.lores.get(lore) {
             Some(x) => x.effectiveness,
-            None => Some(0.66666),
+            None => Theoretical::Unknown(0.66666),
         };
-        1. + lore_effectiveness.unwrap_or(0.66666) * self.get_lore_value(character, &lore) as f64 / 100.
+        Theoretical::from(1.) + lore_effectiveness * Theoretical::from(self.get_lore_value(character, &lore) as f64 / 100.)
     }
 
     /// Return character's effective lore value.
@@ -198,9 +199,9 @@ mod tests {
 
     fn create_test_data() -> Compendium {
         let lores = vec![
-            Lore {name: "Steel Lore".to_owned(), effectiveness: Some(0.66666), parent_name: Some("Iron-based Alloys".to_owned()), parent_2_name: None},
-            Lore {name: "Iron-based Alloys".to_owned(), effectiveness: Some(0.66666), parent_name: Some("Metallurgy".to_owned()), parent_2_name: None},
-            Lore {name: "Metallurgy".to_owned(), effectiveness: Some(0.66666), parent_name: None, parent_2_name: None},
+            Lore {name: "Steel Lore".to_owned(), effectiveness: Theoretical::from(0.66666), parent_name: Some("Iron-based Alloys".to_owned()), parent_2_name: None},
+            Lore {name: "Iron-based Alloys".to_owned(), effectiveness: Theoretical::from(0.66666), parent_name: Some("Metallurgy".to_owned()), parent_2_name: None},
+            Lore {name: "Metallurgy".to_owned(), effectiveness: Theoretical::from(0.66666), parent_name: None, parent_2_name: None},
         ];
         let ingredients = Vec::<Ingredient>::default();
         let lore_values = vec![
