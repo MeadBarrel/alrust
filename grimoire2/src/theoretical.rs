@@ -6,10 +6,22 @@ pub enum Theoretical<T> {
     Unknown(T),
 }
 
+
+pub use Theoretical::*;
+
+
 impl<T> Theoretical<T>
 where
     T: Copy,
 {
+    pub fn to_known(self) -> Theoretical<T> {
+        Self::Known(self.inner())
+    }
+
+    pub fn to_unknown(self) -> Theoretical<T> {
+        Self::Unknown(self.inner())
+    }
+
     #[inline(always)]
     pub fn inner(&self) -> T {
         match self {

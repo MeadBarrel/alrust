@@ -24,8 +24,16 @@ impl Character {
         Theoretical::from(1.) + effectiveness * Theoretical::from(value as f64 / 100.)
     }
 
+    pub fn raw_skill(&self, skill: &str) -> u8 {
+        self.skills.get(skill).cloned().unwrap_or_default()
+    }
+
+    pub fn has_clade(&self, clade: &str) -> bool {
+        self.clades.contains(clade)
+    }
+
     pub fn skill(&self, skills: &Skills, skill: &str) -> u8 {
-        let this_skill_value = self.skills.get(skill).cloned().unwrap_or_default();
+        let this_skill_value = self.raw_skill(skill);
         let this_skill = skills.get(skill).cloned().unwrap_or_default();
 
         let parent_1_value = match this_skill.parent {

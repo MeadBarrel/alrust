@@ -33,5 +33,6 @@ members = [
     'genetic',
     'grimoire',
     'geneticalchemy',
-    'grimoire-sqlite'
+    'grimoire-sqlite',
+    'grimoire-serde',
 ]

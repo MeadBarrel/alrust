@@ -350,6 +350,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "grimoire-serde"
+version = "0.1.0"
+
+[[package]]
 name = "grimoire-sqlite"
 version = "0.1.0"
 dependencies = [
@@ -366,6 +370,7 @@ name = "grimoire2"
 version = "0.1.0"
 dependencies = [
  "float-cmp",
+ "maplit",
  "strum",
  "thiserror",
 ]

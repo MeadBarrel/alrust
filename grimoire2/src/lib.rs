@@ -4,6 +4,7 @@ pub mod effect;
 pub mod modifier;
 pub mod modifiermap;
 pub mod theoretical;
+pub mod modify;
 
 pub mod grimoire;
 pub mod standalone;
