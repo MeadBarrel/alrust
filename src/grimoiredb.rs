@@ -1,14 +1,11 @@
 use std::{collections::HashMap, fmt::Display};
 
-use diesel::{sqlite::SqliteConnection, Connection};
-use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use error_stack::{Context, IntoReport, Report, Result, ResultExt};
+use error_stack::{Context, IntoReport, Result, ResultExt};
 use grimoire2::prelude::{Character, Effect, Grimoire, Ingredient, Skill, Theoretical};
 use serde::Deserialize;
 
-use crate::models;
+use grimoire_sqlite::GrimoireSqlite;
 
-pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 #[derive(Debug, Default)]
 pub struct LoadError {}
@@ -56,7 +53,12 @@ impl GrimoireConfig {
 
     pub fn build(&self) -> Result<Grimoire, LoadError> {
         let mut grimoire = match &self.db {
-            Some(filename) => load_grimoire_from_db(filename)?,
+            Some(filename) => GrimoireSqlite::connect(filename)
+                .into_report()
+                .change_context(LoadError::default())?
+                .load()
+                .into_report()
+                .change_context(LoadError::default())?,
             None => Grimoire::default(),
         };
 
@@ -217,58 +219,4 @@ pub struct IngredientConfig {
     mpl: Option<f64>,
     a: Option<f64>,
     ma: Option<f64>,
-}
-
-pub fn run_migrations(connection: &mut SqliteConnection) -> Result<(), LoadError> {
-    let result = connection.run_pending_migrations(MIGRATIONS);
-    match result {
-        Ok(_) => Ok(()),
-        Err(_) => {
-            Err(Report::new(LoadError::default()).attach_printable("Failed to run migrations"))
-        }
-    }
-}
-
-pub fn load_grimoire_from_db(filename: &str) -> Result<Grimoire, LoadError> {
-    let mut connection = SqliteConnection::establish(filename)
-        .into_report()
-        .change_context(LoadError::default())
-        .attach_printable_lazy(|| format!("Could not load {}", filename))?;
-
-    run_migrations(&mut connection)?;
-
-    let ingredients_db = models::ingredient::Ingredient::load(&mut connection)
-        .into_report()
-        .change_context(LoadError::default())
-        .attach_printable("Could not load ingredients")?;
-
-    let lores_db = models::lore::Lore::load(&mut connection)
-        .into_report()
-        .change_context(LoadError::default())
-        .attach_printable("Could not load lores")?;
-
-    let player_characters_db = models::player_character::PlayerCharacter::load(&mut connection)
-        .into_report()
-        .change_context(LoadError::default())
-        .attach_printable("Could not load characters")?;
-
-    let player_character_lores_db =
-        models::player_character_lore::PlayerCharacterLore::load(&mut connection)
-            .into_report()
-            .change_context(LoadError::default())
-            .attach_printable("Could not load player lores")?;
-
-    let ingredients: HashMap<String, Ingredient> =
-        ingredients_db.iter().map(|x| x.to_grimoire()).collect();
-
-    let skills: HashMap<String, Skill> = lores_db.iter().map(|x| x.to_grimoire()).collect();
-
-    let characters: HashMap<String, Character> = player_characters_db
-        .iter()
-        .map(|x| x.to_grimoire(&player_character_lores_db))
-        .collect();
-
-    let grimoire = Grimoire::new(skills, ingredients, characters);
-
-    Ok(grimoire)
 }

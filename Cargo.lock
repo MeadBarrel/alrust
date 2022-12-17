@@ -20,17 +20,15 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap",
- "diesel",
- "diesel_migrations",
  "error-stack",
  "evalexpr",
  "float-cmp",
  "genetic",
  "geneticalchemy",
+ "grimoire-sqlite",
  "grimoire2",
  "maplit",
  "rand",
- "rusqlite",
  "serde",
  "serde_yaml",
  "thiserror",
@@ -348,6 +346,18 @@ dependencies = [
  "serde",
  "strum",
  "strum_macros",
+ "thiserror",
+]
+
+[[package]]
+name = "grimoire-sqlite"
+version = "0.1.0"
+dependencies = [
+ "diesel",
+ "diesel_migrations",
+ "grimoire2",
+ "maplit",
+ "rusqlite",
  "thiserror",
 ]
 

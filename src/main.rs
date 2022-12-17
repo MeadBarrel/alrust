@@ -1,21 +1,16 @@
 use clap::*;
-use genetic::op;
 use serde_yaml::to_writer;
 use std::io::stdout;
 
 mod experiment;
 mod grimoiredb;
 mod guess;
-mod models;
 mod optimization;
-mod schema;
 mod serializable;
 mod theoretical;
 
-use geneticalchemy;
 use crate::serializable::PotionSerializable;
 
-use crate::grimoiredb::run_migrations;
 
 fn run_genetic(config: &str) {
     // geneticalchemy::builder::GAConfig::load(config).run().unwrap();
@@ -34,22 +29,16 @@ fn run_experiment(config: &str) {
 }
 
 fn run_db(filename: &str) {
-    use grimoiredb::load_grimoire_from_db;
-
-    load_grimoire_from_db(filename).unwrap();
+    use grimoire_sqlite::GrimoireSqlite;
+    GrimoireSqlite::connect(filename).unwrap().load().unwrap();
 }
 
 fn run_update(from: &str, to: &str) {
-    use diesel::prelude::{Connection, SqliteConnection};
     use grimoiredb::GrimoireConfig;
-    use models::write_compendium;
+    use grimoire_sqlite::GrimoireSqlite;
 
     let grimoire = GrimoireConfig::load(from).unwrap().build().unwrap();
-
-    let mut connection = SqliteConnection::establish(to).unwrap();
-    run_migrations(&mut connection).unwrap();
-
-    write_compendium(&mut connection, &grimoire).unwrap();
+    GrimoireSqlite::connect(to).unwrap().write(&grimoire).unwrap();
 }
 
 fn main() {
@@ -76,7 +65,7 @@ fn main() {
             let config_fn = args.get_one::<String>("config").unwrap();
             run_experiment(config_fn);
         }
-        Some(("guess", args)) => guess::greet(),
+        Some(("guess", _)) => guess::greet(),
         Some(("db", args)) => {
             let filename = args.get_one::<String>("filename").unwrap();
             run_db(filename);
