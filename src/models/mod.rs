@@ -13,7 +13,7 @@ pub fn write_compendium(connection: &mut Conn, grimoire: &Grimoire) -> QueryResu
     use diesel::{delete, insert_into};
 
     //connection.execute("PRAGMA foreign_keys = off")?;
-    sql_query("PRAGMA foreign_keys = off;").execute(connection);
+    sql_query("PRAGMA foreign_keys = off;").execute(connection)?;
 
     delete(ingredients::table).execute(connection)?;
     delete(player_character_lores::table).execute(connection)?;
@@ -57,6 +57,6 @@ pub fn write_compendium(connection: &mut Conn, grimoire: &Grimoire) -> QueryResu
         .values(character_lores_to_insert)
         .execute(connection)?;
 
-    sql_query("PRAGMA foreign_keys = on").execute(connection);
+    sql_query("PRAGMA foreign_keys = on").execute(connection)?;
     Ok(())
 }
