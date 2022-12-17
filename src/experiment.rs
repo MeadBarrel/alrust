@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
+use error_stack::{IntoReport, Result, ResultExt};
 use serde::Deserialize;
 use thiserror::Error;
-use error_stack::{Result, ResultExt, IntoReport};
+
+use grimoire2::prelude::{Mix, OptimizedGrimoire, Ingredient};
 
 use crate::grimoiredb::GrimoireConfig;
-use grimoire::mix::Mix;
-use grimoire::optimized::Ingredient;
 
 
 #[derive(Error, Debug)]
@@ -21,8 +21,6 @@ pub enum ExperimentError {
     ConfigFileError,
 }
 
-
-
 #[derive(Deserialize)]
 #[serde(default)]
 pub struct ExperimentConfig {
@@ -30,7 +28,6 @@ pub struct ExperimentConfig {
     character: String,
     mix: HashMap<String, u64>,
 }
-
 
 impl Default for ExperimentConfig {
     fn default() -> Self {
@@ -42,42 +39,45 @@ impl Default for ExperimentConfig {
     }
 }
 
-
 impl ExperimentConfig {
     pub fn load(filename: &str) -> Result<Self, ExperimentError> {
-        use std::fs::File;
         use serde_yaml::from_reader;
+        use std::fs::File;
 
         let file = File::open(filename)
-            .into_report().change_context(ExperimentError::ConfigFileError)?;
+            .into_report()
+            .change_context(ExperimentError::ConfigFileError)?;
 
-        from_reader(file).into_report().change_context(ExperimentError::ConfigFileError)
+        from_reader(file)
+            .into_report()
+            .change_context(ExperimentError::ConfigFileError)
     }
 
-
-    pub fn mix(&self) -> Result<Mix, ExperimentError> {
+    pub fn grimoire(&self) -> Result<OptimizedGrimoire, ExperimentError> {
         let grimoire = self.grimoire.build().change_context(ExperimentError::ExperimentFailed)?;
-        let character = grimoire.characters.get(&self.character).ok_or_else(
-            || ExperimentError::CharacterNotFound(self.character.clone())
-        )?;
-        let optimized_grimoire = grimoire.create_reference(character);
+        let character = grimoire
+            .characters
+            .get(&self.character)
+            .ok_or_else(|| ExperimentError::CharacterNotFound(self.character.clone()))?;
+        Ok((character, &grimoire).into())
 
-        let mut ingredients: Vec<(Ingredient, u64)> = Vec::default();
+    }
+
+    pub fn mix<'a>(&'a self, grimoire: &'a OptimizedGrimoire) -> Result<Mix<'a>, ExperimentError> {
+        let mut ingredients: Vec<(usize, u64)> = Vec::default();
 
         for (name, value) in &self.mix {
-            let index = optimized_grimoire.index.get(name).ok_or_else(
-                || ExperimentError::IngredientNotFound(name.to_string())
-            )?;
+            let index = grimoire
+                .ingredients
+                .by_name(name)
+                .into_report()
+                .change_context(ExperimentError::IngredientNotFound(name.to_string()))?;
 
-            let ingredient = optimized_grimoire.ingredients[*index].clone();
-
-            ingredients.push((ingredient, *value));
+            ingredients.push((index, *value));
         }
 
-        let mix = Mix::new(
-            optimized_grimoire.advanced_potion_making_mod, 
-            character.alvarin_clade, 
-            ingredients);
-        Ok(mix)
+        Ok(
+            Mix::new(grimoire, ingredients)
+        )
     }
 }

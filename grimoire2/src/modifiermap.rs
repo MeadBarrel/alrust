@@ -2,13 +2,10 @@ use std::ops::{Index, IndexMut};
 
 use strum::{EnumCount, IntoEnumIterator};
 
-use crate::effect::Effect;
-use crate::modifier::Modifier;
-
+use crate::{effect::Effect, modifier::Modifier};
 
 #[derive(Debug, Clone)]
 pub struct ModifierMap(Vec<Modifier>);
-
 
 impl ModifierMap {
     pub fn size(&self) -> usize {
@@ -16,19 +13,17 @@ impl ModifierMap {
     }
 }
 
-
 impl From<Vec<(Effect, Modifier)>> for ModifierMap {
     fn from(src: Vec<(Effect, Modifier)>) -> Self {
         let mut result = Self::default();
 
         for (effect, modifier) in src.into_iter() {
             result[effect] = modifier;
-        };
+        }
 
         result
     }
 }
-
 
 impl From<Vec<(Effect, f64, f64)>> for ModifierMap {
     fn from(src: Vec<(Effect, f64, f64)>) -> Self {
@@ -36,19 +31,17 @@ impl From<Vec<(Effect, f64, f64)>> for ModifierMap {
 
         for (effect, term, multiplier) in src.into_iter() {
             result[effect] = Modifier::new_known(term, multiplier);
-        };
+        }
 
-        result        
+        result
     }
 }
-
 
 impl Default for ModifierMap {
     fn default() -> Self {
         Self(Effect::iter().map(|_| Modifier::default()).collect())
     }
 }
-
 
 impl Index<Effect> for ModifierMap {
     type Output = Modifier;
@@ -58,9 +51,8 @@ impl Index<Effect> for ModifierMap {
     }
 }
 
-
 impl IndexMut<Effect> for ModifierMap {
     fn index_mut(&mut self, index: Effect) -> &mut Self::Output {
-       &mut self.0[index as usize] 
+        &mut self.0[index as usize]
     }
 }

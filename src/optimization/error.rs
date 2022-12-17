@@ -1,7 +1,6 @@
-use std::fmt::Display;
 use error_stack;
+use std::fmt::Display;
 use thiserror;
-
 
 #[derive(thiserror::Error, Debug)]
 pub enum OptimizationError {
@@ -12,6 +11,5 @@ pub enum OptimizationError {
     #[error("Error while optimizing")]
     OptimizationError,
 }
-
 
 pub type Result<T> = error_stack::Result<T, OptimizationError>;

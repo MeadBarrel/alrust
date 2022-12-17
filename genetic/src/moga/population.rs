@@ -1,27 +1,22 @@
 use ordered_float::NotNan;
-use std::ops::Index;
-use std::cmp::Ordering;
-use std::mem::take;
+use std::{cmp::Ordering, mem::take, ops::Index};
 
-
-use crate::genetic::*;
-use crate::paretto::paretto_assess;
-use crate::prelude::IndividualStruct;
-use crate::{population::*, prelude::Individual};
-
+use crate::{
+    genetic::*,
+    paretto::paretto_assess,
+    population::*,
+    prelude::{Individual, IndividualStruct},
+};
 
 impl Fitness for Vec<NotNan<f64>> {}
 pub type ParettoFitness = Vec<NotNan<f64>>;
 pub type ParettoIndividual<G> = IndividualStruct<G, ParettoFitness>;
-
-
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct ParettoAdvantage {
     rank: u64,
     crowding_distance: NotNan<f64>,
 }
-
 
 impl Ord for ParettoAdvantage {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -32,7 +27,6 @@ impl Ord for ParettoAdvantage {
         }
     }
 }
-
 
 impl PartialOrd for ParettoAdvantage {
     fn partial_cmp(&self, other: &ParettoAdvantage) -> Option<Ordering> {
@@ -45,12 +39,10 @@ impl PartialOrd for ParettoAdvantage {
     }
 }
 
-
 impl ParettoAdvantage {
-    pub fn new(rank: u64, crowding_distance: f64) -> Self
-    {
-        Self { 
-            rank, 
+    pub fn new(rank: u64, crowding_distance: f64) -> Self {
+        Self {
+            rank,
             crowding_distance: NotNan::new(crowding_distance).unwrap(),
         }
     }
@@ -64,35 +56,33 @@ impl ParettoAdvantage {
     }
 }
 
-
 #[derive(Clone)]
 pub struct ParettoPopulation<I> {
-    individuals: Vec<I>
+    individuals: Vec<I>,
 }
 
-
-impl<I> ParettoPopulation<I> 
-    where I: Individual<Fitness = Vec<NotNan<f64>>>
+impl<I> ParettoPopulation<I>
+where
+    I: Individual<Fitness = Vec<NotNan<f64>>>,
 {
     pub fn new(individuals: Vec<I>) -> Self {
-        Self {
-            individuals
-        }
+        Self { individuals }
     }
 
     fn assess(&self) -> Vec<ParettoAdvantage> {
-        let fitnesses_owned: Vec<Vec<f64>> = self.fitnesses()
+        let fitnesses_owned: Vec<Vec<f64>> = self
+            .fitnesses()
             .into_iter()
             .cloned()
-            .map(|v|
-                v.into_iter().map(|x| x.into_inner()).collect()
-            )
+            .map(|v| v.into_iter().map(|x| x.into_inner()).collect())
             .collect();
         let advantages = paretto_assess(&fitnesses_owned);
-        advantages.into_iter().map(|(r, d)| ParettoAdvantage::new(r, d)).collect()        
-    }        
+        advantages
+            .into_iter()
+            .map(|(r, d)| ParettoAdvantage::new(r, d))
+            .collect()
+    }
 }
-
 
 impl<I> Index<usize> for ParettoPopulation<I> {
     type Output = I;
@@ -100,9 +90,7 @@ impl<I> Index<usize> for ParettoPopulation<I> {
     fn index(&self, index: usize) -> &Self::Output {
         &self.individuals[index]
     }
-
 }
-
 
 impl<I> IntoIterator for ParettoPopulation<I> {
     type Item = I;
@@ -113,26 +101,25 @@ impl<I> IntoIterator for ParettoPopulation<I> {
     }
 }
 
-
-impl<I> Extend<I> for ParettoPopulation<I> 
-    where I: Individual
+impl<I> Extend<I> for ParettoPopulation<I>
+where
+    I: Individual,
 {
     fn extend<T: IntoIterator<Item = I>>(&mut self, iter: T) {
         self.individuals.extend(iter)
     }
-
 }
 
-
-impl<I> Population for ParettoPopulation<I> 
-    where I: Individual<Fitness = Vec<NotNan<f64>>>
+impl<I> Population for ParettoPopulation<I>
+where
+    I: Individual<Fitness = Vec<NotNan<f64>>>,
 {
     type Individual = I;
     type Genotype = I::Genotype;
     type Fitness = I::Fitness;
 
     fn derive(&self, individuals: Vec<Self::Individual>) -> Self {
-        Self::new(individuals)       
+        Self::new(individuals)
     }
 
     fn len(&self) -> usize {
@@ -144,12 +131,10 @@ impl<I> Population for ParettoPopulation<I>
     }
 
     fn from_genomes(
-            genomes: Vec<Self::Genotype>, 
-            fitness_function: &crate::alias::FitnessFunctionAlias<Self::Genotype, Self::Fitness>
-        ) -> Self {
-        Self::new(
-            <Vec<I>>::from_genomes(genomes, fitness_function)
-        )
+        genomes: Vec<Self::Genotype>,
+        fitness_function: &crate::alias::FitnessFunctionAlias<Self::Genotype, Self::Fitness>,
+    ) -> Self {
+        Self::new(<Vec<I>>::from_genomes(genomes, fitness_function))
     }
 
     fn fitnesses(&self) -> Vec<&Self::Fitness> {
@@ -175,10 +160,11 @@ impl<I> Population for ParettoPopulation<I>
     fn sort(&mut self) {
         let advantages = self.assess();
         let individuals = take(&mut self.individuals);
-        let mut ranked: Vec<(I, ParettoAdvantage)> = individuals.into_iter().zip(advantages.into_iter())
-            .map(
-                |(i, a)| (i, a)
-            ).collect();
+        let mut ranked: Vec<(I, ParettoAdvantage)> = individuals
+            .into_iter()
+            .zip(advantages.into_iter())
+            .map(|(i, a)| (i, a))
+            .collect();
         ranked.sort_by_key(|(i, a)| (i.constraint(), a.clone()));
         ranked.reverse();
         self.individuals = ranked.into_iter().map(|(i, _)| i).collect();
@@ -186,16 +172,21 @@ impl<I> Population for ParettoPopulation<I>
 
     fn best(&self) -> Option<&Self::Individual> {
         let advantages = self.assess();
-        self.individuals.iter().enumerate()
-            .max_by_key(|(i, ind)| (ind.constraint(), advantages[*i].clone())).map(|(_, i)| i)
+        self.individuals
+            .iter()
+            .enumerate()
+            .max_by_key(|(i, ind)| (ind.constraint(), advantages[*i].clone()))
+            .map(|(_, i)| i)
     }
 
     fn n_best(&self, n: usize) -> Vec<&Self::Individual> {
         let advantages = self.assess();
-        let mut ranked: Vec<(&I, ParettoAdvantage)> = self.individuals.iter().zip(advantages.into_iter())
-            .map(
-                |(i, a)| (i, a)
-            ).collect();
+        let mut ranked: Vec<(&I, ParettoAdvantage)> = self
+            .individuals
+            .iter()
+            .zip(advantages.into_iter())
+            .map(|(i, a)| (i, a))
+            .collect();
         ranked.sort_by_key(|(i, a)| (i.constraint(), a.clone()));
         ranked.reverse();
         ranked.truncate(n);

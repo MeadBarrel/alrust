@@ -1,9 +1,9 @@
-use std::fmt::Debug;
 use ordered_float::NotNan;
+use std::fmt::Debug;
 
 pub trait Genotype: Clone + Debug {}
 
-/// `Fitness` indicates how well an individual is fit for a certain task. 
+/// `Fitness` indicates how well an individual is fit for a certain task.
 pub trait Fitness: Clone + Debug + Ord {}
 
 /// A specific genome in a genotype of an individual

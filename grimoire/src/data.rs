@@ -1,8 +1,5 @@
-use std::cmp::min;
-use std::collections::HashMap;
-use crate::prelude::Theoretical;
-use crate::types::*;
-use crate::optimized;
+use crate::{optimized, prelude::Theoretical, types::*};
+use std::{cmp::min, collections::HashMap};
 
 #[derive(Debug, Clone)]
 pub struct Lore {
@@ -12,9 +9,13 @@ pub struct Lore {
     pub parent_2_name: Option<String>,
 }
 
-
 impl Lore {
-    pub fn new(name: &str, effectiveness: Theoretical<f64>, parent_name: Option<String>, parent_2_name: Option<String>) -> Self {
+    pub fn new(
+        name: &str,
+        effectiveness: Theoretical<f64>,
+        parent_name: Option<String>,
+        parent_2_name: Option<String>,
+    ) -> Self {
         Self {
             name: name.to_string(),
             effectiveness,
@@ -33,7 +34,6 @@ impl Lore {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct Ingredient {
     pub name: String,
@@ -42,14 +42,18 @@ pub struct Ingredient {
     pub modifiers: HashMap<Property, Modifier>,
 }
 
-
 impl Ingredient {
-    pub fn new(name: &str, alchemical_weight: u8, lore_name: &str, modifiers: HashMap<Property, Modifier>) -> Self{
+    pub fn new(
+        name: &str,
+        alchemical_weight: u8,
+        lore_name: &str,
+        modifiers: HashMap<Property, Modifier>,
+    ) -> Self {
         Self {
             name: name.to_string(),
             lore_name: lore_name.to_string(),
             alchemical_weight,
-            modifiers
+            modifiers,
         }
     }
 
@@ -67,7 +71,6 @@ impl Ingredient {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct Character {
     pub name: String,
@@ -75,7 +78,6 @@ pub struct Character {
     pub advanced_potion_making: u8,
     pub alvarin_clade: bool,
 }
-
 
 impl Default for Character {
     fn default() -> Self {
@@ -88,9 +90,13 @@ impl Default for Character {
     }
 }
 
-
 impl Character {
-    pub fn new(name: &str, lore_values: HashMap<String, u8>, advanced_potion_making: u8, alvarin_clade: bool) -> Self {
+    pub fn new(
+        name: &str,
+        lore_values: HashMap<String, u8>,
+        advanced_potion_making: u8,
+        alvarin_clade: bool,
+    ) -> Self {
         Self {
             name: name.to_string(),
             lore_values,
@@ -104,7 +110,7 @@ impl Character {
             name: name.to_string(),
             lore_values: HashMap::default(),
             advanced_potion_making: 100,
-            alvarin_clade: true,            
+            alvarin_clade: true,
         }
     }
 
@@ -114,47 +120,63 @@ impl Character {
     }
 }
 
-
 #[derive(Debug, Default)]
 pub struct Compendium {
     pub characters: HashMap<String, Character>,
     pub lores: HashMap<String, Lore>,
-    pub ingredients: HashMap<String, Ingredient>
+    pub ingredients: HashMap<String, Ingredient>,
 }
 
-
 impl Compendium {
-    pub fn create_from_vecs(characters: Vec<Character>, lores: Vec<Lore>, ingredients: Vec<Ingredient>) -> Self {
+    pub fn create_from_vecs(
+        characters: Vec<Character>,
+        lores: Vec<Lore>,
+        ingredients: Vec<Ingredient>,
+    ) -> Self {
         Self {
-            characters: characters.iter().map(|x| (x.name.clone(), x.clone())).collect::<HashMap<String, Character>>(),
-            lores: lores.iter().map(|x| (x.name.clone(), x.clone())).collect::<HashMap<String, Lore>>(),
-            ingredients: ingredients.iter().map(|x| (x.name.clone(), x.clone())).collect::<HashMap<String, Ingredient>>(),
+            characters: characters
+                .iter()
+                .map(|x| (x.name.clone(), x.clone()))
+                .collect::<HashMap<String, Character>>(),
+            lores: lores
+                .iter()
+                .map(|x| (x.name.clone(), x.clone()))
+                .collect::<HashMap<String, Lore>>(),
+            ingredients: ingredients
+                .iter()
+                .map(|x| (x.name.clone(), x.clone()))
+                .collect::<HashMap<String, Ingredient>>(),
         }
     }
 
     /// Create an optimized reference for the specified character
     pub fn create_reference(&self, character: &Character) -> optimized::OptimizedGrimoir {
-        let ingredients: Vec<optimized::Ingredient> = self.ingredients.iter().map(
-            |(_, ingredient)| {
-                optimized::Ingredient {
-                    name: ingredient.name.clone(),
-                    alchemical_weight: ingredient.alchemical_weight,
-                    lore_multiplier: self.get_lore_multiplier(character, &ingredient.lore_name),
-                    modifiers: create_modifier_map(&ingredient.modifiers),
-                }
-            }
-        ).collect();
+        let ingredients: Vec<optimized::Ingredient> = self
+            .ingredients
+            .iter()
+            .map(|(_, ingredient)| optimized::Ingredient {
+                name: ingredient.name.clone(),
+                alchemical_weight: ingredient.alchemical_weight,
+                lore_multiplier: self.get_lore_multiplier(character, &ingredient.lore_name),
+                modifiers: create_modifier_map(&ingredient.modifiers),
+            })
+            .collect();
 
-        let index: HashMap<String, usize> =
-            ingredients.iter().enumerate().map(|(i, ing)| (ing.name.clone(), i)).collect();
+        let index: HashMap<String, usize> = ingredients
+            .iter()
+            .enumerate()
+            .map(|(i, ing)| (ing.name.clone(), i))
+            .collect();
 
-        let advanced_potion_making_mod = 1.0 + 0.2 * (character.advanced_potion_making as f64 / 100.);
+        let advanced_potion_making_mod =
+            1.0 + 0.2 * (character.advanced_potion_making as f64 / 100.);
 
         optimized::OptimizedGrimoir {
-            ingredients, index, advanced_potion_making_mod
+            ingredients,
+            index,
+            advanced_potion_making_mod,
         }
     }
-
 
     /// Get caracter's effective lore multiplier for the specified lore
     pub fn get_lore_multiplier(&self, character: &Character, lore: &str) -> Theoretical<f64> {
@@ -162,11 +184,13 @@ impl Compendium {
             Some(x) => x.effectiveness,
             None => Theoretical::Unknown(0.66666),
         };
-        Theoretical::from(1.) + lore_effectiveness * Theoretical::from(self.get_lore_value(character, &lore) as f64 / 100.)
+        Theoretical::from(1.)
+            + lore_effectiveness
+                * Theoretical::from(self.get_lore_value(character, &lore) as f64 / 100.)
     }
 
     /// Return character's effective lore value.
-    /// 
+    ///
     /// If parent lore value is lower, that parent lore value will be returned.
     /// If lore value is not set, return 0.
     pub fn get_lore_value(&self, character: &Character, lore_name: &str) -> u8 {
@@ -176,12 +200,10 @@ impl Compendium {
 
         match &lore.parent_name {
             Some(parent_name) => min(lore_value, self.get_lore_value(character, &parent_name)),
-            None => lore_value
+            None => lore_value,
         }
     }
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -192,26 +214,47 @@ mod tests {
         let compendium = create_test_data();
 
         let expected = 50_u8;
-        let actual = compendium.get_lore_value(&compendium.characters.get("Tashka").unwrap(), "Steel Lore");
+        let actual =
+            compendium.get_lore_value(&compendium.characters.get("Tashka").unwrap(), "Steel Lore");
 
         assert_eq!(actual, expected);
     }
 
     fn create_test_data() -> Compendium {
         let lores = vec![
-            Lore {name: "Steel Lore".to_owned(), effectiveness: Theoretical::from(0.66666), parent_name: Some("Iron-based Alloys".to_owned()), parent_2_name: None},
-            Lore {name: "Iron-based Alloys".to_owned(), effectiveness: Theoretical::from(0.66666), parent_name: Some("Metallurgy".to_owned()), parent_2_name: None},
-            Lore {name: "Metallurgy".to_owned(), effectiveness: Theoretical::from(0.66666), parent_name: None, parent_2_name: None},
+            Lore {
+                name: "Steel Lore".to_owned(),
+                effectiveness: Theoretical::from(0.66666),
+                parent_name: Some("Iron-based Alloys".to_owned()),
+                parent_2_name: None,
+            },
+            Lore {
+                name: "Iron-based Alloys".to_owned(),
+                effectiveness: Theoretical::from(0.66666),
+                parent_name: Some("Metallurgy".to_owned()),
+                parent_2_name: None,
+            },
+            Lore {
+                name: "Metallurgy".to_owned(),
+                effectiveness: Theoretical::from(0.66666),
+                parent_name: None,
+                parent_2_name: None,
+            },
         ];
         let ingredients = Vec::<Ingredient>::default();
         let lore_values = vec![
             ("Steel Lore".to_owned(), 90_u8),
             ("Iron-based Alloys".to_owned(), 100_u8),
-            ("Metallurgy".to_owned(), 50_u8)
-        ].into_iter().collect::<HashMap<String, u8>>();
-        let characters = vec![
-            Character {name: "Tashka".to_owned(), lore_values: lore_values, advanced_potion_making: 100_u8, alvarin_clade: false}
-        ];
+            ("Metallurgy".to_owned(), 50_u8),
+        ]
+        .into_iter()
+        .collect::<HashMap<String, u8>>();
+        let characters = vec![Character {
+            name: "Tashka".to_owned(),
+            lore_values: lore_values,
+            advanced_potion_making: 100_u8,
+            alvarin_clade: false,
+        }];
 
         Compendium::create_from_vecs(characters, lores, ingredients)
     }

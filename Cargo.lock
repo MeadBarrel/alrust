@@ -27,7 +27,6 @@ dependencies = [
  "float-cmp",
  "genetic",
  "geneticalchemy",
- "grimoire",
  "grimoire2",
  "rand",
  "rusqlite",
@@ -322,7 +321,7 @@ name = "geneticalchemy"
 version = "0.1.0"
 dependencies = [
  "genetic",
- "grimoire",
+ "grimoire2",
  "ordered-float",
  "rand",
 ]

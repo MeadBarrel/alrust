@@ -1,26 +1,22 @@
+use rand::{seq::index::sample, Rng};
 use std::ops::Index;
-use rand::seq::index::sample;
-use rand::Rng;
 
-use crate::genetic::*;
-use crate::individual::*;
-use crate::alias::*;
+use crate::{alias::*, genetic::*, individual::*};
 
 // Population --------------------------------------------------------------------------------------
-
 
 /// The Population trait provides an interface for types that represent a population of individuals,
 /// where an individual is defined by a Genotype, a Fitness value, and a Constraint value.
 /// The Population trait is not intended to be used directly; instead, the Individuals type should
 /// be used, which implements Population.
-pub trait Population: 
+pub trait Population:
     Clone
-    + IntoIterator<Item=Self::Individual> 
-    + Index<usize, Output=Self::Individual> 
-    + Sized 
+    + IntoIterator<Item = Self::Individual>
+    + Index<usize, Output = Self::Individual>
+    + Sized
     + Extend<Self::Individual>
 {
-    type Individual: Individual<Genotype=Self::Genotype, Fitness=Self::Fitness>;
+    type Individual: Individual<Genotype = Self::Genotype, Fitness = Self::Fitness>;
     type Genotype: Genotype;
     type Fitness: Fitness;
 
@@ -29,14 +25,14 @@ pub trait Population:
 
     /// Creates a population of individuals from a vector of genomes and a fitness function.
     fn from_genomes(
-        genomes: Vec<Self::Genotype>, 
-        fitness_function: &FitnessFunctionAlias<Self::Genotype, Self::Fitness>
+        genomes: Vec<Self::Genotype>,
+        fitness_function: &FitnessFunctionAlias<Self::Genotype, Self::Fitness>,
     ) -> Self;
 
     /// Derive a new population from this one, with new individuals. It can be used, for example,
     /// to create a new population that may have additional parameters to its constructor method
     /// without calling the constructor.
-    fn derive(&self, individuals: Vec<Self::Individual>) -> Self;  
+    fn derive(&self, individuals: Vec<Self::Individual>) -> Self;
 
     /// Same as derive, but takes a vector of references
     fn derive_ref(&self, individuals: Vec<&Self::Individual>) -> Self;
@@ -67,7 +63,7 @@ pub trait Population:
     fn best(&self) -> Option<&Self::Individual>;
 
     /// Return a sample of n individuals while preserving their order
-    fn sample<R:Rng>(&self, rng: &mut R, amount: usize) -> Vec<&Self::Individual> {
+    fn sample<R: Rng>(&self, rng: &mut R, amount: usize) -> Vec<&Self::Individual> {
         let mut indices: Vec<usize> = sample(rng, self.len(), amount).into_iter().collect();
         indices.sort();
         indices.into_iter().map(|i| &self[i]).collect()
@@ -81,10 +77,9 @@ pub trait Population:
     fn remove(&mut self, index: usize) -> Self::Individual;
 }
 
-
 impl<I> Population for Individuals<I>
-    where
-        I: Individual
+where
+    I: Individual,
 {
     type Individual = I;
     type Genotype = I::Genotype;
@@ -92,9 +87,12 @@ impl<I> Population for Individuals<I>
 
     fn from_genomes(
         genomes: Vec<Self::Genotype>,
-        fitness_function: &FitnessFunctionAlias<Self::Genotype, Self::Fitness>
+        fitness_function: &FitnessFunctionAlias<Self::Genotype, Self::Fitness>,
     ) -> Self {
-        genomes.into_iter().map(|genome| I::from_genome(genome, fitness_function)).collect()
+        genomes
+            .into_iter()
+            .map(|genome| I::from_genome(genome, fitness_function))
+            .collect()
     }
 
     fn fitnesses(&self) -> Vec<&Self::Fitness> {
@@ -144,7 +142,4 @@ impl<I> Population for Individuals<I>
     fn remove(&mut self, index: usize) -> Self::Individual {
         self.remove(index)
     }
-
 }
-
-

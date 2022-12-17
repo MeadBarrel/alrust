@@ -9,5 +9,5 @@ edition = "2021"
 ordered-float = "3.4.0"
 rand = {version="0.8.5", features=["small_rng"]}
 
-grimoire = { path="../grimoire" }
+grimoire2 = { path="../grimoire2" }
 genetic = { path="../genetic" }

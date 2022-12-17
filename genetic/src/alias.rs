@@ -1,5 +1,4 @@
-use crate::genetic::*;
-use crate::op::*;
+use crate::{genetic::*, op::*};
 
 pub type Parents<G> = Vec<G>;
 pub type Children<G> = Vec<G>;

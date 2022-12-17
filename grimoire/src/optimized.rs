@@ -1,15 +1,11 @@
-use std::collections::HashMap;
-use crate::types::*;
-use crate::theoretical::Theoretical;
-use std::{fmt, error::Error};
-use error_stack::{Result};
-
+use crate::{theoretical::Theoretical, types::*};
+use error_stack::Result;
+use std::{collections::HashMap, error::Error, fmt};
 
 #[derive(Debug)]
 pub struct UnknownIngredientError {
-    name: String
+    name: String,
 }
-
 
 impl fmt::Display for UnknownIngredientError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -17,9 +13,7 @@ impl fmt::Display for UnknownIngredientError {
     }
 }
 
-
 impl Error for UnknownIngredientError {}
-
 
 #[derive(Debug, Clone)]
 pub struct Ingredient {
@@ -29,7 +23,6 @@ pub struct Ingredient {
     pub modifiers: ModifierMap,
 }
 
-
 #[derive(Clone)]
 pub struct OptimizedGrimoir {
     pub ingredients: Vec<Ingredient>,
@@ -37,19 +30,23 @@ pub struct OptimizedGrimoir {
     pub advanced_potion_making_mod: f64,
 }
 
-
 impl OptimizedGrimoir {
-    pub fn ingredients_from_names(&self, names: Vec<(String, u64)>) -> Result<Vec<(Ingredient, u64)>, UnknownIngredientError> {
+    pub fn ingredients_from_names(
+        &self,
+        names: Vec<(String, u64)>,
+    ) -> Result<Vec<(Ingredient, u64)>, UnknownIngredientError> {
         let mut result: Vec<(Ingredient, u64)> = Vec::default();
 
         for (name, count) in names {
-            let index = self.index.get(&name).ok_or(UnknownIngredientError { name } )?.to_owned();
+            let index = self
+                .index
+                .get(&name)
+                .ok_or(UnknownIngredientError { name })?
+                .to_owned();
             let ingredient = self.ingredients[index].clone();
             result.push((ingredient, count))
-        };
+        }
 
         Ok(result)
     }
-
 }
-

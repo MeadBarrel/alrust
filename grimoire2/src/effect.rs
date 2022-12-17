@@ -1,6 +1,5 @@
 use strum::{EnumCount, EnumIter};
 
-
 #[derive(EnumCount, EnumIter, Clone, Copy)]
 pub enum Effect {
     DirectHealing,
@@ -9,5 +8,5 @@ pub enum Effect {
     PoisonOverTime,
     HealingLength,
     PoisonLength,
-    Alcohol,    
+    Alcohol,
 }

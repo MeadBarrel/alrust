@@ -7,19 +7,19 @@ pub struct Skill {
     pub parent_2: Option<String>,
 }
 
-
 impl Skill {
     pub fn new(
-        effectiveness: Theoretical<f64>, 
-        parent: Option<String>, 
-        parent_2: Option<String>
+        effectiveness: Theoretical<f64>,
+        parent: Option<String>,
+        parent_2: Option<String>,
     ) -> Self {
         Self {
-            effectiveness, parent, parent_2
-        }    
+            effectiveness,
+            parent,
+            parent_2,
+        }
     }
 }
-
 
 impl Default for Skill {
     fn default() -> Self {

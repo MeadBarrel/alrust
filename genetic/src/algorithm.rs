@@ -1,30 +1,26 @@
 use rand::Rng;
 
-use crate::error::*;
-use crate::op::CrossoverOperator;
-use crate::op::MutateOperator;
-use crate::op::ReinsertOperator;
-use crate::op::SelectOperator;
-use crate::population::*;
-use crate::genetic::*;
+use crate::{
+    error::*,
+    genetic::*,
+    op::{CrossoverOperator, MutateOperator, ReinsertOperator, SelectOperator},
+    population::*,
+};
 
-
-pub struct GeneticAlgorithm<P, F, M, C, S, R, RNG> 
-{
+pub struct GeneticAlgorithm<P, F, M, C, S, R, RNG> {
     fitness: F,
     mutate: M,
     crossover: C,
     select: S,
     reinsert: R,
     rng: RNG,
-    population: P
+    population: P,
 }
 
-
-impl<P, F, M, C, S, R, RNG> GeneticAlgorithm<P, F, M, C, S, R, RNG> 
-    where 
-        P:Population,
-        F:FitnessFunction<Genotype = P::Genotype, Fitness = P::Fitness> + 'static
+impl<P, F, M, C, S, R, RNG> GeneticAlgorithm<P, F, M, C, S, R, RNG>
+where
+    P: Population,
+    F: FitnessFunction<Genotype = P::Genotype, Fitness = P::Fitness> + 'static,
 {
     pub fn new(
         fitness: F,
@@ -33,7 +29,7 @@ impl<P, F, M, C, S, R, RNG> GeneticAlgorithm<P, F, M, C, S, R, RNG>
         select: S,
         reinsert: R,
         rng: RNG,
-        initial_population: Vec<P::Genotype>
+        initial_population: Vec<P::Genotype>,
     ) -> Self {
         let population = P::from_genomes(initial_population, &fitness);
         Self {
@@ -43,44 +39,47 @@ impl<P, F, M, C, S, R, RNG> GeneticAlgorithm<P, F, M, C, S, R, RNG>
             select,
             reinsert,
             rng,
-            population
+            population,
         }
     }
 }
 
-
-impl<P, F, M, C, S, R, RNG> Algorithm for GeneticAlgorithm<P, F, M, C, S, R, RNG> 
-    where
-        P:Population,
-        F:FitnessFunction<Genotype = P::Genotype, Fitness = P::Fitness> + 'static,
-        M:MutateOperator<P::Genotype>,
-        C:CrossoverOperator<P::Genotype>,
-        S:SelectOperator,
-        R:ReinsertOperator,
-        RNG: Rng,
-
+impl<P, F, M, C, S, R, RNG> Algorithm for GeneticAlgorithm<P, F, M, C, S, R, RNG>
+where
+    P: Population,
+    F: FitnessFunction<Genotype = P::Genotype, Fitness = P::Fitness> + 'static,
+    M: MutateOperator<P::Genotype>,
+    C: CrossoverOperator<P::Genotype>,
+    S: SelectOperator,
+    R: ReinsertOperator,
+    RNG: Rng,
 {
     type Population = P;
 
     fn advance_evolution(&mut self) -> Result<()> {
-        let matings = self.select.select_from(self.population.clone(), &mut self.rng)?;
+        let matings = self
+            .select
+            .select_from(self.population.clone(), &mut self.rng)?;
         let mut offspring = Vec::new();
 
-        for mating_result in matings.into_iter().map(|p| self.crossover.crossover(p, &mut self.rng)) {
+        for mating_result in matings
+            .into_iter()
+            .map(|p| self.crossover.crossover(p, &mut self.rng))
+        {
             offspring.extend(mating_result?)
-        };
+        }
 
         for child in offspring.iter_mut() {
             self.mutate.mutate(child, &mut self.rng)?;
-        };
+        }
 
-        let future_individuals = P::from_genomes(offspring, &self.fitness);        
+        let future_individuals = P::from_genomes(offspring, &self.fitness);
 
-        self.population = self.reinsert
-            .reinsert(self.population.clone(), future_individuals, &mut self.rng)?; 
+        self.population =
+            self.reinsert
+                .reinsert(self.population.clone(), future_individuals, &mut self.rng)?;
 
         Ok(())
-
     }
 
     fn last_population(&self) -> Self::Population {
@@ -88,22 +87,17 @@ impl<P, F, M, C, S, R, RNG> Algorithm for GeneticAlgorithm<P, F, M, C, S, R, RNG
     }
 }
 
-
 pub struct AlgorithmIterator<'a, A: Algorithm> {
-    algorithm: &'a mut A
+    algorithm: &'a mut A,
 }
-
 
 impl<'a, A: Algorithm> AlgorithmIterator<'a, A> {
     pub fn new(algorithm: &'a mut A) -> Self {
-        Self {
-            algorithm
-        }
+        Self { algorithm }
     }
 }
 
-
-impl<'a, A:Algorithm> Iterator for AlgorithmIterator<'a, A> {
+impl<'a, A: Algorithm> Iterator for AlgorithmIterator<'a, A> {
     type Item = Result<A::Population>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -115,7 +109,6 @@ impl<'a, A:Algorithm> Iterator for AlgorithmIterator<'a, A> {
     }
 }
 
-
 pub trait Algorithm {
     type Population: Population;
 
@@ -123,13 +116,11 @@ pub trait Algorithm {
     fn last_population(&self) -> Self::Population;
 }
 
-
 // pub trait Algorithm: Iterator {
 //     type Individual: Individual;
 
-//     fn advance_evolution(&mut self) -> 
+//     fn advance_evolution(&mut self) ->
 // }
-
 
 // // pub struct GeneticAlgorithm<I, F, M, C, S, R, RNG>
 //     where I: Individual
@@ -144,7 +135,6 @@ pub trait Algorithm {
 
 //     population: Individuals<I>,
 // }
-
 
 // impl<I, F, A, M, C, S, R, RNG> GeneticAlgorithm<I, F, A, M, C, S, R, RNG>
 //     where
@@ -195,19 +185,17 @@ pub trait Algorithm {
 //             self.mutate.mutate(child, &mut self.rng)?;
 //         }
 
-//         let mut future_individuals = 
+//         let mut future_individuals =
 //             Individuals::from_genomes(offspring, &self.fitness_function);
 
 //         self.population = self.reinsert
 //             .reinsert(self.population.clone(), future_individuals, &mut self.rng)?;
-        
+
 //         Ok(())
 //     }
 // }
 
-
 // pub trait Algorithm: Iterator {}
-
 
 // impl<I, F, M, C, S, R, RNG> Algorithm for GeneticAlgorithm<I, F, M, C, S, R, RNG>
 //     where
@@ -219,7 +207,6 @@ pub trait Algorithm {
 //         R: ReinsertOperator<I::Individual>,
 //         RNG: Rng,
 // {}
-
 
 // impl<I, F, M, C, S, R, RNG> Iterator for GeneticAlgorithm<I, F, M, C, S, R, RNG>
 //     where

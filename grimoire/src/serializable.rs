@@ -1,9 +1,6 @@
 use serde::Serialize;
 
-use crate::mix::*;
-use crate::theoretical::*;
-use crate::types::Property;
-
+use crate::{mix::*, theoretical::*, types::Property};
 
 #[derive(Serialize, Clone, Debug)]
 pub struct AlchemyEffectTotal {
@@ -12,7 +9,6 @@ pub struct AlchemyEffectTotal {
     per_second: Theoretical<f64>,
     length: Theoretical<f64>,
 }
-
 
 #[derive(Serialize, Clone, Debug)]
 pub struct AlchemyEffects {
@@ -25,17 +21,14 @@ pub struct AlchemyEffects {
     a: Theoretical<f64>,
 }
 
-
-
 #[derive(Serialize, Clone, Debug)]
 pub struct PotionSerializable {
     volume: f64,
     effects: AlchemyEffects,
     healing: AlchemyEffectTotal,
     poison: AlchemyEffectTotal,
-    ingredients: Vec<(String, u64)>
+    ingredients: Vec<(String, u64)>,
 }
-
 
 impl PotionSerializable {
     pub fn from_mix(mix: &Mix) -> Self {
@@ -65,9 +58,17 @@ impl PotionSerializable {
             length: effects.hl * Theoretical::from(volume.sqrt()),
         };
 
-        let ingredients = mix.ingredients.iter().map(|x| (x.0.name.clone(), x.1)).collect();
+        let ingredients = mix
+            .ingredients
+            .iter()
+            .map(|x| (x.0.name.clone(), x.1))
+            .collect();
         Self {
-            volume, effects, ingredients, healing, poison
+            volume,
+            effects,
+            ingredients,
+            healing,
+            poison,
         }
     }
 }

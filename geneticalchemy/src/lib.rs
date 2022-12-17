@@ -1,12 +1,10 @@
-pub mod mutate;
-pub mod genetic;
 pub mod algorithm;
-pub mod incubator;
-
+pub mod fitness;
+pub mod gene;
+pub mod genetic;
+pub mod genome;
+pub mod mutate;
 
 pub mod prelude {
-    pub use super::mutate::*;
-    pub use super::genetic::*;
-    pub use super::algorithm::*;
-    pub use super::incubator::*;
+    pub use super::{algorithm::*, fitness::*, gene::*, genetic::*, genome::*, mutate::*};
 }

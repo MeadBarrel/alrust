@@ -1,19 +1,14 @@
-use std::{fmt::Display, collections::HashMap};
+use std::{collections::HashMap, fmt::Display};
 
+use diesel::{sqlite::SqliteConnection, Connection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use diesel::Connection;
-use diesel::sqlite::SqliteConnection;
-use error_stack::{Context, Result, IntoReport, ResultExt, Report};
+use error_stack::{Context, IntoReport, Report, Result, ResultExt};
+use grimoire2::prelude::{Character, Effect, Grimoire, Ingredient, Skill, Theoretical};
 use serde::Deserialize;
 
-use geneticalchemy::prelude::Compendium;
-
 use crate::models;
-use grimoire::theoretical::Theoretical;
-use grimoire::data;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
-
 
 #[derive(Debug, Default)]
 pub struct LoadError {}
@@ -25,7 +20,6 @@ impl Display for LoadError {
 }
 
 impl Context for LoadError {}
-
 
 #[derive(Debug, Default)]
 pub struct SaveError {}
@@ -52,99 +46,123 @@ impl GrimoireConfig {
         use serde_yaml::from_reader;
         use std::fs::File;
 
-        let file = File::open(filename).into_report().change_context(LoadError::default())?;
-        from_reader(file).into_report().change_context(LoadError::default())
+        let file = File::open(filename)
+            .into_report()
+            .change_context(LoadError::default())?;
+        from_reader(file)
+            .into_report()
+            .change_context(LoadError::default())
     }
 
-    pub fn build(&self) -> Result<Compendium, LoadError> {
-        use grimoire::types::{replace_modifier_mod, replace_modifier_mul, Property};
-
+    pub fn build(&self) -> Result<Grimoire, LoadError> {
         let mut grimoire = match &self.db {
             Some(filename) => load_grimoire_from_db(filename)?,
-            None => Compendium::default(),
+            None => Grimoire::default(),
         };
 
         for (name, conf) in &self.lores {
-            let mut lore = grimoire.lores.entry(name.clone())
-                .or_insert_with(|| data::Lore::named_default(name));
-            if let Some(x) = &conf.parent { lore.parent_name = Some(x.clone()); }
-            if let Some(x) = conf.effectiveness { lore.effectiveness = Theoretical::from(x) }
+            let mut lore = grimoire
+                .skills
+                .entry(name.clone())
+                .or_insert_with(|| Skill::default());
+            if let Some(x) = &conf.parent {
+                lore.parent = Some(x.clone());
+            }
+            if let Some(x) = conf.effectiveness {
+                lore.effectiveness = Theoretical::from(x)
+            }
         }
 
         for (name, conf) in &self.characters {
-            let mut character = grimoire.characters.entry(name.clone())
-                .or_insert_with(|| data::Character::named_default(name));
+            let mut c = Character::default();
+
+            let character = grimoire
+                .characters
+                .entry(name.clone())
+                .or_insert_with(|| Character::default());
+                
             if let Some(x) = conf.advanced_potion_making {
-                character.advanced_potion_making = x;
+                character.skills.insert("Advanced Potion Making".to_string(), x);
+            };
+
+            if let Some(x) = conf.alvarin_clade {
+                match x {
+                    true => c.clades.insert("Alchemist".to_string()),
+                    false => c.clades.remove("Alchemist"),
+                };
             }
-            if let Some(x) = conf.alvarin_clade { character.alvarin_clade = x }
+
             for (name, value) in &conf.lores {
-                character.lore_values.insert(name.clone(), *value);
+                character.skills.insert(name.to_string(), *value);
             }
-        };
+        }
 
         for (name, conf) in self.ingredients.iter() {
-            let mut ingredient = grimoire.ingredients.entry(name.clone())
-                .or_insert_with(|| data::Ingredient::named_default(name));
-            
-            if let Some(x) = conf.weight { ingredient.alchemical_weight = x };
-            if let Some(x) = &conf.lore { ingredient.lore_name = x.clone() };
+            let mut ingredient = grimoire
+                .ingredients
+                .entry(name.clone())
+                .or_insert_with(|| Ingredient::default());
+
+            if let Some(x) = conf.weight {
+                ingredient.weight = x > 0
+            };
+            if let Some(x) = &conf.lore {
+                ingredient.skill = Some(x.clone())
+            };
 
             if let Some(x) = conf.dh {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::DirectHealing, Some(x))
+                ingredient.modifiers[Effect::DirectHealing].term = Theoretical::from(x);
             }
             if let Some(x) = conf.mdh {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::DirectHealing, Some(x))
+                ingredient.modifiers[Effect::DirectHealing].multiplier = Theoretical::from(x);
             }
 
             if let Some(x) = conf.dp {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::DirectPoison, Some(x))
+                ingredient.modifiers[Effect::DirectPoison].term = Theoretical::from(x);
             }
             if let Some(x) = conf.mdp {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::DirectPoison, Some(x))
+                ingredient.modifiers[Effect::DirectPoison].multiplier = Theoretical::from(x);
             }
 
             if let Some(x) = conf.hot {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::HealingOverTime, Some(x))
+                ingredient.modifiers[Effect::HealingOverTime].term = Theoretical::from(x);
             }
             if let Some(x) = conf.mhot {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::HealingOverTime, Some(x))
+                ingredient.modifiers[Effect::HealingOverTime].multiplier = Theoretical::from(x);
             }
 
             if let Some(x) = conf.pot {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::PoisonOverTime, Some(x))
+                ingredient.modifiers[Effect::PoisonOverTime].term = Theoretical::from(x);
             }
-            if let Some(x) = conf.mpot {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::PoisonOverTime, Some(x))
+            if let Some(x) = conf.pot {
+                ingredient.modifiers[Effect::PoisonOverTime].multiplier = Theoretical::from(x);
             }
-            
+
             if let Some(x) = conf.hl {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::HealingLength, Some(x))
+                ingredient.modifiers[Effect::HealingLength].term = Theoretical::from(x);
             }
             if let Some(x) = conf.mhl {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::HealingLength, Some(x))
+                ingredient.modifiers[Effect::HealingLength].multiplier = Theoretical::from(x);
             }
 
             if let Some(x) = conf.pl {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::PoisonLength, Some(x))
+                ingredient.modifiers[Effect::PoisonLength].term = Theoretical::from(x);
             }
             if let Some(x) = conf.mpl {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::PoisonLength, Some(x))
+                ingredient.modifiers[Effect::PoisonLength].multiplier = Theoretical::from(x);
             }
-            
+
             if let Some(x) = conf.a {
-                replace_modifier_mod(&mut ingredient.modifiers, Property::Alcohol, Some(x))
+                ingredient.modifiers[Effect::Alcohol].term = Theoretical::from(x);
             }
             if let Some(x) = conf.ma {
-                replace_modifier_mul(&mut ingredient.modifiers, Property::Alcohol, Some(x))
-            }            
-
-        };
+                ingredient.modifiers[Effect::Alcohol].multiplier = Theoretical::from(x);
+            }
+        }
 
         Ok(grimoire)
     }
 }
-
 
 #[derive(Deserialize)]
 #[serde(default)]
@@ -153,25 +171,22 @@ pub struct LoreConfig {
     parent: Option<String>,
 }
 
-
 impl Default for LoreConfig {
     fn default() -> Self {
         Self {
             effectiveness: Some(0.666666666),
-            parent: None
+            parent: None,
         }
     }
 }
-
 
 #[derive(Deserialize)]
 #[serde(default)]
 pub struct CharacterConfig {
     advanced_potion_making: Option<u8>,
     alvarin_clade: Option<bool>,
-    lores: HashMap<String, u8>
+    lores: HashMap<String, u8>,
 }
-
 
 impl Default for CharacterConfig {
     fn default() -> Self {
@@ -179,10 +194,9 @@ impl Default for CharacterConfig {
             advanced_potion_making: Some(100),
             alvarin_clade: Some(true),
             lores: HashMap::default(),
-        }    
+        }
     }
 }
-
 
 #[derive(Deserialize, Default)]
 #[serde(default)]
@@ -205,24 +219,22 @@ pub struct IngredientConfig {
     ma: Option<f64>,
 }
 
-
 pub fn run_migrations(connection: &mut SqliteConnection) -> Result<(), LoadError> {
     let result = connection.run_pending_migrations(MIGRATIONS);
     match result {
         Ok(_) => Ok(()),
-        Err(_) => Err(
-            Report::new(LoadError::default())
-            .attach_printable("Failed to run migrations")
-        )
+        Err(_) => {
+            Err(Report::new(LoadError::default()).attach_printable("Failed to run migrations"))
+        }
     }
 }
 
-pub fn load_grimoire_from_db(filename: &str) -> Result<Compendium, LoadError> {
+pub fn load_grimoire_from_db(filename: &str) -> Result<Grimoire, LoadError> {
     let mut connection = SqliteConnection::establish(filename)
         .into_report()
         .change_context(LoadError::default())
         .attach_printable_lazy(|| format!("Could not load {}", filename))?;
-    
+
     run_migrations(&mut connection)?;
 
     let ingredients_db = models::ingredient::Ingredient::load(&mut connection)
@@ -240,22 +252,23 @@ pub fn load_grimoire_from_db(filename: &str) -> Result<Compendium, LoadError> {
         .change_context(LoadError::default())
         .attach_printable("Could not load characters")?;
 
-    let player_character_lores_db = 
+    let player_character_lores_db =
         models::player_character_lore::PlayerCharacterLore::load(&mut connection)
-        .into_report()
-        .change_context(LoadError::default())
-        .attach_printable("Could not load player lores")?;
+            .into_report()
+            .change_context(LoadError::default())
+            .attach_printable("Could not load player lores")?;
 
-    let ingredients: Vec<data::Ingredient> = 
+    let ingredients: HashMap<String, Ingredient> =
         ingredients_db.iter().map(|x| x.to_grimoire()).collect();
 
-    let lores: Vec<data::Lore> =
-        lores_db.iter().map(|x| x.to_grimoire()).collect();
+    let skills: HashMap<String, Skill> = lores_db.iter().map(|x| x.to_grimoire()).collect();
 
-    let player_characters: Vec<data::Character> =
-        player_characters_db.iter().map(|x| x.to_grimoire(&player_character_lores_db)).collect();
+    let characters: HashMap<String, Character> = player_characters_db
+        .iter()
+        .map(|x| x.to_grimoire(&player_character_lores_db))
+        .collect();
 
-    let grimoire = Compendium::create_from_vecs(player_characters, lores, ingredients);
+    let grimoire = Grimoire::new(skills, ingredients, characters);
 
     Ok(grimoire)
 }

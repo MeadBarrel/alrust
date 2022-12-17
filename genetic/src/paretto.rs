@@ -1,21 +1,19 @@
 use crate::mask::mut_mask;
 
-
 pub type Features = Vec<f64>;
 
-
-pub fn paretto_assess (src: &[Features]) -> Vec<(u64, f64)> {
+pub fn paretto_assess(src: &[Features]) -> Vec<(u64, f64)> {
     let candidates: Vec<Features> = src.to_vec();
 
     let mut ranks = vec![0; candidates.len()];
-    let mut mask = vec![true; candidates.len()];    
+    let mut mask = vec![true; candidates.len()];
     let mut rank: u64 = 0;
 
     while mask.iter().any(|x| *x) {
         let mut efficiency_mask = mask.clone();
 
         get_paretto_efficient_mask_masked(&candidates, &mut efficiency_mask);
-        
+
         for (i, &flag) in efficiency_mask.iter().enumerate() {
             if flag {
                 ranks[i] = rank;
@@ -29,22 +27,18 @@ pub fn paretto_assess (src: &[Features]) -> Vec<(u64, f64)> {
                 mask[i] = false;
             }
         }
-    };
+    }
 
     let crowding_distances = crowding_distance(&candidates);
 
     let mut result = Vec::with_capacity(candidates.len());
 
     for i in 0..crowding_distances.len() {
-        result.push((
-            ranks[i],
-            crowding_distances[i]
-        ))
+        result.push((ranks[i], crowding_distances[i]))
     }
 
     result
 }
-
 
 pub fn get_paretto_efficient_mask<'a>(src: &[Features]) -> Vec<bool> {
     let mut non_dominated_points_mask = vec![true; src.len()];
@@ -54,24 +48,27 @@ pub fn get_paretto_efficient_mask<'a>(src: &[Features]) -> Vec<bool> {
     non_dominated_points_mask
 }
 
-
 pub fn get_paretto_efficient_mask_masked(src: &[Features], mask: &mut Vec<bool>) {
     for (i, features) in src.iter().enumerate() {
-        if !mask[i] { continue; }
-        mut_mask(src, mask, |x| x.iter().zip(features.iter()).any(|(&x, &o)| o<x));
+        if !mask[i] {
+            continue;
+        }
+        mut_mask(src, mask, |x| {
+            x.iter().zip(features.iter()).any(|(&x, &o)| o < x)
+        });
         mask[i] = true;
-    };
+    }
 }
 
-
 pub fn crowding_distance(src: &Vec<Features>) -> Vec<f64> {
-    if src.len() == 0 { return Vec::new(); }
+    if src.len() == 0 {
+        return Vec::new();
+    }
     let num_features = src[0].len();
     let inf = f64::INFINITY;
     let mut distances = vec![0.; src.len()];
     let last_distance = distances.len() - 1;
     let mut src_temp: Vec<(usize, &Features)> = src.iter().enumerate().collect();
-
 
     for i in 0..num_features {
         src_temp.sort_by_key(|(_, x)| (x[i] * 1e+10) as u64);
@@ -85,15 +82,13 @@ pub fn crowding_distance(src: &Vec<Features>) -> Vec<f64> {
         }
 
         for j in 1..last_distance {
-            let difference = src_temp[j+1].1[i] - src_temp[j-1].1[i];
-            distances[src_temp[j].0] +=  difference / norm;
+            let difference = src_temp[j + 1].1[i] - src_temp[j - 1].1[i];
+            distances[src_temp[j].0] += difference / norm;
         }
     }
 
     distances
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -168,44 +163,38 @@ mod tests {
             (5, 0.16366716348478308),
             (2, 0.060289080229606086),
             (1, 0.2704837949183645),
-            (0, inf),          
+            (0, inf),
         ];
 
         let actual = paretto_assess(&points);
 
         for (a, e) in actual.into_iter().zip(expected.into_iter()) {
-            assert!( approx_eq!(f64, a.1, e.1, epsilon = 0.001) && a.0==e.0 )
+            assert!(approx_eq!(f64, a.1, e.1, epsilon = 0.001) && a.0 == e.0)
         }
     }
 
     #[test]
     fn test_crowding_distance() {
-        let points = vec! [
+        let points = vec![
             vec![0.7, 0.1],
             vec![0.5, 0.8],
             vec![0.1, 0.7],
             vec![0.6, 0.5],
-            vec![0.3, 0.9]
+            vec![0.3, 0.9],
         ];
 
         let inf = f64::INFINITY;
-        
-        let expected = vec! [
-            inf,
-            0.75,
-            inf,
-            1.083,
-            inf
-        ];
+
+        let expected = vec![inf, 0.75, inf, 1.083, inf];
 
         let actual = crowding_distance(&points);
 
         for (&a, &e) in actual.iter().zip(expected.iter()) {
             assert!(approx_eq!(f64, a, e, epsilon = 0.001), "{} != {}", a, e)
-        };
+        }
     }
 
-    #[test] 
+    #[test]
     fn test_paretto_front() {
         let points = vec![
             vec![0.7139324067489564, 0.21330768149414225],
@@ -259,15 +248,7 @@ mod tests {
             vec![0.7447345021779552, 0.7129930006020961],
             vec![0.624082199919555, 0.44298877462335495],
         ];
-        let mut expected: Vec<usize> = vec![
-            1,
-            6,
-            33,
-            32,
-            3,
-            38,
-            44,     
-        ];
+        let mut expected: Vec<usize> = vec![1, 6, 33, 32, 3, 38, 44];
 
         expected.sort();
 

@@ -22,7 +22,7 @@ rusqlite = { version = "0.28.0", features = ["bundled"] }
 
 genetic = { path="genetic" }
 geneticalchemy = { path="geneticalchemy" }
-grimoire = { path="grimoire" }
+#grimoire = { path="grimoire" }
 grimoire2 = { path="grimoire2" }
 
 

@@ -4,30 +4,34 @@ use serde_yaml::to_writer;
 use std::io::stdout;
 
 mod experiment;
-mod guess;
 mod grimoiredb;
+mod guess;
 mod models;
-mod schema;
 mod optimization;
+mod schema;
+mod serializable;
+mod theoretical;
 
 use geneticalchemy;
-use grimoire::serializable::PotionSerializable;
+use crate::serializable::PotionSerializable;
 
 use crate::grimoiredb::run_migrations;
 
-
 fn run_genetic(config: &str) {
     // geneticalchemy::builder::GAConfig::load(config).run().unwrap();
-    optimization::build::Optimizator::load(config).unwrap().run().unwrap();
+    optimization::build::Optimizator::load(config)
+        .unwrap()
+        .run()
+        .unwrap();
 }
 
-
 fn run_experiment(config: &str) {
-    let mix = experiment::ExperimentConfig::load(config).unwrap().mix().unwrap();
+    let config = experiment::ExperimentConfig::load(config).unwrap();
+    let grimoire = config.grimoire().unwrap();
+    let mix = config.mix(&grimoire).unwrap();
     let potion = PotionSerializable::from_mix(&mix);
     to_writer(stdout(), &potion).unwrap();
 }
-
 
 fn run_db(filename: &str) {
     use grimoiredb::load_grimoire_from_db;
@@ -35,11 +39,10 @@ fn run_db(filename: &str) {
     load_grimoire_from_db(filename).unwrap();
 }
 
-
 fn run_update(from: &str, to: &str) {
-    use diesel::prelude::{SqliteConnection, Connection};
-    use models::write_compendium;
+    use diesel::prelude::{Connection, SqliteConnection};
     use grimoiredb::GrimoireConfig;
+    use models::write_compendium;
 
     let grimoire = GrimoireConfig::load(from).unwrap().build().unwrap();
 
@@ -49,48 +52,32 @@ fn run_update(from: &str, to: &str) {
     write_compendium(&mut connection, &grimoire).unwrap();
 }
 
-
 fn main() {
     let matches = Command::new("MO2 Alchemy Tools")
         .subcommand(
-            Command::new("genetic")
-                .arg(
-                    arg!(--config <VALUE>).default_value("config.yaml")
-                )
+            Command::new("genetic").arg(arg!(--config <VALUE>).default_value("config.yaml")),
         )
-        .subcommand(
-            Command::new("experiment")
-                .arg(
-                    arg!(--config <VALUE>).required(true)
-                )
-        )
-        .subcommand(
-            Command::new("guess")
-        )
-        .subcommand(
-            Command::new("db")
-                .arg(
-                    arg!(--filename <VALUE>).required(true)
-                )
-        )
+        .subcommand(Command::new("experiment").arg(arg!(--config <VALUE>).required(true)))
+        .subcommand(Command::new("guess"))
+        .subcommand(Command::new("db").arg(arg!(--filename <VALUE>).required(true)))
         .subcommand(
             Command::new("update")
                 .arg(arg!(--from <VALUE>).required(true))
-                .arg(arg!(--to <VALUE>).required(true))
+                .arg(arg!(--to <VALUE>).required(true)),
         )
         .get_matches();
-    
+
     match matches.subcommand() {
         Some(("genetic", args)) => {
             let config_fn = args.get_one::<String>("config").unwrap();
             run_genetic(config_fn);
-        },
+        }
         Some(("experiment", args)) => {
             let config_fn = args.get_one::<String>("config").unwrap();
             run_experiment(config_fn);
         }
-        Some(("guess", args)) => { guess::greet() }
-        Some(("db", args)) => { 
+        Some(("guess", args)) => guess::greet(),
+        Some(("db", args)) => {
             let filename = args.get_one::<String>("filename").unwrap();
             run_db(filename);
         }

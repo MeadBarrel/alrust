@@ -1,8 +1,7 @@
-use diesel::{prelude::*, associations::HasTable};
 use super::Conn;
 use crate::schema::*;
-use grimoire::data;
-
+use diesel::{associations::HasTable, prelude::*};
+use grimoire2::prelude as g2;
 
 #[derive(Debug, Clone, Queryable, Insertable, AsChangeset, Identifiable)]
 #[diesel(table_name=ingredients, primary_key(name))]
@@ -24,86 +23,65 @@ pub struct Ingredient {
     pub mpl: Option<f64>,
     pub a: Option<f64>,
     pub ma: Option<f64>,
-    pub notes: Option<String>
+    pub notes: Option<String>,
 }
-
-
 
 impl Ingredient {
     pub fn load(conn: &mut Conn) -> QueryResult<Vec<Ingredient>> {
         Ingredient::table().load(conn)
     }
 
-    pub fn from_grimoire(src: &data::Ingredient) -> Self {
-        use grimoire::types::Property;
+    pub fn from_grimoire(name: &str, src: &g2::Ingredient) -> Self {
+        use grimoire2::effect::Effect;
 
         Self {
-            name: src.name.clone(),
-            lore: src.lore_name.clone(),
-            al_weight: src.alchemical_weight as i32,
+            name: name.to_string(),
+            lore: src.skill.as_ref().unwrap().clone(),
+            al_weight: src.weight as i32,
 
-            dh: src.modifiers.get(&Property::DirectHealing).cloned().unwrap_or_default().modifier,
-            mdh: src.modifiers.get(&Property::DirectHealing).cloned().unwrap_or_default().multiplier,
+            dh: src.modifiers[Effect::DirectHealing].term.into(),
+            mdh: src.modifiers[Effect::DirectHealing].multiplier.into(),
 
-            dp: src.modifiers.get(&Property::DirectPoison).cloned().unwrap_or_default().modifier,
-            mdp: src.modifiers.get(&Property::DirectPoison).cloned().unwrap_or_default().multiplier,
+            dp: src.modifiers[Effect::DirectPoison].term.into(),
+            mdp: src.modifiers[Effect::DirectPoison].multiplier.into(),
 
-            hot: src.modifiers.get(&Property::HealingOverTime).cloned().unwrap_or_default().modifier,
-            mhot: src.modifiers.get(&Property::HealingOverTime).cloned().unwrap_or_default().multiplier,
+            hot: src.modifiers[Effect::HealingOverTime].term.into(),
+            mhot: src.modifiers[Effect::HealingOverTime].multiplier.into(),
 
-            pot: src.modifiers.get(&Property::PoisonOverTime).cloned().unwrap_or_default().modifier,
-            mpot: src.modifiers.get(&Property::PoisonOverTime).cloned().unwrap_or_default().multiplier,
+            pot: src.modifiers[Effect::PoisonOverTime].term.into(),
+            mpot: src.modifiers[Effect::PoisonOverTime].multiplier.into(),
 
-            hl: src.modifiers.get(&Property::HealingLength).cloned().unwrap_or_default().modifier,
-            mhl: src.modifiers.get(&Property::HealingLength).cloned().unwrap_or_default().multiplier,
+            hl: src.modifiers[Effect::HealingLength].term.into(),
+            mhl: src.modifiers[Effect::HealingLength].multiplier.into(),
 
-            pl: src.modifiers.get(&Property::PoisonLength).cloned().unwrap_or_default().modifier,
-            mpl: src.modifiers.get(&Property::PoisonLength).cloned().unwrap_or_default().multiplier,
+            pl: src.modifiers[Effect::PoisonLength].term.into(),
+            mpl: src.modifiers[Effect::PoisonLength].multiplier.into(),
 
-            a: src.modifiers.get(&Property::Alcohol).cloned().unwrap_or_default().modifier,
-            ma: src.modifiers.get(&Property::Alcohol).cloned().unwrap_or_default().multiplier,
+            a: src.modifiers[Effect::Alcohol].term.into(),
+            ma: src.modifiers[Effect::Alcohol].multiplier.into(),
 
             notes: None,
         }
     }
 
-    pub fn to_grimoire(&self) -> data::Ingredient {
-        use grimoire::types::{Modifier, Property};
+    pub fn to_grimoire(&self) -> (String, g2::Ingredient) {
+        use grimoire2::prelude::Effect;
 
-        data::Ingredient {
-            name: self.name.clone(),
-            alchemical_weight: self.al_weight as u8,
-            lore_name: self.lore.clone(),
-            modifiers: vec! [
-                (
-                    Property::DirectHealing, 
-                    Modifier::new(self.dh, self.mdh)
-                ),
-                (
-                    Property::DirectPoison, 
-                    Modifier::new(self.dp, self.mdp)
-                ),
-                (
-                    Property::HealingOverTime, 
-                    Modifier::new(self.hot, self.mhot)
-                ),
-                (
-                    Property::PoisonOverTime, 
-                    Modifier::new(self.pot, self.mpot)
-                ),
-                (
-                    Property::HealingLength, 
-                    Modifier::new(self.hl, self.mhl)
-                ),
-                (
-                    Property::PoisonLength, 
-                    Modifier::new(self.pl, self.mpl)
-                ),
-                (
-                    Property::Alcohol, 
-                    Modifier::new(self.a, self.ma)
-                ),
-            ].into_iter().collect()
-        }
+        let ingredient = g2::Ingredient {
+            weight: self.al_weight > 0,
+            skill: Some(self.lore.clone()),
+            modifiers: vec![
+                (Effect::DirectHealing, (self.dh, self.mdh).into()),
+                (Effect::DirectPoison, (self.dp, self.mdp).into()),
+                (Effect::HealingOverTime, (self.hot, self.mhot).into()),
+                (Effect::PoisonOverTime, (self.pot, self.mpot).into()),
+                (Effect::HealingLength, (self.hl, self.mhl).into()),
+                (Effect::PoisonLength, (self.pl, self.mpl).into()),
+                (Effect::Alcohol, (self.a, self.ma).into()),
+            ]
+            .into(),
+        };
+
+        (self.name.clone(), ingredient)
     }
 }

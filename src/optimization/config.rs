@@ -1,12 +1,11 @@
-use serde::Deserialize;
 use evalexpr::Node;
+use serde::Deserialize;
 
 use genetic::operators::TournamentSelector;
 
 use crate::grimoiredb::GrimoireConfig;
 
 use super::print::ToYaml;
-
 
 #[derive(Deserialize)]
 #[serde(default)]
@@ -27,7 +26,6 @@ pub struct OptimizatorConfig {
 
     pub num_children: usize,
 }
-
 
 impl Default for OptimizatorConfig {
     fn default() -> Self {
@@ -51,13 +49,12 @@ impl Default for OptimizatorConfig {
     }
 }
 
-
 #[derive(Deserialize)]
 #[serde(default)]
 pub struct MutatorConfig {
     pub amount_grow_ratio: f64,
     pub min_amount_grow: u64,
-    pub num_mutations_amt: usize,    
+    pub num_mutations_amt: usize,
     pub num_mutations_ing: usize,
 }
 

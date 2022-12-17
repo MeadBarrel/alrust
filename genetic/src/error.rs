@@ -1,6 +1,5 @@
-use thiserror;
 use error_stack;
-
+use thiserror;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -11,6 +10,5 @@ pub enum Error {
     #[error("{0}")]
     GenericError(String),
 }
-
 
 pub type Result<T> = error_stack::Result<T, Error>;
