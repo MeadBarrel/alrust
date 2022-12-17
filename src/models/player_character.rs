@@ -31,15 +31,15 @@ impl PlayerCharacter {
     pub fn lores_from_grimoire(name: &str, src: &g2::Character) -> Vec<PlayerCharacterLore> {
         src.skills
             .iter()
-            .map(|(name, &value)| PlayerCharacterLore {
+            .map(|(skill_name, &value)| PlayerCharacterLore {
                 character: name.to_string(),
-                lore: name.clone(),
+                lore: skill_name.clone(),
                 value: value.into(),
             })
             .collect()
     }
 
-    pub fn to_grimoire(&self, lores: &Vec<PlayerCharacterLore>) -> (String, g2::Character) {
+    pub fn to_grimoire(&self, lores: &[PlayerCharacterLore]) -> (String, g2::Character) {
         let clades = match self.alvarin_clade {
             true => vec!["Alchemist".to_string()],
             false => vec![],
@@ -49,7 +49,7 @@ impl PlayerCharacter {
         let character = g2::Character {
             clades,
             skills: lores
-                .into_iter()
+                .iter()
                 .filter(|x| x.character == self.name)
                 .map(|x| (x.lore.clone(), x.value as u8))
                 .collect(),
