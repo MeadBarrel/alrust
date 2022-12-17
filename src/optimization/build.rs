@@ -122,7 +122,7 @@ impl Optimizator {
 
         let initial_pool = (0..config.population_size)
             .into_iter()
-            .map(|_| AlchemyGenome::create_random(&mut rng, &optimized_grimoire))
+            .map(|_| AlchemyGenome::create_random(&mut rng, optimized_grimoire.ingredients.len()))
             .collect();
 
         let ga = create_alchemy_ga(
