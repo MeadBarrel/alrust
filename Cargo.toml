@@ -26,6 +26,10 @@ geneticalchemy = { path="geneticalchemy" }
 grimoire2 = { path="grimoire2" }
 
 
+[dev-dependencies]
+maplit = "1.0.2"
+
+
 [workspace]
 members = [
     'genetic',

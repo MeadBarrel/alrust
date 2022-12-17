@@ -57,3 +57,36 @@ impl PlayerCharacter {
         (self.name.clone(), character)
     }
 }
+
+
+
+#[cfg(test)]
+mod tests{
+    use super::*;
+    use grimoire2::prelude as g2;
+    use maplit::{hashset, hashmap};
+
+    #[test]
+    fn test_from_grimoire_alchemist_apm() {
+        let character = g2::Character::new(
+            hashset!["Alchemist".to_string(), "Another".to_string()],
+            hashmap! {"skill_1".to_string() => 50, "Advanced Potion Making".to_string() => 25}
+        );
+        let actual = PlayerCharacter::from_grimoire("Tashka", &character);
+
+        assert_eq!( actual.advanced_potion_making, 25 );
+        assert!( actual.alvarin_clade );
+    }
+
+    #[test]
+    fn test_from_grimoire_no_alchemist_no_apm() {
+        let character = g2::Character::new(
+            hashset!["Another".to_string()],
+            hashmap! {"skill_1".to_string() => 50}
+        );
+        let actual = PlayerCharacter::from_grimoire("Tashka", &character);
+
+        assert_eq!( actual.advanced_potion_making, 0 );
+        assert!( !actual.alvarin_clade );
+    }    
+}
