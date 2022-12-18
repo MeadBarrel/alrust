@@ -1,22 +1,19 @@
+use std::collections::HashMap;
+
+use strum::IntoEnumIterator;
+
 use crate::grimoire::Ingredient;
 use crate::theoretical::Theoretical;
-use crate::effect::Effect;
+use crate::effect::{Effect, self};
 
-
-#[derive(Clone, Debug)]
-pub enum ModifierUpdate {
-    ToKnown(Effect),
-    ToUnknown(Effect),
-    To(Effect, Theoretical<f64>),
-}
 
 
 #[derive(Default, Clone, Debug)]
 pub struct IngredientUpdate {
-    pub multiplier_actions: Vec<ModifierUpdate>,
-    pub term_actions: Vec<ModifierUpdate>,
-    pub skill: Option<Option<String>>,
-    pub weight: Option<bool>,
+    multiplier_actions: HashMap<Effect, Theoretical<f64>>,
+    term_actions: HashMap<Effect, Theoretical<f64>>,
+    skill: Option<Option<String>>,
+    weight: Option<bool>,
 }
 
 
@@ -51,25 +48,35 @@ impl IngredientUpdate {
             ingredient.weight = x;
         }
 
-        self.term_actions.iter().for_each(|action|
-            match action {
-                ModifierUpdate::To(effect, to) => ingredient.modifiers[*effect].term = *to,
-                ModifierUpdate::ToKnown(effect) => ingredient.modifiers[*effect].term = 
-                    ingredient.modifiers[*effect].term.to_known(),
-                ModifierUpdate::ToUnknown(effect) => ingredient.modifiers[*effect].term =
-                    ingredient.modifiers[*effect].term.to_unknown(),
-            }
+        self.term_actions.iter().for_each(
+            |(effect, value)|
+            { ingredient.modifiers[*effect].term = *value }
         );
 
-        self.multiplier_actions.iter().for_each(|action|
-            match action {
-                ModifierUpdate::To(effect, to) => ingredient.modifiers[*effect].multiplier = *to,
-                ModifierUpdate::ToKnown(effect) => ingredient.modifiers[*effect].multiplier = 
-                    ingredient.modifiers[*effect].multiplier.to_known(),
-                ModifierUpdate::ToUnknown(effect) => ingredient.modifiers[*effect].multiplier =
-                    ingredient.modifiers[*effect].multiplier.to_unknown(),
-            }
-        );
+        self.multiplier_actions.iter().for_each(
+            |(effect, value)|
+            { ingredient.modifiers[*effect].multiplier = *value }
+        );       
+
+        // self.term_actions.iter().for_each(|(effect, action)|
+        //     match action {
+        //         ModifierUpdate::To(to) => ingredient.modifiers[*effect].term = *to,
+        //         ModifierUpdate::ToKnown => ingredient.modifiers[*effect].term = 
+        //             ingredient.modifiers[*effect].term.to_known(),
+        //         ModifierUpdate::ToUnknown => ingredient.modifiers[*effect].term =
+        //             ingredient.modifiers[*effect].term.to_unknown(),
+        //     }
+        // );
+
+        // self.multiplier_actions.iter().for_each(|(effect, action)|
+        //     match action {
+        //         ModifierUpdate::To(to) => ingredient.modifiers[*effect].multiplier = *to,
+        //         ModifierUpdate::ToKnown => ingredient.modifiers[*effect].multiplier = 
+        //             ingredient.modifiers[*effect].multiplier.to_known(),
+        //         ModifierUpdate::ToUnknown => ingredient.modifiers[*effect].multiplier =
+        //             ingredient.modifiers[*effect].multiplier.to_unknown(),
+        //     }
+        // );
 
     }
 
@@ -100,33 +107,29 @@ impl IngredientUpdate {
     }
 
     pub fn set_term(&mut self, effect: Effect, value: Theoretical<f64>) -> &mut Self {
-        self.term_actions.push(ModifierUpdate::To(effect, value));
+        self.term_actions.insert(effect, value);
         self
     }
 
     pub fn set_multiplier(&mut self, effect: Effect, value: Theoretical<f64>) -> &mut Self {
-        self.multiplier_actions.push(ModifierUpdate::To(effect, value));
+        self.multiplier_actions.insert(effect, value);        
         self
     }    
 
-    pub fn set_term_known(&mut self, effect: Effect) -> &mut Self {
-        self.term_actions.push(ModifierUpdate::ToKnown(effect));
-        self
+    pub fn will_set_skill(&self) -> Option<Option<String>> {
+        self.skill.clone()
     }
 
-    pub fn set_multiplier_known(&mut self, effect: Effect) -> &mut Self {
-        self.multiplier_actions.push(ModifierUpdate::ToKnown(effect));
-        self
+    pub fn will_set_weight(&self) -> Option<bool> {
+        self.weight
     }
 
-    pub fn set_term_unknown(&mut self, effect: Effect) -> &mut Self {
-        self.term_actions.push(ModifierUpdate::ToUnknown(effect));
-        self
+    pub fn will_set_term(&self, effect: Effect) -> Option<Theoretical<f64>> {
+        self.term_actions.get(&effect).copied()
     }
 
-    pub fn set_multiplier_unknown(&mut self, effect: Effect) -> &mut Self {
-        self.multiplier_actions.push(ModifierUpdate::ToUnknown(effect));
-        self
+    pub fn will_set_multiplier(&self, effect: Effect) -> Option<Theoretical<f64>> {
+        self.multiplier_actions.get(&effect).copied()
     }
 
 }
@@ -195,31 +198,6 @@ mod tests {
     }
 
     #[test]
-    fn test_set_ordering_1() {
-        let mut ingredient = Ingredient::default();
-        IngredientUpdate::default()
-            .set_multiplier_known(Effect::Alcohol)
-            .set_multiplier(Effect::Alcohol, Theoretical::Theory(0.5))
-            .update(&mut ingredient);
-        
-        assert!( !ingredient.modifiers[Effect::Alcohol].multiplier.is_known() );
-        assert_eq!( ingredient.modifiers[Effect::Alcohol].multiplier.inner(), 0.5 );
-    }
-
-
-    #[test]
-    fn test_set_ordering2() {
-        let mut ingredient = Ingredient::default();
-        IngredientUpdate::default()
-            .set_multiplier(Effect::Alcohol, Theoretical::Theory(0.5))
-            .set_multiplier_known(Effect::Alcohol)
-            .update(&mut ingredient);
-        
-        assert!( ingredient.modifiers[Effect::Alcohol].multiplier.is_known() );
-        assert_eq!( ingredient.modifiers[Effect::Alcohol].multiplier.inner(), 0.5 );
-    }    
-
-    #[test]
     fn test_set_term() {
         let mut ingredient = Ingredient::default();
         IngredientUpdate::default()
@@ -236,42 +214,6 @@ mod tests {
         assert!( ingredient.modifiers[Effect::Alcohol].multiplier.is_known() );
         assert_eq!( ingredient.modifiers[Effect::Alcohol].multiplier.inner(), 0.5 );        
     }
-
-    #[test]
-    fn test_set_term_known() {
-        let mut ingredient = IngredientUpdate::default()
-            .set_term(Effect::Alcohol, Theoretical::Theory(0.5)).create();
-        IngredientUpdate::default().set_term_known(Effect::Alcohol).update(&mut ingredient);
-        assert!( ingredient.modifiers[Effect::Alcohol].term.is_known() );
-        assert_eq!( ingredient.modifiers[Effect::Alcohol].term.inner(), 0.5 );
-    }
-
-    #[test]
-    fn test_set_term_unknown() {
-        let mut ingredient = IngredientUpdate::default()
-            .set_term(Effect::Alcohol, Theoretical::Known(0.5)).create();
-        IngredientUpdate::default().set_term_unknown(Effect::Alcohol).update(&mut ingredient);
-        assert!( !ingredient.modifiers[Effect::Alcohol].term.is_known() );
-        assert_eq!( ingredient.modifiers[Effect::Alcohol].term.inner(), 0.5 );        
-    }
-
-    #[test]
-    fn test_set_multiplier_known() {
-        let mut ingredient = IngredientUpdate::default()
-            .set_multiplier(Effect::Alcohol, Theoretical::Theory(0.5)).create();
-        IngredientUpdate::default().set_multiplier_known(Effect::Alcohol).update(&mut ingredient);
-        assert!( ingredient.modifiers[Effect::Alcohol].multiplier.is_known() );
-        assert_eq!( ingredient.modifiers[Effect::Alcohol].multiplier.inner(), 0.5 );
-    }
-
-    #[test]
-    fn test_set_multiplier_unknown() {
-        let mut ingredient = IngredientUpdate::default()
-            .set_multiplier(Effect::Alcohol, Theoretical::Known(0.5)).create();
-        IngredientUpdate::default().set_multiplier_unknown(Effect::Alcohol).update(&mut ingredient);
-        assert!( !ingredient.modifiers[Effect::Alcohol].multiplier.is_known() );
-        assert_eq!( ingredient.modifiers[Effect::Alcohol].multiplier.inner(), 0.5 );
-    }    
 
     #[test]
     fn test_set_weight() {

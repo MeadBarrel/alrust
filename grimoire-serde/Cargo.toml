@@ -13,3 +13,4 @@ grimoire2 = { path="../grimoire2" }
 
 [dev-dependencies]
 serde_yaml = "0.9.14"
+rstest = "0.16.0"
