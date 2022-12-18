@@ -3,25 +3,37 @@ pub mod skill;
 pub mod ingredient;
 
 
+use std::process::Command;
+
 use crate::grimoire::Grimoire;
+
+use self::ingredient::IngredientUpdate;
 
 
 #[derive(Debug, Clone)]
-enum CharacterUpdateCommand {
+pub enum UpdateCommand<T> {
+    Update(T),
+    Remove,
+    Replace,
+}
+
+
+#[derive(Debug, Clone)]
+pub enum CharacterUpdateCommand {
     Update(String, character::CharacterUpdate),
     Remove(String),
 }
 
 
 #[derive(Debug, Clone)]
-enum SkillUpdateCommand {
+pub enum SkillUpdateCommand {
     Update(String, skill::SkillUpdate),
     Remove(String)
 }
 
 
 #[derive(Debug, Clone)]
-enum IngredientUpdateCommand {
+pub enum IngredientUpdateCommand {
     Update(String, ingredient::IngredientUpdate),
     Remove(String)
 }
@@ -111,7 +123,8 @@ impl GrimoireUpdate {
         self.ingredients.push(
             IngredientUpdateCommand::Remove(name.to_string())
         );
-        self    }
+        self    
+    }
 }
 
 
