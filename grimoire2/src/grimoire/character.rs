@@ -21,7 +21,7 @@ impl Character {
         let effectiveness = skills.get(skill).cloned().unwrap_or_default().effectiveness;
         let value = self.skill(skills, skill);
 
-        Theoretical::from(1.) + effectiveness * Theoretical::from(value as f64 / 100.)
+        Theoretical::from(1.) + effectiveness.default_theory(0.66666) * Theoretical::from(value as f64 / 100.)
     }
 
     pub fn raw_skill(&self, skill: &str) -> u8 {

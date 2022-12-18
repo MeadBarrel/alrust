@@ -27,6 +27,13 @@ where
         Self::Theory(self.inner())
     }
 
+    pub fn default_theory(self, default: T) -> Self {
+        match self {
+            Self::Known(_) | Self::Theory(_) => self,
+            Self::Unknown => Self::Theory(default)
+        }
+    }
+
     #[inline(always)]
     pub fn inner(&self) -> T 
         where T: Default
