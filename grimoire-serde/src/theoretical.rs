@@ -5,7 +5,7 @@ use serde::de;
 use grimoire2::theoretical::Theoretical;
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TheoreticalWrapper {    
     Known(f64),
     Theory(f64),
