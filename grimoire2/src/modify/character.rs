@@ -3,13 +3,14 @@ use std::collections::{HashSet, HashMap};
 use crate::{grimoire::Character};
 
 
+#[derive(Clone, Debug)]
 pub enum ModifyClade {
     Add(String),
     Remove(String),
 }
 
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct CharacterUpdate {
     pub clades_add: Vec<String>,
     pub clades_remove: HashSet<String>,

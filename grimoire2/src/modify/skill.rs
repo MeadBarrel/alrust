@@ -1,7 +1,7 @@
 use crate::{theoretical::Theoretical, prelude::Skill};
 
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct SkillUpdate {
     effectiveness: Option<Theoretical<f64>>,
     parent: Option<Option<String>>,

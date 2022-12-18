@@ -3,7 +3,7 @@ use crate::theoretical::Theoretical;
 use crate::effect::Effect;
 
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum ModifierUpdate {
     ToKnown(Effect),
     ToUnknown(Effect),
@@ -11,7 +11,7 @@ pub enum ModifierUpdate {
 }
 
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct IngredientUpdate {
     pub multiplier_actions: Vec<ModifierUpdate>,
     pub term_actions: Vec<ModifierUpdate>,
