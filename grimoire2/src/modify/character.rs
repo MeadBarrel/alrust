@@ -23,6 +23,15 @@ impl CharacterUpdate {
         character
     }
 
+    pub fn from_character(character: &Character) -> CharacterUpdate {
+        let mut update = Self::default();
+
+        character.clades.iter().for_each(|clade| { update.add_clade(clade); });
+        character.skills.iter().for_each(|(skill, value)| { update.set_skill(skill, *value); } );
+
+        update
+    }
+
     pub fn update(&self, character: &mut Character) {
         character.clades.retain(|x| !self.clades_remove.contains(x));
         character.clades.extend(self.clades_add.iter().cloned());
@@ -46,11 +55,44 @@ impl CharacterUpdate {
 }
 
 
+impl From<Character> for CharacterUpdate {
+    fn from(value: Character) -> Self {
+        Self::from_character(&value)
+    }
+}
+
+
+impl From<CharacterUpdate> for Character {
+    fn from(value: CharacterUpdate) -> Self {
+        value.create()
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use crate::grimoire::Character;
     use super::*;
     use maplit::{hashmap, hashset};
+
+    #[test]
+    fn test_from_character() {
+        let character = CharacterUpdate::default()
+            .add_clade("a")
+            .add_clade("b")
+            .set_skill("a", 100)
+            .set_skill("b", 5)
+            .create();
+        
+        let update = CharacterUpdate::from_character(&character);
+
+        let new_character = update.create();
+
+        assert!(new_character.has_clade("a"));
+        assert!(new_character.has_clade("b"));
+        assert_eq!(new_character.raw_skill("a"), 100);
+        assert_eq!(new_character.raw_skill("b"), 5);
+    }
 
     #[test]
     fn test_modify_character() {

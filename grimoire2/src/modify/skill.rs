@@ -16,6 +16,15 @@ impl SkillUpdate {
         skill
     }
 
+    pub fn from_skill(skill: &Skill) -> Self {
+        let mut update = SkillUpdate::default();
+        update.set_effectiveness(skill.effectiveness);
+        update.parent = Some(skill.parent.clone());
+        update.parent_2 = Some(skill.parent_2.clone());
+
+        update
+    }
+
     pub fn update(&self, skill: &mut Skill) {
         if let Some(x) = self.effectiveness {
             skill.effectiveness = x;
@@ -52,7 +61,20 @@ impl SkillUpdate {
         self.parent_2 = Some(None);
         self
     }   
+}
 
+
+impl From<Skill> for SkillUpdate {
+    fn from(value: Skill) -> Self {
+        Self::from_skill(&value)
+    }
+}
+
+
+impl From<SkillUpdate> for Skill {
+    fn from(value: SkillUpdate) -> Self {
+        value.create()
+    }
 }
 
 

@@ -11,7 +11,12 @@ impl ModifierMap {
     pub fn size(&self) -> usize {
         Effect::COUNT
     }
+
+    pub fn iter(&self) -> impl Iterator<Item = (Effect, &Modifier)> {
+        Effect::iter().zip(self.0.iter())
+    }
 }
+
 
 impl From<Vec<(Effect, Modifier)>> for ModifierMap {
     fn from(src: Vec<(Effect, Modifier)>) -> Self {
