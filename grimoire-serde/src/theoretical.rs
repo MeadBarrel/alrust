@@ -5,13 +5,19 @@ use serde::de;
 use grimoire2::theoretical::Theoretical;
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum TheoreticalWrapper {    
     Known(f64),
     Theory(f64),
     Unknown,
 }
 
+
+impl Default for TheoreticalWrapper {
+    fn default() -> Self {
+        TheoreticalWrapper::Unknown
+    }
+}
 
 impl TheoreticalWrapper {
     pub fn to_theoretical(self, default: f64) -> Theoretical<f64> {
@@ -30,6 +36,17 @@ impl From<Theoretical<f64>> for TheoreticalWrapper {
             Theoretical::Known(x) => TheoreticalWrapper::Known(x),
             Theoretical::Theory(x) => TheoreticalWrapper::Theory(x),
             Theoretical::Unknown => TheoreticalWrapper::Unknown,
+        }
+    }
+}
+
+
+impl From<TheoreticalWrapper> for Theoretical<f64> {
+    fn from(value: TheoreticalWrapper) -> Self {
+        match value {
+            TheoreticalWrapper::Known(x) => Theoretical::Known(x),
+            TheoreticalWrapper::Theory(x) => Theoretical::Theory(x),
+            TheoreticalWrapper::Unknown => Theoretical::Unknown,
         }
     }
 }

@@ -14,7 +14,8 @@ pub enum ModifyClade {
 pub struct CharacterUpdate {
     pub clades_add: Vec<String>,
     pub clades_remove: HashSet<String>,
-    pub skills: Vec<(String, u8)>
+    pub skills: Vec<(String, u8)>,
+    pub skills_remove: HashSet<String>,
 }
 
 impl CharacterUpdate {
@@ -35,6 +36,7 @@ impl CharacterUpdate {
 
     pub fn update(&self, character: &mut Character) {
         character.clades.retain(|x| !self.clades_remove.contains(x));
+        character.skills.retain(|x, _| !self.skills_remove.contains(x));
         character.clades.extend(self.clades_add.iter().cloned());
         character.skills.extend(self.skills.iter().cloned())
     }
@@ -51,6 +53,11 @@ impl CharacterUpdate {
 
     pub fn set_skill(&mut self, skill: &str, value: u8) -> &mut Self {
         self.skills.push((skill.to_string(), value));
+        self
+    }
+
+    pub fn remove_skill(&mut self, skill: &str) -> &mut Self {
+        self.skills_remove.insert(skill.to_string());
         self
     }
 }

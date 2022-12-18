@@ -60,7 +60,19 @@ impl SkillUpdate {
     pub fn remove_parent_2(&mut self) -> &mut Self {
         self.parent_2 = Some(None);
         self
-    }   
+    }
+
+    pub fn will_set_parent(&self) -> Option<Option<String>> {
+        self.parent.clone()
+    }
+
+    pub fn will_set_parent_2(&self) -> Option<Option<String>> {
+        self.parent_2.clone()
+    }
+
+    pub fn will_set_effectiveness(&self) -> Option<Theoretical<f64>> {
+        self.effectiveness
+    }
 }
 
 
