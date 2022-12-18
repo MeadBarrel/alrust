@@ -71,6 +71,20 @@ impl SkillUpdateSerializable {
 }
 
 
+impl From<SkillUpdate> for SkillUpdateSerializable {
+    fn from(value: SkillUpdate) -> Self {
+        Self::from_update(&value)
+    }
+}
+
+
+impl From<SkillUpdateSerializable> for SkillUpdate {
+    fn from(value: SkillUpdateSerializable) -> Self {
+        value.to_update()
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::SkillUpdateSerializable;

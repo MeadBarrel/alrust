@@ -98,6 +98,20 @@ impl IngredientUpdateSerializable {
 }
 
 
+impl From<IngredientUpdate> for IngredientUpdateSerializable {
+    fn from(value: IngredientUpdate) -> Self {
+        Self::from_update(&value)
+    }
+}
+
+
+impl From<IngredientUpdateSerializable> for IngredientUpdate {
+    fn from(value: IngredientUpdateSerializable) -> Self {
+        value.to_update()
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
 
