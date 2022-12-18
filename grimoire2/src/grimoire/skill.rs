@@ -24,7 +24,7 @@ impl Skill {
 impl Default for Skill {
     fn default() -> Self {
         Self {
-            effectiveness: Theoretical::Unknown(0.66666),
+            effectiveness: Theoretical::Theory(0.66666),
             parent: None,
             parent_2: None,
         }

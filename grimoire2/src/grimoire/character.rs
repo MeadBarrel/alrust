@@ -165,7 +165,7 @@ pub mod tests {
             (
                 "Skill".to_string(),
                 Skill::new(
-                    Theoretical::Unknown(2.33333),
+                    Theoretical::Theory(2.33333),
                     Some("Parent Skill".to_string()),
                     None,
                 ),

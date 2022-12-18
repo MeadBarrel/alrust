@@ -18,9 +18,12 @@ impl Serialize for TheoreticalWrapper<f64>
             Theoretical::Known(x) => {
                 serializer.serialize_newtype_variant("Theoretical", 0, "_", x)
             }
-            Theoretical::Unknown(x) => {
+            Theoretical::Theory(x) => {
                 serializer.serialize_newtype_variant("Theoretical", 1, "Unknown", x)
-            }            
+            }
+            Theoretical::Unknown => {
+                serializer.serialize_newtype_variant("Theoretical", 1, "Unknown", &0.)
+            }
         }
 
     }

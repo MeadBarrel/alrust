@@ -164,13 +164,13 @@ mod tests {
         assert_eq!( new_ingredient.modifiers[Effect::DirectHealing].multiplier, (1.0).into() );
 
         assert_eq!( new_ingredient.modifiers[Effect::DirectPoison].term, (2.0).into() );
-        assert_eq!( new_ingredient.modifiers[Effect::DirectPoison].multiplier, Theoretical::Unknown(0.) );
+        assert_eq!( new_ingredient.modifiers[Effect::DirectPoison].multiplier, Theoretical::Unknown );
 
-        assert_eq!( new_ingredient.modifiers[Effect::HealingOverTime].term, Theoretical::Unknown(0.) );
+        assert_eq!( new_ingredient.modifiers[Effect::HealingOverTime].term, Theoretical::Unknown );
         assert_eq!( new_ingredient.modifiers[Effect::HealingOverTime].multiplier, (3.0).into() );
 
-        assert_eq!( new_ingredient.modifiers[Effect::PoisonOverTime].term, Theoretical::Unknown(4.0) );
-        assert_eq!( new_ingredient.modifiers[Effect::PoisonOverTime].multiplier, Theoretical::Unknown(4.0) );
+        assert_eq!( new_ingredient.modifiers[Effect::PoisonOverTime].term, Theoretical::Theory(4.0) );
+        assert_eq!( new_ingredient.modifiers[Effect::PoisonOverTime].multiplier, Theoretical::Theory(4.0) );
 
         assert_eq!( new_ingredient.skill, Some("skill".to_string()) );
         assert!( new_ingredient.weight );
@@ -186,8 +186,8 @@ mod tests {
 
             .set_multiplier(Effect::HealingOverTime, (3.0).into())
 
-            .set_term(Effect::PoisonOverTime, Theoretical::Unknown(4.0))
-            .set_multiplier(Effect::PoisonOverTime, Theoretical::Unknown(4.0))
+            .set_term(Effect::PoisonOverTime, Theoretical::Theory(4.0))
+            .set_multiplier(Effect::PoisonOverTime, Theoretical::Theory(4.0))
 
             .set_skill("skill")
             .set_weight(true)
@@ -199,7 +199,7 @@ mod tests {
         let mut ingredient = Ingredient::default();
         IngredientUpdate::default()
             .set_multiplier_known(Effect::Alcohol)
-            .set_multiplier(Effect::Alcohol, Theoretical::Unknown(0.5))
+            .set_multiplier(Effect::Alcohol, Theoretical::Theory(0.5))
             .update(&mut ingredient);
         
         assert!( !ingredient.modifiers[Effect::Alcohol].multiplier.is_known() );
@@ -211,7 +211,7 @@ mod tests {
     fn test_set_ordering2() {
         let mut ingredient = Ingredient::default();
         IngredientUpdate::default()
-            .set_multiplier(Effect::Alcohol, Theoretical::Unknown(0.5))
+            .set_multiplier(Effect::Alcohol, Theoretical::Theory(0.5))
             .set_multiplier_known(Effect::Alcohol)
             .update(&mut ingredient);
         
@@ -240,7 +240,7 @@ mod tests {
     #[test]
     fn test_set_term_known() {
         let mut ingredient = IngredientUpdate::default()
-            .set_term(Effect::Alcohol, Theoretical::Unknown(0.5)).create();
+            .set_term(Effect::Alcohol, Theoretical::Theory(0.5)).create();
         IngredientUpdate::default().set_term_known(Effect::Alcohol).update(&mut ingredient);
         assert!( ingredient.modifiers[Effect::Alcohol].term.is_known() );
         assert_eq!( ingredient.modifiers[Effect::Alcohol].term.inner(), 0.5 );
@@ -258,7 +258,7 @@ mod tests {
     #[test]
     fn test_set_multiplier_known() {
         let mut ingredient = IngredientUpdate::default()
-            .set_multiplier(Effect::Alcohol, Theoretical::Unknown(0.5)).create();
+            .set_multiplier(Effect::Alcohol, Theoretical::Theory(0.5)).create();
         IngredientUpdate::default().set_multiplier_known(Effect::Alcohol).update(&mut ingredient);
         assert!( ingredient.modifiers[Effect::Alcohol].multiplier.is_known() );
         assert_eq!( ingredient.modifiers[Effect::Alcohol].multiplier.inner(), 0.5 );

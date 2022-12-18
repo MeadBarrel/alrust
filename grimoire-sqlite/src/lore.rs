@@ -31,7 +31,7 @@ impl Lore {
         let skill = g2::Skill {
             effectiveness: match self.effectiveness {
                 Some(x) => Theoretical::Known(x),
-                None => Theoretical::Unknown(0.66666),
+                None => Theoretical::Theory(0.66666),
             },
             parent: self.parent.clone(),
             parent_2: self.parent2.clone(),

@@ -7,9 +7,9 @@ use grimoire2::theoretical::Theoretical;
 
 #[derive(Debug)]
 pub enum TheoreticalWrapper {    
-    Unknown(f64),
     Known(f64),
-    Default,
+    Theory(f64),
+    Unknown,
 }
 
 
@@ -17,8 +17,8 @@ impl TheoreticalWrapper {
     pub fn to_theoretical(self, default: f64) -> Theoretical<f64> {
         match self {
             Self::Known(x) => Theoretical::Known(x),
-            Self::Unknown(x) => Theoretical::Unknown(x),
-            Self::Default => Theoretical::Unknown(default),
+            Self::Theory(x) => Theoretical::Theory(x),
+            Self::Unknown => Theoretical::Unknown,
         }
     }
 }
@@ -28,7 +28,8 @@ impl From<Theoretical<f64>> for TheoreticalWrapper {
     fn from(value: Theoretical<f64>) -> Self {
         match value {
             Theoretical::Known(x) => TheoreticalWrapper::Known(x),
-            Theoretical::Unknown(x) => TheoreticalWrapper::Unknown(x)
+            Theoretical::Theory(x) => TheoreticalWrapper::Theory(x),
+            Theoretical::Unknown => TheoreticalWrapper::Unknown,
         }
     }
 }
@@ -40,10 +41,10 @@ impl Serialize for TheoreticalWrapper {
     {
         match self {
             TheoreticalWrapper::Known(value) => value.serialize(serializer),
-            TheoreticalWrapper::Unknown(value) => {
+            TheoreticalWrapper::Theory(value) => {
                 serializer.serialize_newtype_variant("TheoreticalWrapper", 1, "?", value)
             },
-            TheoreticalWrapper::Default => {
+            TheoreticalWrapper::Unknown => {
                 serializer.serialize_unit_variant("TheoreticalWrapper", 2, "??")
             }
         }
@@ -73,7 +74,7 @@ impl<'de> Deserialize<'de> for TheoreticalWrapper {
                 where
                     E: de::Error, {
                 match v {
-                    "??" => Ok(TheoreticalWrapper::Default),
+                    "??" => Ok(TheoreticalWrapper::Unknown),
                     _ => Err(de::Error::custom(format!("Unknown value: {}", v)))
                 }
             }
@@ -86,9 +87,9 @@ impl<'de> Deserialize<'de> for TheoreticalWrapper {
 
                 match variant.as_str() {
                     "?" => Ok(
-                        values.newtype_variant().map(TheoreticalWrapper::Unknown)
+                        values.newtype_variant().map(TheoreticalWrapper::Theory)
                     )?,      
-                    "!" => Ok(values.newtype_variant().map(TheoreticalWrapper::Unknown))?,
+                    "!" => Ok(values.newtype_variant().map(TheoreticalWrapper::Theory))?,
                     _ => Err(de::Error::unknown_variant(&variant, &["!", "?"]))
                 }
                 
@@ -118,7 +119,7 @@ mod tests {
 
     #[test]
     fn test_serialize_unknown_f64() {
-        let value: TheoreticalWrapper = Theoretical::Unknown(0.5).into();
+        let value: TheoreticalWrapper = Theoretical::Theory(0.5).into();
         let expected = "!? 0.5\n";
         let actual = to_string(&value).unwrap();
         assert_eq!(actual, expected, "Serialization result: '{:?}'", actual);
@@ -126,7 +127,7 @@ mod tests {
 
     #[test]
     fn test_serialize_default() {
-        let value: TheoreticalWrapper = TheoreticalWrapper::Default;
+        let value: TheoreticalWrapper = TheoreticalWrapper::Unknown;
         let expected = "??\n";
         let actual = to_string(&value).unwrap();
         assert_eq!(actual, expected, "Serialization result: '{:?}'", actual);
@@ -143,7 +144,7 @@ mod tests {
     #[test]
     fn test_deserialize_unknown_f64() {
         let input = "!? 0.5\n";
-        let expected: Theoretical<f64> = Theoretical::Unknown(0.5);
+        let expected: Theoretical<f64> = Theoretical::Theory(0.5);
         let actual = from_str::<TheoreticalWrapper>(input).unwrap().to_theoretical(0.);
         assert_eq!(expected, actual);
     }
@@ -151,7 +152,7 @@ mod tests {
     #[test]
     fn test_deserialize_default() {
         let input = "??\n";
-        let expected: Theoretical<f64> = Theoretical::Unknown(0.);
+        let expected: Theoretical<f64> = Theoretical::Unknown;
         let actual = from_str::<TheoreticalWrapper>(input).unwrap().to_theoretical(0.);
         assert_eq!(expected, actual);
     }

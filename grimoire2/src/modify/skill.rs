@@ -80,14 +80,14 @@ impl From<SkillUpdate> for Skill {
 
 #[cfg(test)]
 mod tests {
-    use crate::{grimoire::Skill, prelude::{Known, Unknown}};
+    use crate::{grimoire::Skill, prelude::{Known, Theory}};
 
     use super::SkillUpdate;
 
     #[test]
     fn test_skill_update_set_effectiveness() {
         let mut skill = Skill::new(Known(0.9), None, None);
-        let update = SkillUpdate::default().set_effectiveness(Unknown(0.5)).clone();
+        let update = SkillUpdate::default().set_effectiveness(Theory(0.5)).clone();
 
         update.update(&mut skill);
 
