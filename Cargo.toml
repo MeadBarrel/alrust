@@ -22,6 +22,7 @@ geneticalchemy = { path="geneticalchemy" }
 #grimoire = { path="grimoire" }
 grimoire2 = { path="grimoire2" }
 grimoire-sqlite = { path="grimoire-sqlite" }
+grimoire-serde = { path="grimoire-serde" }
 
 
 [dev-dependencies]

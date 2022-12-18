@@ -1,5 +1,8 @@
 use clap::*;
-use serde_yaml::to_writer;
+use experiment::ExperimentConfig;
+use std::fs::File;
+use serde::{Serialize, Deserialize, de::DeserializeOwned};
+use serde_yaml::{to_writer, from_reader};
 use std::io::stdout;
 
 mod experiment;
@@ -21,11 +24,15 @@ fn run_genetic(config: &str) {
 }
 
 fn run_experiment(config: &str) {
-    let config = experiment::ExperimentConfig::load(config).unwrap();
-    let grimoire = config.grimoire().unwrap();
-    let mix = config.mix(&grimoire).unwrap();
-    let potion = PotionSerializable::from_mix(&mix);
-    to_writer(stdout(), &potion).unwrap();
+    let experiment = load_yaml::<ExperimentConfig>(config);
+    let result = experiment.run().unwrap();
+    print_yaml(&result);
+
+    // let config = experiment::ExperimentConfig::load(config).unwrap();
+    // let grimoire = config.grimoire().unwrap();
+    // let mix = config.mix(&grimoire).unwrap();
+    // let potion = PotionSerializable::from_mix(&mix);
+    // to_writer(stdout(), &potion).unwrap();
 }
 
 fn run_db(filename: &str) {
@@ -40,6 +47,24 @@ fn run_update(from: &str, to: &str) {
     let grimoire = GrimoireConfig::load(from).unwrap().build().unwrap();
     GrimoireSqlite::connect(to).unwrap().write(&grimoire).unwrap();
 }
+
+
+fn load_yaml<T: DeserializeOwned>(filename: &str) -> T {
+    let f = File::open(filename).unwrap();
+    from_reader(f).unwrap()
+}
+
+
+fn save_yaml<T: Serialize>(filename: &str, value: &T) {
+    let f = File::create(filename).unwrap();
+    to_writer(f, value).unwrap();
+}
+
+
+fn print_yaml<T: Serialize>(value: &T) {
+    to_writer(stdout(), value).unwrap();
+}
+
 
 fn main() {
     let matches = Command::new("MO2 Alchemy Tools")

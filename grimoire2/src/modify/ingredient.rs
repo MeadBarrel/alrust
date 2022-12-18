@@ -106,7 +106,7 @@ impl IngredientUpdate {
         self
     }
 
-    pub fn set_term(&mut self, effect: Effect, value: Theoretical<f64>) -> &mut Self {
+    pub fn set_term(&mut self, effect: Effect, value: Theoretical<f64>) -> &mut Self {        
         self.term_actions.insert(effect, value);
         self
     }

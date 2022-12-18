@@ -1,4 +1,4 @@
-mod theoretical;
-mod mix;
-mod potion;
-mod modify;
+pub mod theoretical;
+pub mod mix;
+pub mod potion;
+pub mod modify;
