@@ -91,6 +91,88 @@ impl From<SkillUpdate> for Skill {
 }
 
 
+pub mod versioned {
+    use serde::{Serialize, Deserialize};
+
+    use super::{SkillUpdate, SkillUpdateCommand};
+
+    #[derive(Clone, Debug, Serialize, Deserialize)]
+    pub enum SkillUpdateVersioned {
+        #[serde(rename="0")]
+        V0(v0::SkillUpdateV0)
+    }
+
+    impl From<SkillUpdate> for SkillUpdateVersioned {
+        fn from(value: SkillUpdate) -> Self {
+            Self::V0(value.into())
+        }
+    }
+
+    impl From<SkillUpdateVersioned> for SkillUpdate {
+        fn from(value: SkillUpdateVersioned) -> Self {
+            match value {
+                SkillUpdateVersioned::V0(x) => x.into()
+            }
+        }
+    }
+
+    pub mod v0 {
+        use super::*;
+        use crate::theoretical::versioned::TheoreticalVersioned;
+        
+        #[derive(Clone, Debug, Serialize, Deserialize)]
+        pub struct SkillUpdateV0 {
+            commands: Vec<SkillUpdateCommandV0>
+        }
+
+        impl From<SkillUpdate> for SkillUpdateV0 {
+            fn from(value: SkillUpdate) -> Self {
+                Self {
+                    commands: value.commands.into_iter().map(|x| x.into()).collect(),
+                }
+            }
+        }
+
+        impl From<SkillUpdateV0> for SkillUpdate {
+            fn from(value: SkillUpdateV0) -> Self {
+                Self {
+                    commands: value.commands.into_iter().map(|x| x.into()).collect(),
+                }                
+            }
+        }
+
+        #[derive(Clone, Debug, Serialize, Deserialize)]
+        pub enum SkillUpdateCommandV0 {
+            SetEffectiveness(TheoreticalVersioned<f64>),
+            SetParent(Option<String>),
+            SetParent2(Option<String>)
+        }
+
+        impl From<SkillUpdateCommand> for SkillUpdateCommandV0 {
+            fn from(value: SkillUpdateCommand) -> Self {
+                match value {
+                    SkillUpdateCommand::SetEffectiveness(x) => 
+                        SkillUpdateCommandV0::SetEffectiveness(x.into()),
+                    SkillUpdateCommand::SetParent(x) => SkillUpdateCommandV0::SetParent(x),
+                    SkillUpdateCommand::SetParent2(x) => SkillUpdateCommandV0::SetParent2(x),
+                }
+            }
+        }
+
+        impl From<SkillUpdateCommandV0> for SkillUpdateCommand {
+            fn from(value: SkillUpdateCommandV0) -> Self {
+                match value {
+                    SkillUpdateCommandV0::SetEffectiveness(x) => 
+                        SkillUpdateCommand::SetEffectiveness(x.into()),
+                    SkillUpdateCommandV0::SetParent(x) => SkillUpdateCommand::SetParent(x),
+                    SkillUpdateCommandV0::SetParent2(x) => SkillUpdateCommand::SetParent2(x),
+                }                
+            }
+        }
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use crate::{grimoire::Skill, prelude::{Known, Theory}};
