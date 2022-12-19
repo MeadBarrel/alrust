@@ -200,7 +200,6 @@ dependencies = [
 name = "grimoire2"
 version = "0.1.0"
 dependencies = [
- "derive_more",
  "float-cmp",
  "maplit",
  "serde",
