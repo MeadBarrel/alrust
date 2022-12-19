@@ -12,7 +12,7 @@ type Skills = HashMap<String, Skill>;
 type Ingredients = HashMap<String, Ingredient>;
 type Characters = HashMap<String, Character>;
 
-#[derive(Default)]
+#[derive(Default, Debug, Clone)]
 pub struct Grimoire {
     pub skills: Skills,
     pub ingredients: Ingredients,

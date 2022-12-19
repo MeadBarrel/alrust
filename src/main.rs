@@ -1,4 +1,9 @@
 mod app;
+mod top_panel;
+mod error;
+mod characters;
+mod grimoire_state;
+mod publicstate;
 
 use grimoire_sqlite::GrimoireSqlite;
 use grimoire2::grimoire::versioned::GrimoireVersioned;
@@ -8,9 +13,9 @@ use serde_json::to_writer_pretty;
 
 
 fn main() {
-    let grimoire = GrimoireSqlite::connect("../backups/db.sqlite").unwrap().load().unwrap();
-    let grimoire_ser: GrimoireVersioned = grimoire.into();
-    let f = File::create("grimoire.json").unwrap();
-    to_writer_pretty(f, &grimoire_ser).unwrap();
-    //app::main()
+    // let grimoire = GrimoireSqlite::connect("../backups/db.sqlite").unwrap().load().unwrap();
+    // let grimoire_ser: GrimoireVersioned = grimoire.into();
+    // let f = File::create("grimoire.json").unwrap();
+    // to_writer_pretty(f, &grimoire_ser).unwrap();
+    app::main()
 }
