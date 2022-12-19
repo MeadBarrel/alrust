@@ -27,12 +27,6 @@ fn run_experiment(config: &str) {
     let experiment = load_yaml::<ExperimentConfig>(config);
     let result = experiment.run().unwrap();
     print_yaml(&result);
-
-    // let config = experiment::ExperimentConfig::load(config).unwrap();
-    // let grimoire = config.grimoire().unwrap();
-    // let mix = config.mix(&grimoire).unwrap();
-    // let potion = PotionSerializable::from_mix(&mix);
-    // to_writer(stdout(), &potion).unwrap();
 }
 
 fn run_db(filename: &str) {

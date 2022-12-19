@@ -61,7 +61,7 @@ impl GrimoireUpdateSerializable {
         update
     }
 
-    pub fn from_grimoire(grimoire: Grimoire) -> Self {
+    pub fn from_grimoire(grimoire: &Grimoire) -> Self {
         let mut result = Self::default();
 
         grimoire.characters.iter().for_each(|(name, character)| {

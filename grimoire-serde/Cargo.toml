@@ -8,6 +8,8 @@ edition = "2021"
 [dependencies]
 serde = {version = "1.0.149", features = ["derive"]}
 serde_derive = "1.0.151"
+chrono = { version="0.4.23", features = ["serde"] }
+thiserror = "1.0.38"
 
 grimoire2 = { path="../grimoire2" }
 

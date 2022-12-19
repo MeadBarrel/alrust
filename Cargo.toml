@@ -36,4 +36,9 @@ members = [
     'geneticalchemy',
     'grimoire-sqlite',
     'grimoire-serde',
+    'grimoire-cli',
 ]
+
+
+[features]
+json = []
