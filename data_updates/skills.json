@@ -1,0 +1,2044 @@
+{
+  "version": 0,
+  "sub_version": 0,
+  "data_version": 1,
+  "records": [
+    {
+      "created": "2022-12-19T00:15:08.716392200Z",
+      "content": {
+        "remove_characters": [],
+        "remove_skills": [],
+        "remove_ingredients": [],
+        "characters": {
+          "Tashka": {
+            "remove_clades": [],
+            "add_clades": [
+              "Alchemist"
+            ],
+            "remove_skills": [],
+            "skills": {
+              "Material Lore": 100,
+              "Metallurgy": 100,
+              "Iron-Based Alloys": 100,
+              "Steel Lore": 100,
+              "Herbology": 100,
+              "Botany": 100
+            }
+          }
+        },
+        "skills": {
+          "Red Bleckblende Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Kimurite Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Brownwood Lore": {
+            "effectiveness": "??",
+            "parent": "Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Honey Lore": {
+            "effectiveness": "??",
+            "parent": "Arthropoda",
+            "parent_2": "Arthropod Produce Lore",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Equidae": {
+            "effectiveness": "??",
+            "parent": "Perissodactyla",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Maalite Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Bleck Lore": {
+            "effectiveness": "??",
+            "parent": "Basic Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Radiata": {
+            "effectiveness": "??",
+            "parent": "Holozoa",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Acanthopterygii": {
+            "effectiveness": "??",
+            "parent": "Osteichthyes",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Gabore Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Theropoda": {
+            "effectiveness": "??",
+            "parent": "Saurischia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pork Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Reptile Carapace Lore": {
+            "effectiveness": "??",
+            "parent": "Carapace Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Flakestone Lore": {
+            "effectiveness": "??",
+            "parent": "Sedimentary Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Coal Lore": {
+            "effectiveness": "??",
+            "parent": "Sedimentary Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Saburra Lore": {
+            "effectiveness": "??",
+            "parent": "Sedimentary Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Sarducaan Papyrus Lore": {
+            "effectiveness": "??",
+            "parent": "Papyrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Blood Ore Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ichor Lore": {
+            "effectiveness": "??",
+            "parent": "Advanced Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Fullgrain Leather Lore": {
+            "effectiveness": "??",
+            "parent": "Leather Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pyrite Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Caudata": {
+            "effectiveness": "??",
+            "parent": "Amphibia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Walker Knowledge": {
+            "effectiveness": "??",
+            "parent": "Zoology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Agnatha": {
+            "effectiveness": "??",
+            "parent": "Pisces",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Azurite Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Agrostology": {
+            "effectiveness": "??",
+            "parent": "Botany",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Placodermi": {
+            "effectiveness": "??",
+            "parent": "Pisces",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Alchemical Mineralogy": {
+            "effectiveness": "??",
+            "parent": "Petrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Bovinae": {
+            "effectiveness": "??",
+            "parent": "Pecora",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Myriapoda": {
+            "effectiveness": "??",
+            "parent": "Arthropoda",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pegasoferae": {
+            "effectiveness": "??",
+            "parent": "Mammalia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Kyanite Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ampelology": {
+            "effectiveness": "??",
+            "parent": "Botany",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Eurypterida": {
+            "effectiveness": "??",
+            "parent": "Chelicerata",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pterosauria": {
+            "effectiveness": "??",
+            "parent": "Archosauromorpha",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Sanguinite Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Xenarthra": {
+            "effectiveness": "??",
+            "parent": "Mammalia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Carnivora Meat Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Emalj Lore": {
+            "effectiveness": "??",
+            "parent": "Dental Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Feliformia": {
+            "effectiveness": "??",
+            "parent": "Pegasoferae",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Amphibia": {
+            "effectiveness": "??",
+            "parent": "Zoology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Reptilia": {
+            "effectiveness": "??",
+            "parent": "Zoology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Advanced Metals": {
+            "effectiveness": "??",
+            "parent": "Metallurgy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Silver Lore": {
+            "effectiveness": "??",
+            "parent": "Precious Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Beeswax Lore": {
+            "effectiveness": "??",
+            "parent": "Arthropoda",
+            "parent_2": "Arthropod Produce Lore",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Tarsiiformes": {
+            "effectiveness": "??",
+            "parent": "Primata",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Carapace Lore": {
+            "effectiveness": "??",
+            "parent": "Exoskeleton Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cerulite Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cetantodonta": {
+            "effectiveness": "??",
+            "parent": "Cetartiodactyla",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Osteichthyes": {
+            "effectiveness": "??",
+            "parent": "Pisces",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Skadite Lore": {
+            "effectiveness": "??",
+            "parent": "Precious Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Nitre Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Dissolvents",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Bron Lore": {
+            "effectiveness": "??",
+            "parent": "Cuprum-Based Alloys",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Advanced Dendrology": {
+            "effectiveness": "??",
+            "parent": "Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Bloodsilk Lore": {
+            "effectiveness": "??",
+            "parent": "Textile Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cuprite Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemy",
+            "parent_2": "Alchemical Mineralogy",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Botany": {
+            "effectiveness": "??",
+            "parent": "Material Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Sauropodomorpha": {
+            "effectiveness": "??",
+            "parent": "Saurischia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Anapsida": {
+            "effectiveness": "??",
+            "parent": "Reptilia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cosmoid Scales Lore": {
+            "effectiveness": "??",
+            "parent": "Scales Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Herbology": {
+            "effectiveness": "??",
+            "parent": "Botany",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pansar Carapace Lore": {
+            "effectiveness": "??",
+            "parent": "Carapace Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pyropite Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Herptile Meat Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Arthropod Carapace Lore": {
+            "effectiveness": "??",
+            "parent": "Carapace Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Rawhide Lore": {
+            "effectiveness": "??",
+            "parent": "Leather Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Glires Meat Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Castorimorpha": {
+            "effectiveness": "??",
+            "parent": "Rodentia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Animal Materials": {
+            "effectiveness": "??",
+            "parent": "Material Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Magnum Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Electrum Lore": {
+            "effectiveness": "??",
+            "parent": "Cuprum-Based Alloys",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Whitewood Lore": {
+            "effectiveness": "??",
+            "parent": "Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Glimmer Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Acarina": {
+            "effectiveness": "??",
+            "parent": "Arachnida",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pansar Scales Lore": {
+            "effectiveness": "??",
+            "parent": "Scales Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cinnabar Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Demorite Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Salt Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Dissolvents",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Alchemical Dissolvents": {
+            "effectiveness": "??",
+            "parent": "Alchemy",
+            "parent_2": "Petrology",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Tapii Lore": {
+            "effectiveness": "??",
+            "parent": "Advanced Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Precious Metals": {
+            "effectiveness": "??",
+            "parent": "Metallurgy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Paleognathae": {
+            "effectiveness": "??",
+            "parent": "Aves",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Opiliones": {
+            "effectiveness": "??",
+            "parent": "Arachnida",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Carpology": {
+            "effectiveness": "??",
+            "parent": "Botany",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Vegetology": {
+            "effectiveness": "??",
+            "parent": "Botany",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Trilobitomorpha": {
+            "effectiveness": "??",
+            "parent": "Arthropoda",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Placoid Scales Lore": {
+            "effectiveness": "??",
+            "parent": "Scales Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Tindremic Messing Lore": {
+            "effectiveness": "??",
+            "parent": "Cuprum-Based Alloys",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Chalk Glance Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ossiconidae": {
+            "effectiveness": "??",
+            "parent": "Pecora",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Jotuni": {
+            "effectiveness": "??",
+            "parent": "Simia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Quality Leather Lore": {
+            "effectiveness": "??",
+            "parent": "Leather Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Igneous Rock": {
+            "effectiveness": "??",
+            "parent": "Petrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Seafood Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Annelida": {
+            "effectiveness": "??",
+            "parent": "Bilateria",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Material Lore": {
+            "effectiveness": "??",
+            "parent": null,
+            "parent_2": null,
+            "remove_parent": true,
+            "remove_parent_2": true
+          },
+          "Barbourofelidae": {
+            "effectiveness": "??",
+            "parent": "Feliformia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Spongewood Lore": {
+            "effectiveness": "??",
+            "parent": "Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Archosauromorpha": {
+            "effectiveness": "??",
+            "parent": "Reptilia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Dense Crepite Lore": {
+            "effectiveness": "??",
+            "parent": "Exoskeleton Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Musteloidea": {
+            "effectiveness": "??",
+            "parent": "Caniformia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Zoology": {
+            "effectiveness": "??",
+            "parent": null,
+            "parent_2": null,
+            "remove_parent": true,
+            "remove_parent_2": true
+          },
+          "Grain Steel Lore": {
+            "effectiveness": "??",
+            "parent": "Iron-Based Alloys",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Nyx Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Tephra Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Malachite Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Exoskeleton Lore": {
+            "effectiveness": "??",
+            "parent": "Skeleton Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pig Iron Lore": {
+            "effectiveness": "??",
+            "parent": "Basic Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Chiroptera": {
+            "effectiveness": "??",
+            "parent": "Pegasoferae",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Fabricula Expertise": {
+            "effectiveness": "??",
+            "parent": "Alchemy Contraptions",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Viverroidea": {
+            "effectiveness": "??",
+            "parent": "Feliformia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Amphicyonidae": {
+            "effectiveness": "??",
+            "parent": "Caniformia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ironsilk Lore": {
+            "effectiveness": "??",
+            "parent": "Textile Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Mycology": {
+            "effectiveness": "??",
+            "parent": "Botany",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Xiphosura": {
+            "effectiveness": "??",
+            "parent": "Chelicerata",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Jadeite Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Greywood Lore": {
+            "effectiveness": "??",
+            "parent": "Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Canidae": {
+            "effectiveness": "??",
+            "parent": "Caniformia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ecdysozoa": {
+            "effectiveness": "??",
+            "parent": "Bilateria",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Insecta": {
+            "effectiveness": "??",
+            "parent": "Arthropoda",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Sulfur Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Dissolvents",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Skin Lore": {
+            "effectiveness": "??",
+            "parent": "Leather Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pecora": {
+            "effectiveness": "??",
+            "parent": "Cetartiodactyla",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Sedimentary Rock": {
+            "effectiveness": "??",
+            "parent": "Petrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Guard Fur Lore": {
+            "effectiveness": "??",
+            "parent": "Fur Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Scales Lore": {
+            "effectiveness": "??",
+            "parent": "Animal Materials",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Aabam Lore": {
+            "effectiveness": "??",
+            "parent": "Basic Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Blackwood Lore": {
+            "effectiveness": "??",
+            "parent": "Advanced Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ironbone Lore": {
+            "effectiveness": "??",
+            "parent": "Endoskeleton Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Potion Making": {
+            "effectiveness": "??",
+            "parent": "Alchemy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Tylopoda": {
+            "effectiveness": "??",
+            "parent": "Cetartiodactyla",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Heavy Carapace Lore": {
+            "effectiveness": "??",
+            "parent": "Carapace Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Crustacea": {
+            "effectiveness": "??",
+            "parent": "Arthropoda",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Serpentes": {
+            "effectiveness": "??",
+            "parent": "Lepidosauromorpha",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cotton Lore": {
+            "effectiveness": "??",
+            "parent": "Textile Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cuprum-Based Alloys": {
+            "effectiveness": "??",
+            "parent": "Metallurgy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ironwool Lore": {
+            "effectiveness": "??",
+            "parent": "Fur Lore",
+            "parent_2": "Textile Lore",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Titanit Powder Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Styganthropa": {
+            "effectiveness": "??",
+            "parent": "Simia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Parazoa": {
+            "effectiveness": "??",
+            "parent": "Holozoa",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Dendrology": {
+            "effectiveness": "??",
+            "parent": "Botany",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Amarantum Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Horned Scales Lore": {
+            "effectiveness": "??",
+            "parent": "Scales Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Firmwood Lore": {
+            "effectiveness": "??",
+            "parent": "Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Tunicata": {
+            "effectiveness": "??",
+            "parent": "Pisces",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Sauropterygia": {
+            "effectiveness": "??",
+            "parent": "Lepidosauromorpha",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cervidae": {
+            "effectiveness": "??",
+            "parent": "Pecora",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Scorpiones": {
+            "effectiveness": "??",
+            "parent": "Arachnida",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Calx Lore": {
+            "effectiveness": "??",
+            "parent": "Sedimentary Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Gold Lore": {
+            "effectiveness": "??",
+            "parent": "Precious Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Leather Lore": {
+            "effectiveness": "??",
+            "parent": "Mammal Skin Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Silk Lore": {
+            "effectiveness": "??",
+            "parent": "Textile Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Steel Lore": {
+            "effectiveness": "??",
+            "parent": "Iron-Based Alloys",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Botanical Oils Lore": {
+            "effectiveness": "??",
+            "parent": "Botany",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pteridology": {
+            "effectiveness": "??",
+            "parent": "Botany",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Flesh Lore": {
+            "effectiveness": "??",
+            "parent": "Animal Materials",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Fur Lore": {
+            "effectiveness": "??",
+            "parent": "Mammal Skin Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Mineralogy": {
+            "effectiveness": "??",
+            "parent": "Petrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Arthropod Produce Lore": {
+            "effectiveness": "??",
+            "parent": "Arthropoda",
+            "parent_2": "Animal Materials",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Mammal Skin Lore": {
+            "effectiveness": "??",
+            "parent": "Animal Materials",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cetartiodactyla": {
+            "effectiveness": "??",
+            "parent": "Mammalia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ophiosquami Lore": {
+            "effectiveness": "??",
+            "parent": "Dragon Lore",
+            "parent_2": "Scales Lore",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Ophiocorni Lore": {
+            "effectiveness": "??",
+            "parent": "Dragon Lore",
+            "parent_2": "Keratin Lore",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Bore Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Dissolvents",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Dairy Products Lore": {
+            "effectiveness": "??",
+            "parent": "Animal Materials",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Paenungulata": {
+            "effectiveness": "??",
+            "parent": "Mammalia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ground Fur Lore": {
+            "effectiveness": "??",
+            "parent": "Fur Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Endoskeleton Lore": {
+            "effectiveness": "??",
+            "parent": "Skeleton Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Venison Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Bilateria": {
+            "effectiveness": "??",
+            "parent": "Holozoa",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Gymnophiona": {
+            "effectiveness": "??",
+            "parent": "Amphibia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ornitischia": {
+            "effectiveness": "??",
+            "parent": "Archosauromorpha",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Primata": {
+            "effectiveness": "??",
+            "parent": "Evarchonta",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Holostei": {
+            "effectiveness": "??",
+            "parent": "Osteichthyes",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Perissodactyla": {
+            "effectiveness": "??",
+            "parent": "Pegasoferae",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Wool Lore": {
+            "effectiveness": "??",
+            "parent": "Fur Lore",
+            "parent_2": "Textile Lore",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Fuming Salt Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Dissolvents",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Basic Metals": {
+            "effectiveness": "??",
+            "parent": "Metallurgy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Keratin Lore": {
+            "effectiveness": "??",
+            "parent": "Animal Materials",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ganoid Scales Lore": {
+            "effectiveness": "??",
+            "parent": "Scales Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ophionite Lore": {
+            "effectiveness": "??",
+            "parent": "Dragon Lore",
+            "parent_2": "Endoskeleton Lore",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Rock Oil Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Dissolvents",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Textile Lore": {
+            "effectiveness": "??",
+            "parent": "Material Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Advanced Potion Making": {
+            "effectiveness": "??",
+            "parent": "Potion Making",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pholidota": {
+            "effectiveness": "??",
+            "parent": "Pegasoferae",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Neognathae": {
+            "effectiveness": "??",
+            "parent": "Aves",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Galbinium Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Incisium Lore": {
+            "effectiveness": "??",
+            "parent": "Dental Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Dragon Salt Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Dissolvents",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ichthyosauria": {
+            "effectiveness": "??",
+            "parent": "Reptilia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Calspar Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Lagomorpha": {
+            "effectiveness": "??",
+            "parent": "Mammalia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Great Horn Lore": {
+            "effectiveness": "??",
+            "parent": "Keratin Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pisces": {
+            "effectiveness": "??",
+            "parent": "Zoology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cephalochordata": {
+            "effectiveness": "??",
+            "parent": "Pisces",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Fat and Tallow Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Opteromorpha": {
+            "effectiveness": "??",
+            "parent": "Evarchonta",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Gem Metal Lore": {
+            "effectiveness": "??",
+            "parent": "Advanced Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Papyrology": {
+            "effectiveness": "??",
+            "parent": "Material Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Tungsteel Lore": {
+            "effectiveness": "??",
+            "parent": "Iron-Based Alloys",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Almine Lore": {
+            "effectiveness": "??",
+            "parent": "Basic Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Perciformes": {
+            "effectiveness": "??",
+            "parent": "Osteichthyes",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Crepite Lore": {
+            "effectiveness": "??",
+            "parent": "Exoskeleton Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Rodentia": {
+            "effectiveness": "??",
+            "parent": "Mammalia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Compact Horn Lore": {
+            "effectiveness": "??",
+            "parent": "Keratin Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Brained Leather Lore": {
+            "effectiveness": "??",
+            "parent": "Leather Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Boiled Leather Lore": {
+            "effectiveness": "??",
+            "parent": "Leather Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Metallurgy": {
+            "effectiveness": "??",
+            "parent": "Material Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Dapplewood Lore": {
+            "effectiveness": "??",
+            "parent": "Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Fish Meat Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ivory Carapace Lore": {
+            "effectiveness": "??",
+            "parent": "Carapace Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Horn Lore": {
+            "effectiveness": "??",
+            "parent": "Keratin Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Mollusca": {
+            "effectiveness": "??",
+            "parent": "Bilateria",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Papyrus Lore": {
+            "effectiveness": "??",
+            "parent": "Papyrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Arachnida": {
+            "effectiveness": "??",
+            "parent": "Chelicerata",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Fowl Meat Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "IvoryHide Lore": {
+            "effectiveness": "??",
+            "parent": "Leather Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Alchemy": {
+            "effectiveness": "??",
+            "parent": null,
+            "parent_2": null,
+            "remove_parent": true,
+            "remove_parent_2": true
+          },
+          "Alchemy Contraptions": {
+            "effectiveness": "??",
+            "parent": "Alchemy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Serpentidoidea": {
+            "effectiveness": "??",
+            "parent": "Lepidosauromorpha",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Volcanic Ash Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Chondrostei": {
+            "effectiveness": "??",
+            "parent": "Osteichthyes",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Arcronite Lore": {
+            "effectiveness": "??",
+            "parent": "Advanced Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Irminae": {
+            "effectiveness": "??",
+            "parent": "Simia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Calamine Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Beef Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Sciuromorpha": {
+            "effectiveness": "??",
+            "parent": "Rodentia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Insectivora": {
+            "effectiveness": "??",
+            "parent": "Mammalia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Irnofur Lore": {
+            "effectiveness": "??",
+            "parent": "Fur Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Bleckblende Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Stonewood Lore": {
+            "effectiveness": "??",
+            "parent": "Advanced Dendrology",
+            "parent_2": "Petrology",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Suina": {
+            "effectiveness": "??",
+            "parent": "Cetartiodactyla",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Lupium Lore": {
+            "effectiveness": "??",
+            "parent": "Advanced Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Synapsida": {
+            "effectiveness": "??",
+            "parent": "Reptilia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Leptoid Scales Lore": {
+            "effectiveness": "??",
+            "parent": "Scales Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Holozoa": {
+            "effectiveness": "??",
+            "parent": "Zoology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Crustacean Carapace Lore": {
+            "effectiveness": "??",
+            "parent": "Carapace Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Molarium Lore": {
+            "effectiveness": "??",
+            "parent": "Dental Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Evarchonta": {
+            "effectiveness": "??",
+            "parent": "Mammalia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Brachiopoda": {
+            "effectiveness": "??",
+            "parent": "Bilateria",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Chondrichtyes": {
+            "effectiveness": "??",
+            "parent": "Pisces",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Cuprum Lore": {
+            "effectiveness": "??",
+            "parent": "Basic Metals",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Saurischia": {
+            "effectiveness": "??",
+            "parent": "Archosauromorpha",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Petrology": {
+            "effectiveness": "??",
+            "parent": "Material Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Skeleton Lore": {
+            "effectiveness": "??",
+            "parent": "Animal Materials",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Shinaria": {
+            "effectiveness": "??",
+            "parent": "Simia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Bone Tissue Lore": {
+            "effectiveness": "??",
+            "parent": "Endoskeleton Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Simia": {
+            "effectiveness": "??",
+            "parent": "Primata",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Master Alloys": {
+            "effectiveness": "??",
+            "parent": "Metallurgy",
+            "parent_2": "Advanced Metals",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Waterstone Lore": {
+            "effectiveness": "??",
+            "parent": "Alchemical Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Deuterostomia": {
+            "effectiveness": "??",
+            "parent": "Bilateria",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Araneae": {
+            "effectiveness": "??",
+            "parent": "Arachnida",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Arthropod Meat Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ursidae": {
+            "effectiveness": "??",
+            "parent": "Caniformia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Caprinomorpha": {
+            "effectiveness": "??",
+            "parent": "Pecora",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Caniformia": {
+            "effectiveness": "??",
+            "parent": "Pegasoferae",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Crurotarsi": {
+            "effectiveness": "??",
+            "parent": "Archosauromorpha",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Hystricomorpha": {
+            "effectiveness": "??",
+            "parent": "Rodentia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "UNKNOWN": {
+            "effectiveness": "??",
+            "parent": null,
+            "parent_2": null,
+            "remove_parent": true,
+            "remove_parent_2": true
+          },
+          "Messing Lore": {
+            "effectiveness": "??",
+            "parent": "Cuprum-Based Alloys",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Aves": {
+            "effectiveness": "??",
+            "parent": "Zoology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Dental Lore": {
+            "effectiveness": "??",
+            "parent": "Animal Materials",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Lepidosauromorpha": {
+            "effectiveness": "??",
+            "parent": "Reptilia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pantherinae": {
+            "effectiveness": "??",
+            "parent": "Feliformia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Arthropoda": {
+            "effectiveness": "??",
+            "parent": "Zoology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pycnogonida": {
+            "effectiveness": "??",
+            "parent": "Chelicerata",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pyroxene Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Pinnipedia": {
+            "effectiveness": "??",
+            "parent": "Caniformia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Teleostei": {
+            "effectiveness": "??",
+            "parent": "Osteichthyes",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Mammalia": {
+            "effectiveness": "??",
+            "parent": "Zoology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Myomorpha": {
+            "effectiveness": "??",
+            "parent": "Rodentia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Granum Lore": {
+            "effectiveness": "??",
+            "parent": "Igneous Rock",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ophiodermi Lore": {
+            "effectiveness": "??",
+            "parent": "Dragon Lore",
+            "parent_2": "Scales Lore",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Plate Scales Lore": {
+            "effectiveness": "??",
+            "parent": "Scales Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Iron-Based Alloys": {
+            "effectiveness": "??",
+            "parent": "Metallurgy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ophium Lore": {
+            "effectiveness": "??",
+            "parent": "Dragon Lore",
+            "parent_2": "Dental Lore",
+            "remove_parent": false,
+            "remove_parent_2": false
+          },
+          "Keeled Scales Lore": {
+            "effectiveness": "??",
+            "parent": "Scales Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Anura": {
+            "effectiveness": "??",
+            "parent": "Amphibia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Lacertilia": {
+            "effectiveness": "??",
+            "parent": "Lepidosauromorpha",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Dragon Lore": {
+            "effectiveness": "??",
+            "parent": "Zoology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Chelicerata": {
+            "effectiveness": "??",
+            "parent": "Arthropoda",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Coke Lore": {
+            "effectiveness": "??",
+            "parent": "Mineralogy",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ironwood Lore": {
+            "effectiveness": "??",
+            "parent": "Advanced Dendrology",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Primate Meat Lore": {
+            "effectiveness": "??",
+            "parent": "Flesh Lore",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Aigialosauridae": {
+            "effectiveness": "??",
+            "parent": "Lepidosauromorpha",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Ceratomorpha": {
+            "effectiveness": "??",
+            "parent": "Perissodactyla",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          },
+          "Felinae": {
+            "effectiveness": "??",
+            "parent": "Feliformia",
+            "parent_2": null,
+            "remove_parent": false,
+            "remove_parent_2": true
+          }
+        },
+        "ingredients": {}
+      }
+    }
+  ]
+}
