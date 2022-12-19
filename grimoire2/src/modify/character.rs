@@ -91,6 +91,33 @@ impl From<CharacterUpdate> for Character {
 }
 
 
+pub mod versioned {
+    use serde::{Serialize, Deserialize};
+
+    use super::CharacterUpdate;
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum CharacterUpdateVersioned {
+        #[serde(rename="0")]
+        V0(CharacterUpdate)
+    }
+
+    impl From<CharacterUpdate> for CharacterUpdateVersioned {
+        fn from(value: CharacterUpdate) -> Self {
+            Self::V0(value)
+        }
+    }
+
+    impl From<CharacterUpdateVersioned> for CharacterUpdate {
+        fn from(value: CharacterUpdateVersioned) -> Self {
+            match value {
+                CharacterUpdateVersioned::V0(x) => x
+            }
+        }
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use crate::grimoire::Character;
