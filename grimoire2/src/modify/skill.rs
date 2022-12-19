@@ -2,11 +2,16 @@ use serde::{Serialize, Deserialize};
 use crate::{theoretical::Theoretical, prelude::Skill};
 
 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum SkillUpdateCommand {
+    SetEffectiveness(Theoretical<f64>),
+    SetParent(Option<String>),
+    SetParent2(Option<String>)
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct SkillUpdate {
-    effectiveness: Option<Theoretical<f64>>,
-    parent: Option<Option<String>>,
-    parent_2: Option<Option<String>>,
+    commands: Vec<SkillUpdateCommand>
 }
 
 
@@ -20,60 +25,55 @@ impl SkillUpdate {
     pub fn from_skill(skill: &Skill) -> Self {
         let mut update = SkillUpdate::default();
         update.set_effectiveness(skill.effectiveness);
-        update.parent = Some(skill.parent.clone());
-        update.parent_2 = Some(skill.parent_2.clone());
+        
+        match &skill.parent {
+            Some(x) => update.set_parent(x),
+            None => update.remove_parent(),
+        };
+
+        match &skill.parent_2 {
+            Some(x) => update.set_parent2(x),
+            None => update.remove_parent_2()
+        };
 
         update
     }
 
     pub fn update(&self, skill: &mut Skill) {
-        if let Some(x) = self.effectiveness {
-            skill.effectiveness = x;
-        }
-        if let Some(x) = &self.parent {
-            skill.parent = x.clone();
-        }
-        if let Some(x) = &self.parent_2 {
-            skill.parent_2 = x.clone();
-        }
+        for command in &self.commands {
+            match command {
+                SkillUpdateCommand::SetEffectiveness(x) => skill.effectiveness = *x,
+                SkillUpdateCommand::SetParent(x) => skill.parent = x.clone(),
+                SkillUpdateCommand::SetParent2(x) => skill.parent_2 = x.clone(),
+            }
+        };
     }
 
     pub fn set_effectiveness(&mut self, value: Theoretical<f64>) -> &mut Self {
-        self.effectiveness = Some(value);
+        self.commands.push(SkillUpdateCommand::SetEffectiveness(value));
         self
     }
 
     pub fn set_parent(&mut self, value: &str) -> &mut Self {
-        self.parent = Some(Some(value.to_string()));
+        self.commands.push(SkillUpdateCommand::SetParent(Some(value.to_string())));
         self
     }
 
     pub fn set_parent2(&mut self, value: &str) -> &mut Self {
-        self.parent_2 = Some(Some(value.to_string()));
+        self.commands.push(SkillUpdateCommand::SetParent2(Some(value.to_string())));
         self
     }    
 
     pub fn remove_parent(&mut self) -> &mut Self {
-        self.parent = Some(None);
+        self.commands.push(SkillUpdateCommand::SetParent(None));
         self
     }
 
     pub fn remove_parent_2(&mut self) -> &mut Self {
-        self.parent_2 = Some(None);
+        self.commands.push(SkillUpdateCommand::SetParent2(None));
         self
     }
 
-    pub fn will_set_parent(&self) -> Option<Option<String>> {
-        self.parent.clone()
-    }
-
-    pub fn will_set_parent_2(&self) -> Option<Option<String>> {
-        self.parent_2.clone()
-    }
-
-    pub fn will_set_effectiveness(&self) -> Option<Theoretical<f64>> {
-        self.effectiveness
-    }
 }
 
 
