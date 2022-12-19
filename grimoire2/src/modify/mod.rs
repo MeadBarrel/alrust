@@ -3,11 +3,9 @@ pub mod skill;
 pub mod ingredient;
 
 
-use std::process::Command;
+use serde::{Serialize, Deserialize};
 
 use crate::grimoire::Grimoire;
-
-use self::ingredient::IngredientUpdate;
 
 
 #[derive(Debug, Clone)]
@@ -39,11 +37,20 @@ pub enum IngredientUpdateCommand {
 }
 
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum GrimoireUpdateCommand {
+    Character(String, character::CharacterUpdate),
+    Skill(String, skill::SkillUpdate),
+    Ingredient(String, ingredient::IngredientUpdate),
+    RemoveCharacter(String),
+    RemoveSkill(String),
+    RemoveIngredient(String),
+}
+
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct GrimoireUpdate {
-    characters: Vec<CharacterUpdateCommand>,
-    skills: Vec<SkillUpdateCommand>,
-    ingredients: Vec<IngredientUpdateCommand>,
+    commands: Vec<GrimoireUpdateCommand>,
 }
 
 
@@ -55,74 +62,59 @@ impl GrimoireUpdate {
     }
 
     pub fn update(&self, grimoire: &mut Grimoire) {
-        self.characters.iter().for_each(|action| {
-            match action {
-                CharacterUpdateCommand::Update(name, update) => 
-                    { 
-                        update.update(grimoire.characters.entry(name.clone()).or_default());
-                    },
-                CharacterUpdateCommand::Remove(name) => 
-                    { grimoire.characters.remove(name); }
+        for command in &self.commands {
+            match command {
+                GrimoireUpdateCommand::Character(name, update) => {
+                    let character = grimoire.characters.entry(name.clone()).or_default();
+                    update.update(character);
+                }
+                GrimoireUpdateCommand::Skill(name, update) => {
+                    let skill = grimoire.skills.entry(name.clone()).or_default();
+                    update.update(skill);
+                }
+                GrimoireUpdateCommand::Ingredient(name, update) => {
+                    let ingredient = grimoire.ingredients.entry(name.clone()).or_default();
+                    update.update(ingredient);
+                },
+                GrimoireUpdateCommand::RemoveCharacter(name) => {
+                    grimoire.characters.remove(name);
+                },
+                GrimoireUpdateCommand::RemoveSkill(name) => {
+                    grimoire.skills.remove(name);
+                },
+                GrimoireUpdateCommand::RemoveIngredient(name) => {
+                    grimoire.ingredients.remove(name);
+                }
             }
-        });
-
-        self.skills.iter().for_each(|action| {
-            match action {
-                SkillUpdateCommand::Update(name, update) => 
-                    { update.update(grimoire.skills.entry(name.clone()).or_default()); },
-                SkillUpdateCommand::Remove(name) => 
-                    { grimoire.skills.remove(name); }
-            }
-        });
-
-        self.ingredients.iter().for_each(|action| {
-            match action {
-                IngredientUpdateCommand::Update(name, update) => 
-                    { update.update(grimoire.ingredients.entry(name.clone()).or_default()); },
-                IngredientUpdateCommand::Remove(name) => 
-                    { grimoire.ingredients.remove(name); }
-            }
-        })
+        }
     }
 
     pub fn character(&mut self, name: &str, update: character::CharacterUpdate) -> &mut Self {
-        self.characters.push(
-            CharacterUpdateCommand::Update(name.to_string(), update)
-        );
+        self.commands.push(GrimoireUpdateCommand::Character(name.to_string(), update));
         self
     }
 
     pub fn skill(&mut self, name: &str, update: skill::SkillUpdate) -> &mut Self {
-        self.skills.push(
-            SkillUpdateCommand::Update(name.to_string(), update)
-        );
+        self.commands.push(GrimoireUpdateCommand::Skill(name.to_string(), update));
         self
     }
 
     pub fn ingredient(&mut self, name: &str, update: ingredient::IngredientUpdate) -> &mut Self {
-        self.ingredients.push(
-            IngredientUpdateCommand::Update(name.to_string(), update)
-        );
+        self.commands.push(GrimoireUpdateCommand::Ingredient(name.to_string(), update));
         self
     }
 
     pub fn remove_character(&mut self, name: &str) -> &mut Self {
-        self.characters.push(
-            CharacterUpdateCommand::Remove(name.to_string())
-        );
+        self.commands.push(GrimoireUpdateCommand::RemoveCharacter(name.to_string()));
         self
     }
 
     pub fn remove_skill(&mut self, name: &str) -> &mut Self {
-        self.skills.push(
-            SkillUpdateCommand::Remove(name.to_string())
-        );
+        self.commands.push(GrimoireUpdateCommand::RemoveSkill(name.to_string()));
         self
     }
     pub fn remove_ingredient(&mut self, name: &str) -> &mut Self {
-        self.ingredients.push(
-            IngredientUpdateCommand::Remove(name.to_string())
-        );
+        self.commands.push(GrimoireUpdateCommand::RemoveIngredient(name.to_string()));
         self    
     }
 }
@@ -251,7 +243,7 @@ mod tests {
                     .add_clade("B")
                     .clone()
             )
-            .character("ShallRemove", CharacterUpdate::default().clone())
+            .character("ShallRemove", CharacterUpdate::default())
             .skill(
                 "a", SkillUpdate::default()
                     .set_effectiveness(Theoretical::Known(0.5))
@@ -263,7 +255,7 @@ mod tests {
                     .set_effectiveness(Theoretical::Theory(0.3))
                     .clone()
             )
-            .skill("ShallRemove", SkillUpdate::default().clone())
+            .skill("ShallRemove", SkillUpdate::default())
             .ingredient(
                 "A", IngredientUpdate::default()
                     .set_term(Effect::Alcohol, Theoretical::Known(0.5))
@@ -274,7 +266,7 @@ mod tests {
                     .set_skill("a")
                     .clone()
             )
-            .ingredient("ShallRemove", IngredientUpdate::default().clone())
+            .ingredient("ShallRemove", IngredientUpdate::default())
             .clone()
     }
 }
