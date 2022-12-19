@@ -1,5 +1,3 @@
-use serde::{Serialize, Deserialize};
-
 use crate::theoretical::Theoretical;
 
 #[derive(Debug, Clone)]

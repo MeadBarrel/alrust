@@ -35,7 +35,7 @@ pub mod versioned {
 
     use serde::{Serialize, Deserialize};
     
-    use super::{Grimoire, Skills, Ingredients, Characters};
+    use super::Grimoire;
     use super::character::versioned::CharacterVersioned;
     use super::skill::versioned::SkillVersioned;
     use super::ingredient::versioned::IngredientVersioned;
