@@ -1,20 +1,22 @@
-use std::collections::HashMap;
-
 use serde::{Serialize, Deserialize};
-use strum::IntoEnumIterator;
 
 use crate::grimoire::Ingredient;
 use crate::theoretical::Theoretical;
-use crate::effect::{Effect, self};
+use crate::effect::Effect;
 
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum IngredientUpdateCommand {
+    ChangeMultiplier(Effect, Theoretical<f64>),
+    ChangeTerm(Effect, Theoretical<f64>),
+    SetSkill(Option<String>),
+    SetWeight(bool)
+}
 
 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IngredientUpdate {
-    multiplier_actions: HashMap<Effect, Theoretical<f64>>,
-    term_actions: HashMap<Effect, Theoretical<f64>>,
-    skill: Option<Option<String>>,
-    weight: Option<bool>,
+    commands: Vec<IngredientUpdateCommand>
 }
 
 
@@ -41,58 +43,36 @@ impl IngredientUpdate {
     }
 
     pub fn update(&self, ingredient: &mut Ingredient) {
-        if let Some(x) = &self.skill {
-            ingredient.skill = x.clone();
+        for command in &self.commands {
+            match command {
+                IngredientUpdateCommand::ChangeMultiplier(effect, value) => {
+                    ingredient.modifiers[*effect].multiplier = *value;
+                },
+                IngredientUpdateCommand::ChangeTerm(effect, value) => {
+                    ingredient.modifiers[*effect].term = *value;
+                },
+                IngredientUpdateCommand::SetSkill(value) => {
+                    ingredient.skill = value.clone()
+                },
+                IngredientUpdateCommand::SetWeight(value) => {
+                    ingredient.weight = *value
+                }
+            }
         }
-
-        if let Some(x) = self.weight {
-            ingredient.weight = x;
-        }
-
-        self.term_actions.iter().for_each(
-            |(effect, value)|
-            { ingredient.modifiers[*effect].term = *value }
-        );
-
-        self.multiplier_actions.iter().for_each(
-            |(effect, value)|
-            { ingredient.modifiers[*effect].multiplier = *value }
-        );       
-
-        // self.term_actions.iter().for_each(|(effect, action)|
-        //     match action {
-        //         ModifierUpdate::To(to) => ingredient.modifiers[*effect].term = *to,
-        //         ModifierUpdate::ToKnown => ingredient.modifiers[*effect].term = 
-        //             ingredient.modifiers[*effect].term.to_known(),
-        //         ModifierUpdate::ToUnknown => ingredient.modifiers[*effect].term =
-        //             ingredient.modifiers[*effect].term.to_unknown(),
-        //     }
-        // );
-
-        // self.multiplier_actions.iter().for_each(|(effect, action)|
-        //     match action {
-        //         ModifierUpdate::To(to) => ingredient.modifiers[*effect].multiplier = *to,
-        //         ModifierUpdate::ToKnown => ingredient.modifiers[*effect].multiplier = 
-        //             ingredient.modifiers[*effect].multiplier.to_known(),
-        //         ModifierUpdate::ToUnknown => ingredient.modifiers[*effect].multiplier =
-        //             ingredient.modifiers[*effect].multiplier.to_unknown(),
-        //     }
-        // );
-
     }
 
     pub fn set_skill(&mut self, skill: &str) -> &mut Self {
-        self.skill = Some(Some(skill.to_string()));
+        self.commands.push(IngredientUpdateCommand::SetSkill(Some(skill.to_string())));
         self
     }
 
     pub fn remove_skill(&mut self) -> &mut Self {
-        self.skill = Some(None);
+        self.commands.push(IngredientUpdateCommand::SetSkill(None));
         self
     }
 
     pub fn set_weight(&mut self, weight: bool) -> &mut Self {
-        self.weight = Some(weight);
+        self.commands.push(IngredientUpdateCommand::SetWeight(weight));
         self
     }
 
@@ -108,31 +88,14 @@ impl IngredientUpdate {
     }
 
     pub fn set_term(&mut self, effect: Effect, value: Theoretical<f64>) -> &mut Self {        
-        self.term_actions.insert(effect, value);
+        self.commands.push(IngredientUpdateCommand::ChangeTerm(effect, value));
         self
     }
 
     pub fn set_multiplier(&mut self, effect: Effect, value: Theoretical<f64>) -> &mut Self {
-        self.multiplier_actions.insert(effect, value);        
+        self.commands.push(IngredientUpdateCommand::ChangeMultiplier(effect, value));
         self
     }    
-
-    pub fn will_set_skill(&self) -> Option<Option<String>> {
-        self.skill.clone()
-    }
-
-    pub fn will_set_weight(&self) -> Option<bool> {
-        self.weight
-    }
-
-    pub fn will_set_term(&self, effect: Effect) -> Option<Theoretical<f64>> {
-        self.term_actions.get(&effect).copied()
-    }
-
-    pub fn will_set_multiplier(&self, effect: Effect) -> Option<Theoretical<f64>> {
-        self.multiplier_actions.get(&effect).copied()
-    }
-
 }
 
 
