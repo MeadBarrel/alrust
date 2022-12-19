@@ -33,7 +33,7 @@ impl History {
     }
 
     pub fn combine(&mut self, other: &Self) -> bool {
-        if self.data_version >= other.data_version { return false };
+        if self.data_version != other.data_version - 1 { return false };
 
         self.data_version = other.data_version;
         self.records.extend(other.records.clone());

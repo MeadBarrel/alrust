@@ -1,28 +1,52 @@
 mod fs;
-mod experiment;
-mod grimoire;
+mod commands;
 
-use clap::{Command, Arg};
+use std::path::Path;
+
+use clap::{Command, Arg, ArgAction};
+
+use grimoire_serde::history::History;
 
 
 fn main() {
-    use grimoire_sqlite::GrimoireSqlite;
-    use grimoire_serde::history::History;
-    use grimoire2::modify::skill::SkillUpdate;
-    use grimoire2::theoretical::Theoretical;
-    use crate::fs::save;
-    use std::path::Path;
 
-    let mut grimoire = GrimoireSqlite::connect("db.sqlite").unwrap().load().unwrap();
+    let commands: Vec<Box<dyn commands::SubCommand>> = vec![
+        Box::new(commands::mix::MixCommand())
+    ];
 
-    let skill_update = SkillUpdate::default().set_effectiveness(Theoretical::Unknown).clone();
+    let grimoire_arg = Arg::new("grimoire")
+        .short('g')
+        .long("grimoire")
+        .value_name("grimoire");
 
-    grimoire.skills.iter_mut().for_each(|x| skill_update.update(x.1));
+    let mut app = Command::new("Alrust")
+        .arg_required_else_help(true);
 
-    let history = History::from_grimoire(&grimoire, 0);
-    save(Path::new("history2.json"), &history).unwrap();
+    app = app.arg(grimoire_arg);
 
-    // println!("Hello, world!");
+    for command in commands.iter() {
+        app = app.subcommand(
+            command.create()
+        );
+    }
+
+    let matches = app.get_matches();
+
+    let grimoire_name = matches.get_one::<String>("grimoire");
+
+    let history: History = match grimoire_name {
+        Some(x) => { fs::load(Path::new(x)).unwrap() },
+        None => { println!("File not set"); return }
+    };
+
+    if let Some((name, sub_matches)) = matches.subcommand() {
+        let command = commands.iter().find(|x| x.accepts(name));
+        if let Some(com) = command {
+            com.run(history, sub_matches).unwrap()
+        }
+    }
+
+
 
     // let json_arg = Arg::new("json")
     //     .short('j')

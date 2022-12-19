@@ -1,3 +1,4 @@
+use grimoire2::prelude::Grimoire;
 use thiserror::Error;
 use serde::Deserialize;
 use error_stack::{IntoReport, Result, ResultExt, Report};
@@ -14,7 +15,6 @@ use grimoire2::standalone::{OptimizedGrimoire, Mix};
 #[derive(Deserialize, Debug, Default)]
 #[serde(default)]
 pub struct ExperimentConfig {
-    db: String,
     character: String,
     potion: PotionSerializableConfig,
     grimoire: GrimoireUpdateSerializable,
@@ -34,14 +34,7 @@ pub enum ExperimentError {
 
 
 impl ExperimentConfig {
-    pub fn run(&self) -> Result<PotionSerializable, ExperimentError> {
-        let mut grimoire = GrimoireSqlite::connect(&self.db)
-            .into_report()
-            .change_context(ExperimentError::GrimoireLoadFailed)?
-            .load()
-            .into_report()
-            .change_context(ExperimentError::GrimoireLoadFailed)?;
-        
+    pub fn run(&self, mut grimoire: Grimoire) -> Result<PotionSerializable, ExperimentError> {
         self.grimoire.to_update().update(&mut grimoire);
         let character = grimoire.characters.get(&self.character)
             .ok_or(
