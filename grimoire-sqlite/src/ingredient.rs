@@ -7,7 +7,7 @@ use grimoire2::prelude as g2;
 #[diesel(table_name=ingredients, primary_key(name))]
 pub struct Ingredient {
     pub name: String,
-    pub lore: String,
+    pub lore: Option<String>,
     pub al_weight: i32,
     pub dh: Option<f64>,
     pub dp: Option<f64>,
@@ -36,7 +36,7 @@ impl Ingredient {
 
         Self {
             name: name.to_string(),
-            lore: src.skill.as_ref().unwrap().clone(),
+            lore: src.skill.clone(),
             al_weight: src.weight as i32,
 
             dh: src.modifiers[Effect::DirectHealing].term.into(),
@@ -69,7 +69,7 @@ impl Ingredient {
 
         let ingredient = g2::Ingredient {
             weight: self.al_weight > 0,
-            skill: Some(self.lore.clone()),
+            skill: self.lore.clone(),
             modifiers: vec![
                 (Effect::DirectHealing, (self.dh, self.mdh).into()),
                 (Effect::DirectPoison, (self.dp, self.mdp).into()),

@@ -3,7 +3,7 @@
 diesel::table! {
     ingredients (name) {
         name -> Text,
-        lore -> Text,
+        lore -> Nullable<Text>,
         al_weight -> Integer,
         dh -> Nullable<Double>,
         dp -> Nullable<Double>,
@@ -48,9 +48,6 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(ingredients -> lores (lore));
-diesel::joinable!(player_character_lores -> lores (lore));
-diesel::joinable!(player_character_lores -> player_characters (character));
 
 diesel::allow_tables_to_appear_in_same_query!(
     ingredients,
