@@ -8,6 +8,8 @@ edition = "2021"
 [dependencies]
 strum = { version = "0.24", features = ["derive"] }
 thiserror = "1.0.37"
+serde = { version = "1.0.151", features = ["derive"] }
+derive_more = "0.99.17"
 
 [dev-dependencies]
 float-cmp = "0.9.0"

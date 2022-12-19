@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use serde::{Serialize, Deserialize};
 use strum::IntoEnumIterator;
 
 use crate::grimoire::Ingredient;
@@ -8,7 +9,7 @@ use crate::effect::{Effect, self};
 
 
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IngredientUpdate {
     multiplier_actions: HashMap<Effect, Theoretical<f64>>,
     term_actions: HashMap<Effect, Theoretical<f64>>,

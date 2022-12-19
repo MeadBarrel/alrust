@@ -1,7 +1,8 @@
+use serde::{Serialize, Deserialize};
 use crate::{theoretical::Theoretical, prelude::Skill};
 
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SkillUpdate {
     effectiveness: Option<Theoretical<f64>>,
     parent: Option<Option<String>>,

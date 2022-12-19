@@ -1,16 +1,18 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::HashSet;
+
+use serde::{Serialize, Deserialize};
 
 use crate::{grimoire::Character};
 
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum ModifyClade {
     Add(String),
     Remove(String),
 }
 
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CharacterUpdate {
     pub clades_add: Vec<String>,
     pub clades_remove: HashSet<String>,

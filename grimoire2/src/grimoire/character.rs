@@ -2,11 +2,12 @@ use std::{
     cmp::min,
     collections::{HashMap, HashSet},
 };
+use serde::{Serialize, Deserialize};
 
 use super::Skills;
 use crate::theoretical::Theoretical;
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Character {
     pub clades: HashSet<String>,
     pub skills: HashMap<String, u8>,
@@ -193,5 +194,32 @@ pub mod tests {
             "{:?}",
             actual
         )
+    }
+}
+
+
+pub mod versioned {
+    use serde::{Serialize, Deserialize};
+
+    use super::Character;
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum CharacterVersioned {
+        #[serde(rename="0")]
+        V0(Character)
+    }
+
+    impl From<Character> for CharacterVersioned {
+        fn from(value: Character) -> Self {
+            Self::V0(value)
+        }
+    }
+
+    impl From<CharacterVersioned> for Character {
+        fn from(value: CharacterVersioned) -> Self {
+            match value {
+                CharacterVersioned::V0(x) => x
+            }
+        }
     }
 }

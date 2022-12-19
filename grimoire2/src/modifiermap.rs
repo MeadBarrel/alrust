@@ -1,10 +1,11 @@
 use std::ops::{Index, IndexMut};
 
+use serde::{Serialize, Deserialize};
 use strum::{EnumCount, IntoEnumIterator};
 
 use crate::{effect::Effect, modifier::Modifier};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModifierMap(Vec<Modifier>);
 
 impl ModifierMap {
@@ -59,5 +60,48 @@ impl Index<Effect> for ModifierMap {
 impl IndexMut<Effect> for ModifierMap {
     fn index_mut(&mut self, index: Effect) -> &mut Self::Output {
         &mut self.0[index as usize]
+    }
+}
+
+
+pub mod versioned {
+    use serde::{Serialize, Deserialize};
+
+    use super::ModifierMap;
+    use crate::modifier::versioned::ModifierVersioned;
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct ModifierMapV0(Vec<ModifierVersioned>);
+
+    impl From<ModifierMap> for ModifierMapV0 {
+        fn from(value: ModifierMap) -> Self {
+            Self(value.0.into_iter().map(|x| x.into()).collect())
+        }
+    }
+
+    impl From<ModifierMapV0> for ModifierMap {
+        fn from(value: ModifierMapV0) -> Self {
+            Self(value.0.into_iter().map(|x| x.into()).collect())
+        }
+    }
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum ModifierMapVersioned {
+        #[serde(rename="0")]
+        V0(ModifierMapV0)
+    }
+
+    impl From<ModifierMap> for ModifierMapVersioned {
+        fn from(value: ModifierMap) -> Self {
+            Self::V0(value.into())
+        }
+    }
+
+    impl From<ModifierMapVersioned> for ModifierMap {
+        fn from(value: ModifierMapVersioned) -> Self {
+            match value {
+                ModifierMapVersioned::V0(x) => x.into()
+            }
+        }
     }
 }
