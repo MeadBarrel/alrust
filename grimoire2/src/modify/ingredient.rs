@@ -202,3 +202,96 @@ mod tests {
         assert!( ingredient.skill.is_none() )
     }
 }
+
+
+
+pub mod versioned {
+    use serde::{Serialize, Deserialize};
+    use super::{IngredientUpdate, IngredientUpdateCommand};
+
+    #[derive(Clone, Debug, Serialize, Deserialize)]
+    pub enum IngredientUpdateVersioned {
+        #[serde(rename="0")]
+        V0(v0::IngredientUpdateV0)
+    }
+
+    impl From<IngredientUpdate> for IngredientUpdateVersioned {
+        fn from(value: IngredientUpdate) -> Self {
+            Self::V0(value.into())
+        }
+    }
+
+    impl From<IngredientUpdateVersioned> for IngredientUpdate {
+        fn from(value: IngredientUpdateVersioned) -> Self {
+            match value {
+                IngredientUpdateVersioned::V0(x) => x.into()
+            }
+        }
+    }
+
+    pub mod v0 {
+        use super::*;
+
+        use crate::theoretical::versioned::TheoreticalVersioned;
+        use crate::effect::Effect;
+
+        #[derive(Clone, Debug, Serialize, Deserialize)]
+        pub struct IngredientUpdateV0 {
+            commands: Vec<IngredientUpdateCommandV0>
+        }
+
+        impl From<IngredientUpdate> for IngredientUpdateV0 {
+            fn from(value: IngredientUpdate) -> Self {
+                Self {
+                    commands: value.commands.into_iter().map(|x| x.into()).collect(),
+                }
+            }
+        }
+
+        impl From<IngredientUpdateV0> for IngredientUpdate {
+            fn from(value: IngredientUpdateV0) -> Self {
+                Self {
+                    commands: value.commands.into_iter().map(|x| x.into()).collect(),
+                }                
+            }
+        }
+
+        #[derive(Clone, Debug, Serialize, Deserialize)]
+        pub enum IngredientUpdateCommandV0 {
+            ChangeMultiplier(Effect, TheoreticalVersioned<f64>),
+            ChangeTerm(Effect, TheoreticalVersioned<f64>),
+            SetSkill(Option<String>),
+            SetWeight(bool)
+        }
+
+        impl From<IngredientUpdateCommand> for IngredientUpdateCommandV0 {
+            fn from(value: IngredientUpdateCommand) -> Self {
+                match value {
+                    IngredientUpdateCommand::ChangeMultiplier(n, v) => 
+                        IngredientUpdateCommandV0::ChangeMultiplier(n, v.into()),
+                    IngredientUpdateCommand::ChangeTerm(n, v) =>
+                        IngredientUpdateCommandV0::ChangeTerm(n, v.into()),
+                    IngredientUpdateCommand::SetSkill(n) => 
+                        IngredientUpdateCommandV0::SetSkill(n),
+                    IngredientUpdateCommand::SetWeight(n) =>
+                        IngredientUpdateCommandV0::SetWeight(n)
+                }
+            }
+        }
+
+        impl From<IngredientUpdateCommandV0> for IngredientUpdateCommand {
+            fn from(value: IngredientUpdateCommandV0) -> Self {
+                match value {
+                    IngredientUpdateCommandV0::ChangeMultiplier(n, v) => 
+                        IngredientUpdateCommand::ChangeMultiplier(n, v.into()),
+                    IngredientUpdateCommandV0::ChangeTerm(n, v) =>
+                        IngredientUpdateCommand::ChangeTerm(n, v.into()),
+                    IngredientUpdateCommandV0::SetSkill(n) => 
+                        IngredientUpdateCommand::SetSkill(n),
+                    IngredientUpdateCommandV0::SetWeight(n) =>
+                        IngredientUpdateCommand::SetWeight(n)
+                }                
+            }
+        }
+    }
+}
