@@ -2,7 +2,9 @@ use crate::error::Report;
 
 
 #[derive(Debug, Default)]
-pub struct Wishes {}
+pub struct Wishes {
+    counter: usize,
+}
 
 
 impl Wishes {
@@ -12,5 +14,10 @@ impl Wishes {
             .set_title("Error")
             .set_description(&format!("{}", report));
         dialog.show();        
+    }
+
+    pub fn counter(&mut self) -> usize {
+        self.counter += 1;
+        self.counter
     }
 }

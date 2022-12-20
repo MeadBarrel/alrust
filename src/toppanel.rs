@@ -4,7 +4,6 @@ use crate::wishes::Wishes;
 use error_stack::*;
 use grimoire2::grimoire::versioned::GrimoireVersioned;
 use grimoire2::grimoire::Grimoire;
-use crate::grimoire_state::GrimoireState;
 use crate::error::{Error, Result};
 use crate::editor;
 
@@ -66,7 +65,8 @@ fn open_button(ui: &mut Ui, wishes: &mut Wishes, maybe_editor: &mut Option<edito
     match load_grimoire(path) {
         Ok(grimoire) => { 
             *maybe_editor = Some(editor::State { 
-                grimoire: GrimoireState::new(grimoire), ..Default::default()
+                grimoire,
+                ..Default::default()
             })
         },
         Err(err) => wishes.handle_error(err)

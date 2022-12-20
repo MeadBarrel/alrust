@@ -2,7 +2,7 @@ pub mod characters;
 
 use eframe::egui::Ui;
 use crate::wishes::Wishes;
-use crate::grimoire_state::GrimoireState;
+use grimoire2::grimoire::Grimoire;
 
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
 pub enum Tab {
@@ -14,7 +14,7 @@ pub enum Tab {
 
 #[derive(Debug, Default)]
 pub struct State {
-    pub grimoire: crate::grimoire_state::GrimoireState,
+    pub grimoire: Grimoire,
     pub current_tab: Tab,
 
     pub characters_editor_state: characters::State,
@@ -28,10 +28,10 @@ pub fn editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut State) {
     }
 }
 
-fn skills_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut GrimoireState) {
+fn skills_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut Grimoire) {
     ui.label("This is skills editor");
 }
 
-fn ingredients_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut GrimoireState) { 
+fn ingredients_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut Grimoire) { 
     ui.label("This is ingredients editor");
 }

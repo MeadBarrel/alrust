@@ -1,6 +1,5 @@
 mod app;
 mod error;
-mod grimoire_state;
 mod wishes;
 mod toppanel;
 mod editor;

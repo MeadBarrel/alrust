@@ -27,6 +27,8 @@ impl eframe::App for AlrustApp {
         let state = &mut self.state;
         let wishes = &mut self.wishes;
         
+        //ctx.memory().focus();
+
         egui::TopBottomPanel::top("ar_top_panel").show(ctx, |ui| {
             crate::toppanel::top_panel(ui, wishes, state)
         });
