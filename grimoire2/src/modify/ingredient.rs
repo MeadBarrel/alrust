@@ -96,6 +96,49 @@ impl IngredientUpdate {
         self.commands.push(IngredientUpdateCommand::ChangeMultiplier(effect, value));
         self
     }    
+
+    /// Get the number of commands
+    pub fn len(&self) -> usize {
+        self.commands.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.commands.is_empty()
+    }
+
+    /// If possible, combine the last two commands into a single command
+    pub fn combine_last(&mut self) -> &mut Self {
+        use IngredientUpdateCommand::*;
+
+        if self.len() < 2 { return  self; }
+
+        let prev = &self.commands[self.len()-2];
+        let last = &self.commands[self.len()-1];
+
+        match (prev, last) {
+            (ChangeTerm(a, _), ChangeTerm(b, _)) => if a == b {
+                self._replace_last_two_with(last.clone());
+            },
+            (ChangeMultiplier(a, _), ChangeMultiplier(b, _)) => if a == b {
+                self._replace_last_two_with(last.clone())
+            },
+            (SetWeight(_), SetWeight(_)) => {
+                self._replace_last_two_with(last.clone())
+            },
+            (SetSkill(_), SetSkill(_)) => {
+                self._replace_last_two_with(last.clone())
+            },
+            (_, _) => {},
+        }
+
+        self
+    }
+
+    /// Cut off the last two commands and replace them with a command from the argument
+    fn _replace_last_two_with(&mut self, command: IngredientUpdateCommand) {
+        self.commands.truncate(self.len()-2);
+        self.commands.push(command);
+    }
 }
 
 
@@ -201,6 +244,86 @@ mod tests {
         IngredientUpdate::default().remove_skill().update(&mut ingredient);
         assert!( ingredient.skill.is_none() )
     }
+
+    #[test]
+    fn test_combine_last_set_remove_skill() {
+        let update = IngredientUpdate::default()
+            .set_skill("a")
+            .remove_skill()
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 1);
+        assert!(ingredient.skill.is_none());
+    }
+
+    #[test]
+    fn test_combine_last_remove_set_skill() {
+        let update = IngredientUpdate::default()
+            .remove_skill()
+            .set_skill("a")
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 1);
+        assert_eq!(ingredient.skill, Some("a".to_string()));        
+    }
+
+    #[test]
+    fn test_combine_last_set_term() {
+        let update = IngredientUpdate::default()
+            .set_term(Effect::Alcohol, Theoretical::Known(1.))
+            .set_term(Effect::Alcohol, Theoretical::Known(2.))
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 1);
+        assert_eq!(ingredient.modifiers[Effect::Alcohol].term, Theoretical::Known(2.));        
+    }
+
+    #[test]
+    fn test_combine_last_set_multiplier() {
+        let update = IngredientUpdate::default()
+            .set_multiplier(Effect::Alcohol, Theoretical::Known(1.))
+            .set_multiplier(Effect::Alcohol, Theoretical::Known(2.))
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 1);
+        assert_eq!(ingredient.modifiers[Effect::Alcohol].multiplier, Theoretical::Known(2.));        
+    }    
+
+    #[test]
+    fn test_combine_last_set_term_diff_effects() {
+        let update = IngredientUpdate::default()
+            .set_term(Effect::Alcohol, Theoretical::Known(1.))
+            .set_term(Effect::DirectHealing, Theoretical::Known(2.))
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 2);
+        assert_eq!(ingredient.modifiers[Effect::Alcohol].term, Theoretical::Known(1.));
+        assert_eq!(ingredient.modifiers[Effect::DirectHealing].term, Theoretical::Known(2.));
+    }
+
+    #[test]
+    fn test_combine_last_set_multiplier_diff_effects() {
+        let update = IngredientUpdate::default()
+            .set_multiplier(Effect::Alcohol, Theoretical::Known(1.))
+            .set_multiplier(Effect::DirectHealing, Theoretical::Known(2.))
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 2);
+        assert_eq!(ingredient.modifiers[Effect::Alcohol].multiplier, Theoretical::Known(1.));
+        assert_eq!(ingredient.modifiers[Effect::DirectHealing].multiplier, Theoretical::Known(2.));
+    }        
 }
 
 
