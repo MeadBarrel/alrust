@@ -4,6 +4,8 @@ mod error;
 mod characters;
 mod grimoire_state;
 mod publicstate;
+mod grimoireeditor;
+mod events;
 
 use grimoire_sqlite::GrimoireSqlite;
 use grimoire2::grimoire::versioned::GrimoireVersioned;

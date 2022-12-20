@@ -8,7 +8,7 @@ pub struct CharactersEditor {}
 
 impl CharactersEditor {
     pub fn show(&mut self, ui: &mut Ui, state: &mut PublicState) {
-        let layout = egui::Layout::top_down(egui::Align::LEFT);
+        let layout = egui::Layout::top_down(egui::Align::Max);
 
         ui.with_layout(layout, |ui| {
             self.top_panel(ui, state);
@@ -20,6 +20,6 @@ impl CharactersEditor {
         if ui.button("Add Character").clicked() {
 
         }
-    }    
+    }
 }
 
