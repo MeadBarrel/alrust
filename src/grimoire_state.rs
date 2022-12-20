@@ -1,6 +1,7 @@
 use grimoire2::grimoire::Grimoire;
 use grimoire2::modify::{
     GrimoireUpdate,
+    command::Commands,
     skill::SkillUpdate,
     character::CharacterUpdate,
     ingredient::IngredientUpdate
@@ -37,7 +38,7 @@ impl GrimoireState {
     }
 
     pub fn character(&mut self, name: &str, update: CharacterUpdate) {
-        self.updates.character(name, update);
+        self.updates.character(name, update);        
         self.update();
     }
 
@@ -74,6 +75,7 @@ impl GrimoireState {
     }
 
     fn update(&mut self) {
+        self.updates.combine_last();
         self.current = self.grimoire.clone();
         self.updates.update(&mut self.current);
     }
