@@ -1,7 +1,9 @@
 pub mod character;
 pub mod skill;
 pub mod ingredient;
+pub mod command;
 
+use command::Commands;
 
 use serde::{Serialize, Deserialize};
 

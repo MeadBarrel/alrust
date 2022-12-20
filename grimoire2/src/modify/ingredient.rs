@@ -1,5 +1,8 @@
+use std::ops::Index;
+
 use serde::{Serialize, Deserialize};
 
+use super::command::Commands;
 use crate::grimoire::Ingredient;
 use crate::theoretical::Theoretical;
 use crate::effect::Effect;
@@ -21,46 +24,6 @@ pub struct IngredientUpdate {
 
 
 impl IngredientUpdate {
-    pub fn create(&self) -> Ingredient {
-        let mut ingredient = Ingredient::default();
-        self.update(&mut ingredient);
-        ingredient
-    }
-
-    pub fn from_ingredient(ingredient: &Ingredient) -> Self {
-        let mut result = Self::default();
-        ingredient.modifiers.iter().for_each(
-            |(effect, modifier)|
-            { result.set_modifier(effect, modifier.term, modifier.multiplier); }
-        );
-        match &ingredient.skill {
-            Some(x) => result.set_skill(x),
-            None => result.remove_skill(),
-        };
-
-        result.set_weight(ingredient.weight);
-        result
-    }
-
-    pub fn update(&self, ingredient: &mut Ingredient) {
-        for command in &self.commands {
-            match command {
-                IngredientUpdateCommand::ChangeMultiplier(effect, value) => {
-                    ingredient.modifiers[*effect].multiplier = *value;
-                },
-                IngredientUpdateCommand::ChangeTerm(effect, value) => {
-                    ingredient.modifiers[*effect].term = *value;
-                },
-                IngredientUpdateCommand::SetSkill(value) => {
-                    ingredient.skill = value.clone()
-                },
-                IngredientUpdateCommand::SetWeight(value) => {
-                    ingredient.weight = *value
-                }
-            }
-        }
-    }
-
     pub fn set_skill(&mut self, skill: &str) -> &mut Self {
         self.commands.push(IngredientUpdateCommand::SetSkill(Some(skill.to_string())));
         self
@@ -97,17 +60,74 @@ impl IngredientUpdate {
         self
     }    
 
-    /// Get the number of commands
-    pub fn len(&self) -> usize {
+}
+
+
+impl Index<usize> for IngredientUpdate {
+    type Output = IngredientUpdateCommand;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.commands[index]
+    }
+}
+
+
+impl Commands<Ingredient, IngredientUpdateCommand> for IngredientUpdate {
+    fn create_from(ingredient: &Ingredient) -> Self {
+        let mut result = Self::default();
+        ingredient.modifiers.iter().for_each(
+            |(effect, modifier)|
+            { result.set_modifier(effect, modifier.term, modifier.multiplier); }
+        );
+        match &ingredient.skill {
+            Some(x) => result.set_skill(x),
+            None => result.remove_skill(),
+        };
+
+        result.set_weight(ingredient.weight);
+        result
+    }
+
+    fn update(&self, ingredient: &mut Ingredient) {
+        for command in &self.commands {
+            match command {
+                IngredientUpdateCommand::ChangeMultiplier(effect, value) => {
+                    ingredient.modifiers[*effect].multiplier = *value;
+                },
+                IngredientUpdateCommand::ChangeTerm(effect, value) => {
+                    ingredient.modifiers[*effect].term = *value;
+                },
+                IngredientUpdateCommand::SetSkill(value) => {
+                    ingredient.skill = value.clone()
+                },
+                IngredientUpdateCommand::SetWeight(value) => {
+                    ingredient.weight = *value
+                }
+            }
+        }
+    }
+
+    fn add(&mut self, command: IngredientUpdateCommand) -> &mut Self {
+        self.commands.push(command);
+        self
+    }
+
+    fn truncate(&mut self, index: usize) -> &mut Self {
+        self.commands.truncate(index);
+        self
+    }
+
+    fn create(&self) -> Ingredient {
+        let mut ingredient = Ingredient::default();
+        self.update(&mut ingredient);
+        ingredient
+    }
+
+    fn len(&self) -> usize {
         self.commands.len()
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.commands.is_empty()
-    }
-
-    /// If possible, combine the last two commands into a single command
-    pub fn combine_last(&mut self) -> &mut Self {
+    fn combine_last(&mut self) -> &mut Self {
         use IngredientUpdateCommand::*;
 
         if self.len() < 2 { return  self; }
@@ -132,19 +152,25 @@ impl IngredientUpdate {
         }
 
         self
-    }
+    }        
 
-    /// Cut off the last two commands and replace them with a command from the argument
-    fn _replace_last_two_with(&mut self, command: IngredientUpdateCommand) {
-        self.commands.truncate(self.len()-2);
-        self.commands.push(command);
-    }
 }
 
 
 impl From<Ingredient> for IngredientUpdate {
     fn from(ingredient: Ingredient) -> Self {
-        Self::from_ingredient(&ingredient)
+        let mut result = Self::default();
+        ingredient.modifiers.iter().for_each(
+            |(effect, modifier)|
+            { result.set_modifier(effect, modifier.term, modifier.multiplier); }
+        );
+        match &ingredient.skill {
+            Some(x) => result.set_skill(x),
+            None => result.remove_skill(),
+        };
+
+        result.set_weight(ingredient.weight);
+        result
     }
 }
 
@@ -163,11 +189,12 @@ mod tests {
     use crate::theoretical::Theoretical;
 
     use super::IngredientUpdate;
+    use super::Commands;
 
     #[test]
     fn test_from_ingredient() {
         let ingredient = ingredient_updater().create();
-        let update = IngredientUpdate::from_ingredient(&ingredient);
+        let update = IngredientUpdate::create_from(&ingredient);
         let new_ingredient = update.create();
 
         assert_eq!( new_ingredient.modifiers[Effect::DirectHealing].term, (1.0).into() );
