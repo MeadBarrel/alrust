@@ -8,7 +8,7 @@ use grimoire2::modify::{
 };
 
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct GrimoireState {
     grimoire: Grimoire,
     current: Grimoire,

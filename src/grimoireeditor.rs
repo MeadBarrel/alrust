@@ -1,22 +1,30 @@
-use egui::Ui;
+use eframe::egui::Ui;
 use crate::wishes::Wishes;
 use crate::grimoire_state::GrimoireState;
 
-
-pub enum GrimoireEditorTab {
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+pub enum GrimoireEditTab {
+    #[default]
     Characters,
     Skills,
     Ingredients,
 }
 
-pub struct GrimoireEditor {
-    grimoire: GrimoireState,
-    tab: GrimoireEditorTab,
+#[derive(Debug, Default)]
+pub struct GrimoireEditorState {
+    pub grimoire: crate::grimoire_state::GrimoireState,
+    pub current_tab: GrimoireEditTab,
 }
 
+pub fn grimoire_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut GrimoireEditorState) {
 
-impl GrimoireEditor {
-    pub fn show(&mut self, ui: &mut Ui, wishes: &mut Wishes) {
-        ui.label("Hello Grimoire!");
-    }
+}
+
+fn characters_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut GrimoireState) {
+}
+
+fn skills_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut GrimoireState) {
+}
+
+fn ingredients_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut GrimoireState) { 
 }
