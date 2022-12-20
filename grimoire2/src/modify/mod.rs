@@ -8,7 +8,7 @@ use command::Commands;
 
 use serde::{Serialize, Deserialize};
 
-use crate::grimoire::{Grimoire, Ingredient};
+use crate::{grimoire::{Grimoire, Ingredient}, prelude::{Character, Skill}};
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -112,15 +112,15 @@ impl Commands<Grimoire, GrimoireUpdateCommand> for GrimoireUpdate {
         for command in &self.commands {
             match command {
                 GrimoireUpdateCommand::Character(name, update) => {
-                    let character = grimoire.characters.entry(name.clone()).or_default();
+                    let character = grimoire.characters.entry(name.clone()).or_insert(Character::default());
                     update.update(character);
                 }
                 GrimoireUpdateCommand::Skill(name, update) => {
-                    let skill = grimoire.skills.entry(name.clone()).or_default();
+                    let skill = grimoire.skills.entry(name.clone()).or_insert(Skill::default());
                     update.update(skill);
                 }
                 GrimoireUpdateCommand::Ingredient(name, update) => {
-                    let ingredient = grimoire.ingredients.entry(name.clone()).or_default();
+                    let ingredient = grimoire.ingredients.entry(name.clone()).or_insert(Ingredient::default());
                     update.update(ingredient);
                 },
                 GrimoireUpdateCommand::RemoveCharacter(name) => {

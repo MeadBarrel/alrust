@@ -10,6 +10,8 @@ thiserror = { version="1.0.37" }
 rusqlite = { version = "0.28.0", features = ["bundled"] }
 diesel = {version = "2.0.2", features = ["sqlite"]}
 diesel_migrations = "2.0.0"
+indexmap_192 = { version = "1.9.2", features=["serde-1"], package="indexmap" }
+
 
 grimoire2 = { path="../grimoire2" }
 

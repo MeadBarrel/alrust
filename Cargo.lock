@@ -1069,6 +1069,7 @@ dependencies = [
  "diesel",
  "diesel_migrations",
  "grimoire2",
+ "indexmap",
  "maplit",
  "rusqlite",
  "thiserror",
@@ -1079,6 +1080,7 @@ name = "grimoire2"
 version = "0.1.0"
 dependencies = [
  "float-cmp",
+ "indexmap",
  "maplit",
  "serde",
  "strum",
@@ -1150,6 +1152,17 @@ checksum = "e14ddfc70884202db2244c223200c204c2bda1bc6e0998d11b5e024d657209e6"
 dependencies = [
  "unicode-bidi",
  "unicode-normalization",
+]
+
+[[package]]
+name = "indexmap"
+version = "1.9.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1885e79c1fc4b10f0e172c475f458b7f7b93061064d98c3293e98c5ba0c8b399"
+dependencies = [
+ "autocfg",
+ "hashbrown",
+ "serde",
 ]
 
 [[package]]

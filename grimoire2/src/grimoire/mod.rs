@@ -6,11 +6,11 @@ pub use character::*;
 pub use ingredient::*;
 pub use skill::*;
 
-use std::collections::HashMap;
+use indexmap::IndexMap;
 
-type Skills = HashMap<String, Skill>;
-type Ingredients = HashMap<String, Ingredient>;
-type Characters = HashMap<String, Character>;
+type Skills = IndexMap<String, Skill>;
+type Ingredients = IndexMap<String, Ingredient>;
+type Characters = IndexMap<String, Character>;
 
 #[derive(Default, Debug, Clone)]
 pub struct Grimoire {

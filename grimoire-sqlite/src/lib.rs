@@ -6,7 +6,7 @@ mod lore;
 mod player_character;
 mod player_character_lore;
 
-use std::collections::HashMap;
+use indexmap_192::IndexMap;
 use diesel::{sql_query, sqlite::SqliteConnection, QueryResult, RunQueryDsl, Connection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use grimoire2::prelude::Grimoire;
@@ -67,12 +67,12 @@ fn load(conn: &mut Conn) -> Result<Grimoire> {
 
     let player_character_lores_db = PlayerCharacterLore::load(conn)?;
 
-    let ingredients: HashMap<String, g2::Ingredient> =
+    let ingredients: IndexMap<String, g2::Ingredient> =
         ingredients_db.iter().map(|x| x.to_grimoire()).collect();
 
-    let skills: HashMap<String, g2::Skill> = lores_db.iter().map(|x| x.to_grimoire()).collect();
+    let skills: IndexMap<String, g2::Skill> = lores_db.iter().map(|x| x.to_grimoire()).collect();
 
-    let characters: HashMap<String, g2::Character> = player_characters_db
+    let characters: IndexMap<String, g2::Character> = player_characters_db
         .iter()
         .map(|x| x.to_grimoire(&player_character_lores_db))
         .collect();
