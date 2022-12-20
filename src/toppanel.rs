@@ -1,12 +1,12 @@
 use eframe::egui::Ui;
 use crate::app::AppState;
 use crate::wishes::Wishes;
-use crate::grimoireeditor::{GrimoireEditTab, GrimoireEditorState};
 use error_stack::*;
 use grimoire2::grimoire::versioned::GrimoireVersioned;
 use grimoire2::grimoire::Grimoire;
 use crate::grimoire_state::GrimoireState;
 use crate::error::{Error, Result};
+use crate::editor;
 
 
 pub fn top_panel(ui: &mut Ui, wishes: &mut Wishes, state: &mut AppState) {
@@ -31,14 +31,14 @@ pub fn menu(ui: &mut Ui, wishes: &mut Wishes, state: &mut AppState) {
 }
 
 
-fn tab_panel(ui: &mut Ui, editor: &mut GrimoireEditorState) {
-    tab_button(ui, "Characters", editor, GrimoireEditTab::Characters);
-    tab_button(ui, "Skills", editor, GrimoireEditTab::Skills);
-    tab_button(ui, "Ingredients", editor, GrimoireEditTab::Ingredients);
+fn tab_panel(ui: &mut Ui, editor: &mut editor::State) {
+    tab_button(ui, "Characters", editor, editor::Tab::Characters);
+    tab_button(ui, "Skills", editor, editor::Tab::Skills);
+    tab_button(ui, "Ingredients", editor, editor::Tab::Ingredients);
 }
 
 
-fn tab_button(ui: &mut Ui, text: &str, editor: &mut GrimoireEditorState, this_tab: GrimoireEditTab){
+fn tab_button(ui: &mut Ui, text: &str, editor: &mut editor::State, this_tab: editor::Tab) {
     use egui::widgets::Button;
     use egui::widgets::Widget;
 
@@ -57,7 +57,7 @@ fn tab_button(ui: &mut Ui, text: &str, editor: &mut GrimoireEditorState, this_ta
 }
 
 
-fn open_button(ui: &mut Ui, wishes: &mut Wishes, maybe_editor: &mut Option<GrimoireEditorState>) {
+fn open_button(ui: &mut Ui, wishes: &mut Wishes, maybe_editor: &mut Option<editor::State>) {
     if !ui.button("Open").clicked() { return }
 
     let dialog = rfd::FileDialog::new().add_filter("Grimoire as JSON", &["json"]);
@@ -65,7 +65,7 @@ fn open_button(ui: &mut Ui, wishes: &mut Wishes, maybe_editor: &mut Option<Grimo
 
     match load_grimoire(path) {
         Ok(grimoire) => { 
-            *maybe_editor = Some(GrimoireEditorState { 
+            *maybe_editor = Some(editor::State { 
                 grimoire: GrimoireState::new(grimoire), ..Default::default()
             })
         },
@@ -74,7 +74,7 @@ fn open_button(ui: &mut Ui, wishes: &mut Wishes, maybe_editor: &mut Option<Grimo
 }
 
 
-fn close_button(ui: &mut Ui, _: &mut Wishes, maybe_editor: &mut Option<GrimoireEditorState>) {
+fn close_button(ui: &mut Ui, _: &mut Wishes, maybe_editor: &mut Option<editor::State>) {
     if !ui.button("Close").clicked() { return; }
 
     let ok = rfd::MessageDialog::default()

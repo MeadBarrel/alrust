@@ -1,10 +1,10 @@
-use crate::grimoireeditor;
 use crate::wishes::Wishes;
+use crate::editor;
 
 
 #[derive(Default)]
 pub struct AppState {
-    pub grimoire_editor: Option<grimoireeditor::GrimoireEditorState>,
+    pub grimoire_editor: Option<editor::State>,
 }
 
 
@@ -32,7 +32,10 @@ impl eframe::App for AlrustApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.label("hi!")
+            match &mut self.state.grimoire_editor {
+                Some(editor) => editor::editor(ui, wishes, editor),
+                None => { ui.label("First open a grimoire using the File menu above..."); }
+            }            
         });
     }
 }

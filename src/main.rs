@@ -2,8 +2,8 @@ mod app;
 mod error;
 mod grimoire_state;
 mod wishes;
-mod grimoireeditor;
 mod toppanel;
+mod editor;
 
 pub fn main() {
     app::main()
