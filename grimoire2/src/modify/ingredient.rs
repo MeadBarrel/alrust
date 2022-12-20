@@ -154,6 +154,9 @@ impl Commands<Ingredient, IngredientUpdateCommand> for IngredientUpdate {
         self
     }        
 
+    fn extend(&mut self, other: &Self) {
+        self.commands.extend(other.commands.iter().cloned())
+    }    
 }
 
 
@@ -172,12 +175,20 @@ impl From<Ingredient> for IngredientUpdate {
         result.set_weight(ingredient.weight);
         result
     }
+    
 }
 
 
 impl From<IngredientUpdate> for Ingredient {
     fn from(value: IngredientUpdate) -> Self {
         value.create()
+    }
+}
+
+
+impl From<&Ingredient> for IngredientUpdate {
+    fn from(value: &Ingredient) -> Self {
+        Self::create_from(value)
     }
 }
 
@@ -350,7 +361,7 @@ mod tests {
         assert_eq!(update.len(), 2);
         assert_eq!(ingredient.modifiers[Effect::Alcohol].multiplier, Theoretical::Known(1.));
         assert_eq!(ingredient.modifiers[Effect::DirectHealing].multiplier, Theoretical::Known(2.));
-    }        
+    }
 }
 
 

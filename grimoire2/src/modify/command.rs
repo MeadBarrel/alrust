@@ -19,4 +19,5 @@ pub trait Commands<T, C>: From<T> + Into<T> + Clone + Index<usize, Output = C> {
         self.truncate(self.len()-2);
         self.add(command);
     }    
+    fn extend(&mut self, other: &Self);
 }

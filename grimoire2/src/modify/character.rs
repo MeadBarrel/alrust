@@ -121,6 +121,17 @@ impl Commands<Character, CharacterUpdateCommand> for CharacterUpdate {
         self.commands.truncate(index);
         self
     }
+
+    fn extend(&mut self, other: &Self) {
+        self.commands.extend(other.commands.iter().cloned())
+    }
+}
+
+
+impl From<&Character> for CharacterUpdate {
+    fn from(value: &Character) -> Self {
+        CharacterUpdate::create_from(value)
+    }
 }
 
 

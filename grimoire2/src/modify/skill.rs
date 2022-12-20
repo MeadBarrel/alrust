@@ -123,6 +123,10 @@ impl Commands<Skill, SkillUpdateCommand> for SkillUpdate {
         self.commands.truncate(index);
         self
     }
+    
+    fn extend(&mut self, other: &Self) {
+        self.commands.extend(other.commands.iter().cloned())
+    }    
 }
 
 
@@ -136,6 +140,13 @@ impl From<Skill> for SkillUpdate {
 impl From<SkillUpdate> for Skill {
     fn from(value: SkillUpdate) -> Self {
         value.create()
+    }
+}
+
+
+impl From<&Skill> for SkillUpdate {
+    fn from(value: &Skill) -> Self {
+        Self::create_from(value)
     }
 }
 
