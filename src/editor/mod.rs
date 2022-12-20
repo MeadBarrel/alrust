@@ -16,11 +16,13 @@ pub enum Tab {
 pub struct State {
     pub grimoire: crate::grimoire_state::GrimoireState,
     pub current_tab: Tab,
+
+    pub characters_editor_state: characters::State,
 }
 
 pub fn editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut State) {
     match state.current_tab {
-        Tab::Characters => characters::editor(ui, wishes, &mut state.grimoire),
+        Tab::Characters => characters::editor(ui, wishes, &mut state.characters_editor_state, &mut state.grimoire),
         Tab::Skills => skills_editor(ui, wishes, &mut state.grimoire),
         Tab::Ingredients => ingredients_editor(ui, wishes, &mut state.grimoire),
     }
