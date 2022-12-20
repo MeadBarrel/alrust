@@ -88,6 +88,12 @@ impl Commands<Ingredient, IngredientUpdateCommand> for IngredientUpdate {
         result
     }
 
+    fn create(&self) -> Ingredient {
+        let mut ingredient = Ingredient::default();
+        self.update(&mut ingredient);
+        ingredient
+    }
+
     fn update(&self, ingredient: &mut Ingredient) {
         for command in &self.commands {
             match command {
@@ -110,17 +116,6 @@ impl Commands<Ingredient, IngredientUpdateCommand> for IngredientUpdate {
     fn add(&mut self, command: IngredientUpdateCommand) -> &mut Self {
         self.commands.push(command);
         self
-    }
-
-    fn truncate(&mut self, index: usize) -> &mut Self {
-        self.commands.truncate(index);
-        self
-    }
-
-    fn create(&self) -> Ingredient {
-        let mut ingredient = Ingredient::default();
-        self.update(&mut ingredient);
-        ingredient
     }
 
     fn len(&self) -> usize {
@@ -151,6 +146,11 @@ impl Commands<Ingredient, IngredientUpdateCommand> for IngredientUpdate {
             (_, _) => {},
         }
 
+        self
+    }
+
+    fn truncate(&mut self, index: usize) -> &mut Self {
+        self.commands.truncate(index);
         self
     }        
 

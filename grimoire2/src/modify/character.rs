@@ -1,6 +1,10 @@
+use std::ops::Index;
+
 use serde::{Serialize, Deserialize};
 
 use crate::{grimoire::Character};
+
+use super::command::Commands;
 
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -29,32 +33,6 @@ impl CharacterUpdate {
         character
     }
 
-    pub fn from_character(character: &Character) -> CharacterUpdate {
-        let mut update = Self::default();
-
-        character.clades.iter().for_each(|clade| { update.add_clade(clade); });
-        character.skills.iter().for_each(|(skill, value)| { update.set_skill(skill, *value); } );
-
-        update
-    }
-
-    pub fn update(&self, character: &mut Character) {
-        self.commands.iter().for_each(|command|
-            match command {
-                CharacterUpdateCommand::AddClade(clade) => { character.clades.insert(clade.clone()); },
-                CharacterUpdateCommand::RemoveClade(clade) => { character.clades.remove(clade.as_str()); },
-                CharacterUpdateCommand::SetSkill(skill, value) => match value {
-                    0 => { character.skills.remove(skill.as_str()); },
-                    x => { 
-                        let v = character.skills.entry(skill.clone()).or_default();
-                        *v = *x;
-                    }
-                }
-            }
-        );
-
-    }
-
     pub fn add_clade(&mut self, clade: &str) -> &mut Self {
         self.commands.push(CharacterUpdateCommand::AddClade(clade.to_string()));
         self
@@ -77,9 +55,78 @@ impl CharacterUpdate {
 }
 
 
+impl Index<usize> for CharacterUpdate {
+    type Output = CharacterUpdateCommand;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.commands[index]
+    }
+}
+
+
+impl Commands<Character, CharacterUpdateCommand> for CharacterUpdate {
+    fn create_from(character: &Character) -> CharacterUpdate {
+        let mut update = Self::default();
+
+        character.clades.iter().for_each(|clade| { update.add_clade(clade); });
+        character.skills.iter().for_each(|(skill, value)| { update.set_skill(skill, *value); } );
+
+        update
+    }
+
+    fn update(&self, character: &mut Character) {
+        self.commands.iter().for_each(|command|
+            match command {
+                CharacterUpdateCommand::AddClade(clade) => { character.clades.insert(clade.clone()); },
+                CharacterUpdateCommand::RemoveClade(clade) => { character.clades.remove(clade.as_str()); },
+                CharacterUpdateCommand::SetSkill(skill, value) => match value {
+                    0 => { character.skills.remove(skill.as_str()); },
+                    x => { 
+                        let v = character.skills.entry(skill.clone()).or_default();
+                        *v = *x;
+                    }
+                }
+            }
+        );
+    }
+
+    fn add(&mut self, command: CharacterUpdateCommand) -> &mut Self {
+        self.commands.push(command);
+        self
+    }
+
+    fn len(&self) -> usize {
+        self.commands.len()
+    }
+
+    fn combine_last(&mut self) -> &mut Self {
+        use CharacterUpdateCommand::*;
+
+        if self.len() < 2 { return  self; }
+
+        let prev = &self.commands[self.len()-2];
+        let last = &self.commands[self.len()-1];
+
+        match (prev, last) {
+            (AddClade(a), RemoveClade(b)) => if a == b { self._replace_last_two_with(last.clone()); },
+            (RemoveClade(a), AddClade(b)) => if a == b { self._replace_last_two_with(last.clone()); },
+            (SetSkill(a, _), SetSkill(b, _)) => if a == b { self._replace_last_two_with(last.clone()); },
+            (_, _) => {},
+        }
+
+        self
+    }
+
+    fn truncate(&mut self, index: usize) -> &mut Self {
+        self.commands.truncate(index);
+        self
+    }
+}
+
+
 impl From<Character> for CharacterUpdate {
     fn from(value: Character) -> Self {
-        Self::from_character(&value)
+        Self::create_from(&value)
     }
 }
 
@@ -120,7 +167,7 @@ pub mod versioned {
 
 #[cfg(test)]
 mod tests {
-    use crate::grimoire::Character;
+    use crate::{grimoire::Character, prelude::character};
     use super::*;
     use maplit::{hashmap, hashset};
 
@@ -133,7 +180,7 @@ mod tests {
             .set_skill("b", 5)
             .create();
         
-        let update = CharacterUpdate::from_character(&character);
+        let update = CharacterUpdate::create_from(&character);
 
         let new_character = update.create();
 
@@ -177,4 +224,85 @@ mod tests {
 
         Character::new(clades, skills)
     }
+
+    #[test]
+    fn test_combine_last_add_remove_clade() {
+        let update = CharacterUpdate::default()
+            .add_clade("a")
+            .remove_clade("a")
+            .combine_last()
+            .clone();
+        let character = &mut CharacterUpdate::default().add_clade("a").create();
+        update.update(character);
+        assert_eq!(update.len(), 1);
+        assert!(!character.has_clade("a"));
+    }
+
+    #[test]
+    fn test_combine_last_remove_add_clade() {
+        let update = CharacterUpdate::default()
+            .remove_clade("a")
+            .add_clade("a")
+            .combine_last()
+            .clone();
+        let character = &mut Character::default();
+        update.update(character);
+        assert_eq!(update.len(), 1);
+        assert!(character.has_clade("a"));
+    }    
+
+    #[test]
+    fn test_combine_last_add_remove_clade_different() {
+        let update = CharacterUpdate::default()
+            .add_clade("b")
+            .remove_clade("a")
+            .combine_last()
+            .clone();
+        let character = &mut CharacterUpdate::default().add_clade("a").create();
+        update.update(character);
+        assert_eq!(update.len(), 2);
+        assert!(!character.has_clade("a"));
+        assert!(character.has_clade("b"));
+    }
+
+    #[test]
+    fn test_combine_last_remove_add_clade_different() {
+        let update = CharacterUpdate::default()
+            .remove_clade("a")
+            .add_clade("b")
+            .combine_last()
+            .clone();
+        let character = &mut CharacterUpdate::default().add_clade("a").create();
+        update.update(character);
+        assert_eq!(update.len(), 2);
+        assert!(!character.has_clade("a"));
+        assert!(character.has_clade("b"));
+    }    
+
+    #[test]
+    fn test_combine_last_set_skill() {
+        let update = CharacterUpdate::default()
+            .set_skill("a", 50)
+            .remove_skill("a")
+            .combine_last()
+            .clone();
+        let character = &mut CharacterUpdate::default().set_skill("a", 100).create();
+        update.update(character);
+        assert_eq!(update.len(), 1);
+        assert_eq!(character.raw_skill("a"), 0);
+    }
+
+    #[test]
+    fn test_combine_last_set_skill_diff() {
+        let update = CharacterUpdate::default()
+            .set_skill("b", 50)
+            .remove_skill("a")
+            .combine_last()
+            .clone();
+        let character = &mut CharacterUpdate::default().set_skill("a", 100).create();
+        update.update(character);
+        assert_eq!(update.len(), 2);
+        assert_eq!(character.raw_skill("a"), 0);
+        assert_eq!(character.raw_skill("b"), 50);
+    }    
 }
