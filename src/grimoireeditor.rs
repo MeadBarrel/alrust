@@ -1,5 +1,5 @@
 use egui::Ui;
-use crate::events::{Event, Events};
+use crate::wishes::Wishes;
 use crate::grimoire_state::GrimoireState;
 
 
@@ -11,12 +11,13 @@ pub enum GrimoireEditorTab {
 
 pub struct GrimoireEditor {
     grimoire: GrimoireState,
+    tab: GrimoireEditorTab,
 }
 
 
 impl GrimoireEditor {
-    pub fn show(&mut self, ui: &mut Ui, tab: GrimoireEditorTab) -> Events {
-        Events::default()
+    pub fn show(&mut self, ui: &mut Ui, events: &mut Wishes) -> Wishes {
+        Wishes::default()
     }
 
 }

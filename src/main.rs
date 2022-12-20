@@ -5,7 +5,7 @@ mod characters;
 mod grimoire_state;
 mod publicstate;
 mod grimoireeditor;
-mod events;
+mod wishes;
 
 use grimoire_sqlite::GrimoireSqlite;
 use grimoire2::grimoire::versioned::GrimoireVersioned;

@@ -4,6 +4,7 @@ use error_stack::{IntoReport, ResultExt};
 use crate::error::{Result, Error, handle_result};
 use crate::grimoire_state::GrimoireState;
 use crate::publicstate::{PublicState, GrimoireEditTab};
+use crate::wishes::Wishes;
 
 use grimoire2::grimoire::versioned::GrimoireVersioned;
 use grimoire2::grimoire::Grimoire;
@@ -66,7 +67,7 @@ fn grimoire_panel_frame(ui: &mut Ui, state: &mut PublicState) {
 
 fn grimoire_panel(ui: &mut Ui, state: &mut PublicState) {
     let grimoire_loaded_result = grimoire_select_button(ui, state);
-    handle_result(state, grimoire_loaded_result);
+    handle_result(&mut Wishes::default(), grimoire_loaded_result);
 
     if state.grimoire_state.is_some() {
         grimoire_close_button(ui, state);
