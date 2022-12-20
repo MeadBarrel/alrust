@@ -178,7 +178,7 @@ pub mod versioned {
 
 #[cfg(test)]
 mod tests {
-    use crate::{grimoire::Character, prelude::character};
+    use crate::grimoire::Character;
     use super::*;
     use maplit::{hashmap, hashset};
 
