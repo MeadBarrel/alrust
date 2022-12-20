@@ -16,8 +16,7 @@ pub struct GrimoireEditor {
 
 
 impl GrimoireEditor {
-    pub fn show(&mut self, ui: &mut Ui, events: &mut Wishes) -> Wishes {
-        Wishes::default()
+    pub fn show(&mut self, ui: &mut Ui, events: &mut Wishes) {
+        ui.label("Hello Grimoire!");
     }
-
 }
