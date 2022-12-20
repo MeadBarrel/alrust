@@ -376,60 +376,6 @@ mod tests {
         assert_eq!(update.len(), 2);
     }
 
-    #[test]
-    fn test_combine_last_characters_combine() {
-        let update = GrimoireUpdate::default()
-            .character("a", CharacterUpdate::default().set_skill("a", 50).clone())
-            .character("a", CharacterUpdate::default().set_skill("a", 100).clone())
-            .combine_last()
-            .clone();
-        let mut grimoire = Grimoire::default();
-        update.update(&mut grimoire);
-        assert_eq!(update.len(), 1);
-        if let GrimoireUpdateCommand::Character(_, x) = &update[0] {
-            assert_eq!(x.len(), 1);
-        } else {
-            panic!("Incorrect command found");
-        };
-        assert_eq!(grimoire.characters["a"].raw_skill("a"), 100);        
-    }
-
-    #[test]
-    fn test_combine_last_skills_combine() {
-        let update = GrimoireUpdate::default()
-            .skill("a", SkillUpdate::default().set_parent("a").clone())
-            .skill("a", SkillUpdate::default().set_parent("b").clone())
-            .combine_last()
-            .clone();
-        let mut grimoire = Grimoire::default();
-        update.update(&mut grimoire);
-        assert_eq!(update.len(), 1);
-        if let GrimoireUpdateCommand::Skill(_, x) = &update[0] {
-            assert_eq!(x.len(), 1);
-        } else {
-            panic!("Incorrect command found");
-        };
-        assert_eq!(grimoire.skills["a"].parent, Some("b".to_string()));
-    }
-
-    #[test]
-    fn test_combine_last_ingredients_combine() {
-        let update = GrimoireUpdate::default()
-            .ingredient("a", IngredientUpdate::default().set_skill("a").clone())
-            .ingredient("a", IngredientUpdate::default().set_skill("b").clone())
-            .combine_last()
-            .clone();
-        let mut grimoire = Grimoire::default();
-        update.update(&mut grimoire);
-        assert_eq!(update.len(), 1);
-        if let GrimoireUpdateCommand::Ingredient(_, x) = &update[0] {
-            assert_eq!(x.len(), 1);
-        } else {
-            panic!("Incorrect command found");
-        };
-        assert_eq!(grimoire.ingredients["a"].skill, Some("b".to_string()));
-    }
-
     fn grimoire_update() -> GrimoireUpdate {
         GrimoireUpdate::default()
             .character(
