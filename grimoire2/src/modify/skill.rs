@@ -1,5 +1,9 @@
+use std::ops::Index;
 use serde::{Serialize, Deserialize};
 use crate::{theoretical::Theoretical, prelude::Skill};
+
+
+use super::Commands;
 
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -20,33 +24,6 @@ impl SkillUpdate {
         let mut skill = Skill::default();
         self.update(&mut skill);
         skill
-    }
-
-    pub fn from_skill(skill: &Skill) -> Self {
-        let mut update = SkillUpdate::default();
-        update.set_effectiveness(skill.effectiveness);
-        
-        match &skill.parent {
-            Some(x) => update.set_parent(x),
-            None => update.remove_parent(),
-        };
-
-        match &skill.parent_2 {
-            Some(x) => update.set_parent2(x),
-            None => update.remove_parent_2()
-        };
-
-        update
-    }
-
-    pub fn update(&self, skill: &mut Skill) {
-        for command in &self.commands {
-            match command {
-                SkillUpdateCommand::SetEffectiveness(x) => skill.effectiveness = *x,
-                SkillUpdateCommand::SetParent(x) => skill.parent = x.clone(),
-                SkillUpdateCommand::SetParent2(x) => skill.parent_2 = x.clone(),
-            }
-        };
     }
 
     pub fn set_effectiveness(&mut self, value: Theoretical<f64>) -> &mut Self {
@@ -77,9 +54,81 @@ impl SkillUpdate {
 }
 
 
+impl Index<usize> for SkillUpdate {
+    type Output = SkillUpdateCommand;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.commands[index]
+    }
+}
+
+
+impl Commands<Skill, SkillUpdateCommand> for SkillUpdate {
+    fn create_from(skill: &Skill) -> Self {
+        let mut update = SkillUpdate::default();
+        update.set_effectiveness(skill.effectiveness);
+
+        match &skill.parent {
+            Some(x) => update.set_parent(x),
+            None => update.remove_parent(),
+        };
+
+        match &skill.parent_2 {
+            Some(x) => update.set_parent2(x),
+            None => update.remove_parent_2()
+        };
+
+        update
+    }
+
+    fn update(&self, skill: &mut Skill) {
+        for command in &self.commands {
+            match command {
+                SkillUpdateCommand::SetEffectiveness(x) => skill.effectiveness = *x,
+                SkillUpdateCommand::SetParent(x) => skill.parent = x.clone(),
+                SkillUpdateCommand::SetParent2(x) => skill.parent_2 = x.clone(),
+            }
+        };
+    }
+
+    fn add(&mut self, command: SkillUpdateCommand) -> &mut Self {
+        self.commands.push(command);
+        self
+    }
+
+    fn len(&self) -> usize {
+        self.commands.len()
+    }
+
+    fn combine_last(&mut self) -> &mut Self {
+        use SkillUpdateCommand::*;
+
+        if self.len() < 2 { return  self; }
+
+        let prev = &self.commands[self.len()-2];
+        let last = &self.commands[self.len()-1];
+
+        match (prev, last) {
+            (SetEffectiveness(_), SetEffectiveness(_)) =>
+                self._replace_last_two_with(last.clone()),
+            (SetParent(_), SetParent(_)) => self._replace_last_two_with(last.clone()),
+            (SetParent2(_), SetParent2(_)) => self._replace_last_two_with(last.clone()),
+            (_, _) => {}
+        }
+
+        self
+    }
+
+    fn truncate(&mut self, index: usize) -> &mut Self {
+        self.commands.truncate(index);
+        self
+    }
+}
+
+
 impl From<Skill> for SkillUpdate {
     fn from(value: Skill) -> Self {
-        Self::from_skill(&value)
+        Self::create_from(&value)
     }
 }
 
@@ -178,6 +227,7 @@ mod tests {
     use crate::{grimoire::Skill, prelude::{Known, Theory}};
 
     use super::SkillUpdate;
+    use super::Commands;
 
     #[test]
     fn test_skill_update_set_effectiveness() {
@@ -232,5 +282,44 @@ mod tests {
         assert!( skill.effectiveness.is_known() );
         assert_eq!( skill.parent, Some("parent".to_string()) );
         assert!( skill.parent_2.is_none() );
+    }
+
+    #[test]
+    fn test_update_last_set_effectiveness() {
+        let update = SkillUpdate::default()
+            .set_effectiveness(Known(1.0))
+            .set_effectiveness(Known(2.0))
+            .combine_last()
+            .clone();
+        let skill = &mut SkillUpdate::default().create();
+        update.update(skill);
+        assert_eq!(update.len(), 1);
+        assert_eq!(skill.effectiveness, Known(2.0));
+    }
+
+    #[test]
+    fn test_update_last_set_parent() {
+        let update = SkillUpdate::default()
+            .set_parent("a")
+            .remove_parent()
+            .combine_last()
+            .clone();
+        let skill = &mut SkillUpdate::default().set_parent("b").create();
+        update.update(skill);
+        assert_eq!(update.len(), 1);
+        assert_eq!(skill.parent, None);
+    }
+
+    #[test]
+    fn test_update_last_set_parent_2() {
+        let update = SkillUpdate::default()
+            .set_parent2("b")
+            .remove_parent_2()
+            .combine_last()
+            .clone();
+        let skill = &mut SkillUpdate::default().set_parent2("b").create();
+        update.update(skill);
+        assert_eq!(update.len(), 1);
+        assert_eq!(skill.parent_2, None);
     }
 }
