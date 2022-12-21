@@ -3,7 +3,7 @@ use crate::editor;
 
 #[derive(Default)]
 pub struct AlrustApp {
-    pub grimoire_editor: Option<editor::Editor>,
+    pub grimoire_editor: Option<editor::GrimoireEditor>,
 }
 
 

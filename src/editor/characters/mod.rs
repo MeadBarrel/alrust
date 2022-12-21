@@ -10,14 +10,14 @@ use crate::types::*;
 
 
 #[derive(Debug, Default)]
-pub struct Editor {
+pub struct CharactersEditor {
     id: PrefixedId,
     create_windows: Vec<SetStringWindow>,
     edit_windows: Vec<CharacterEditWindow>,
 }
 
 
-impl Editor {
+impl CharactersEditor {
     pub fn show(&mut self, ui: &mut Ui, characters: &mut Characters) {
         egui::TopBottomPanel::top(self.id.derive_suffix("top")).show_inside(ui, |ui| {
             self.top_panel(ui);
@@ -43,6 +43,10 @@ impl Editor {
         });
     }
 
+    fn central_panel(&mut self, ui: &mut Ui, characters: &mut Characters) {
+        self.characters_table(ui, characters);
+    }
+
     fn add_character_button(&mut self, ui: &mut Ui) {
         if ui.button("Add Character").clicked() {
             self.create_windows.push(
@@ -50,10 +54,6 @@ impl Editor {
                     .title("Create new Character")
             )
         };
-    }
-
-    fn central_panel(&mut self, ui: &mut Ui, characters: &mut Characters) {
-        self.characters_table(ui, characters);
     }
 
     fn characters_table(&mut self, ui: &mut Ui, characters: &mut Characters) {
@@ -110,15 +110,6 @@ impl Editor {
                     ui.close_menu();
                 };
             });
-        // if clicked {
-        //     debug!("CLicked!");
-        //     self.edit_windows.push(
-        //         CharacterEditWindow::new(
-        //             name, 
-        //             character::CharacterEditor::default()
-        //         )
-        //     )
-        // }        
     }
 
     fn open_character_editor(&mut self, ui: &mut Ui, name: &String) {

@@ -17,19 +17,19 @@ pub enum Tab {
 
 
 #[derive(Debug, Default)]
-pub struct Editor {
+pub struct GrimoireEditor {
     pub grimoire: Grimoire,
     pub tab: Tab,
     pub id: PrefixedId,
 
-    pub characters_editor: characters::Editor,
+    pub characters_editor: characters::CharactersEditor,
 }
 
 
-impl Editor {
+impl GrimoireEditor {
     pub fn new(grimoire: Grimoire) -> Self {
         Self {
-            grimoire: grimoire,
+            grimoire,
             ..Default::default()
         }
     }

@@ -27,7 +27,7 @@ pub fn menu(ui: &mut Ui, app: &mut AlrustApp) {
 
 
 
-fn open_button(ui: &mut Ui, maybe_editor: &mut Option<editor::Editor>) {
+fn open_button(ui: &mut Ui, maybe_editor: &mut Option<editor::GrimoireEditor>) {
     if !ui.button("Open").clicked() { return }
 
     ui.close_menu();
@@ -37,7 +37,7 @@ fn open_button(ui: &mut Ui, maybe_editor: &mut Option<editor::Editor>) {
 
     match load_grimoire(path) {
         Ok(grimoire) => { 
-            *maybe_editor = Some(editor::Editor { 
+            *maybe_editor = Some(editor::GrimoireEditor { 
                 grimoire,
                 ..Default::default()
             })
@@ -47,7 +47,7 @@ fn open_button(ui: &mut Ui, maybe_editor: &mut Option<editor::Editor>) {
 }
 
 
-fn close_button(ui: &mut Ui, maybe_editor: &mut Option<editor::Editor>) {
+fn close_button(ui: &mut Ui, maybe_editor: &mut Option<editor::GrimoireEditor>) {
     if !ui.button("Close").clicked() { return; }
 
     ui.close_menu();
