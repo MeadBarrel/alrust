@@ -1,4 +1,5 @@
 pub mod characters;
+pub mod character;
 
 use eframe::egui::Ui;
 use crate::wishes::Wishes;

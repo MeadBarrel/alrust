@@ -3,6 +3,8 @@ mod error;
 mod wishes;
 mod toppanel;
 mod editor;
+mod widget;
+mod id;
 
 pub fn main() {
     app::main()

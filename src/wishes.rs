@@ -1,4 +1,5 @@
 use crate::error::Report;
+use crate::id::PrefixedId;
 
 
 #[derive(Debug, Default)]
@@ -19,5 +20,9 @@ impl Wishes {
     pub fn counter(&mut self) -> usize {
         self.counter += 1;
         self.counter
+    }
+
+    pub fn id(&mut self) -> PrefixedId {
+        PrefixedId::new("prefixed", self.counter())
     }
 }
