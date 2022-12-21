@@ -30,6 +30,8 @@ pub fn menu(ui: &mut Ui, app: &mut AlrustApp) {
 fn open_button(ui: &mut Ui, maybe_editor: &mut Option<editor::Editor>) {
     if !ui.button("Open").clicked() { return }
 
+    ui.close_menu();
+
     let dialog = rfd::FileDialog::new().add_filter("Grimoire as JSON", &["json"]);
     let path = if let Some(path) = dialog.pick_file() { path } else { return; };
 
@@ -47,6 +49,8 @@ fn open_button(ui: &mut Ui, maybe_editor: &mut Option<editor::Editor>) {
 
 fn close_button(ui: &mut Ui, maybe_editor: &mut Option<editor::Editor>) {
     if !ui.button("Close").clicked() { return; }
+
+    ui.close_menu();
 
     let ok = rfd::MessageDialog::default()
         .set_level(rfd::MessageLevel::Warning)

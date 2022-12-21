@@ -4,9 +4,9 @@ mod toppanel;
 mod editor;
 mod widget;
 mod id;
+mod types;
 
 
-use tracing::{self, instrument::WithSubscriber};
 use tracing_subscriber::*;
 
 
@@ -16,7 +16,7 @@ pub fn main() {
     let subs = fmt()
         .with_env_filter(EnvFilter::new("alrust=debug"))
         .finish();
-    tracing::subscriber::set_global_default(subs);
+    tracing::subscriber::set_global_default(subs).unwrap();
         
 
     //simple_logger::SimpleLogger::default().init().unwrap();

@@ -1,6 +1,7 @@
 use crate::id::PrefixedId;
 use eframe::egui::Ui;
 use super::{OkCancelWindow, OkCancel};
+use crate::types::*;
 
 
 #[derive(Default, Debug)]
@@ -42,7 +43,7 @@ impl SetStringWindow {
         self
     }
 
-    pub fn show(&mut self, ui: &mut Ui) -> OkCancel {
+    pub fn show(&mut self, ui: &mut Ui) -> AugmentedWindowResponse<OkCancel, ()> {
         self.ok_cancel_window.show(ui, |ui| {
             ui.text_edit_singleline(&mut self.value);
             OkCancel::None

@@ -1,13 +1,14 @@
 use eframe::egui;
-use egui::Ui;
 use crate::id::PrefixedId;
-use tracing::*;
+use egui::InnerResponse;
+use crate::types::*;
 
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum OkCancel {
     Ok,
     Cancel,
+    #[default]
     None,
 }
 
@@ -68,9 +69,9 @@ impl OkCancelWindow {
         self
     }
 
-    pub fn show(&mut self, ui: &mut egui::Ui, func: impl FnOnce(&mut egui::Ui) -> OkCancel ) -> OkCancel {
+    pub fn show(&mut self, ui: &mut egui::Ui, func: impl FnOnce(&mut egui::Ui) -> OkCancel ) -> AugmentedWindowResponse<OkCancel, ()> {
         let mut close_not_clicked = true;
-        let mut result = OkCancel::None;
+        let mut result = OkCancel::default();
 
         let mut window = egui::Window::new(&self.title).id(self.id.id())
             .resizable(self.resizable);
@@ -79,7 +80,7 @@ impl OkCancelWindow {
             window = window.open(&mut close_not_clicked);
         }
 
-        window.show(ui.ctx(), |ui| {            
+        let maybe_response = window.show(ui.ctx(), |ui| {            
             ui.vertical(|ui| {
                 let func_result = func(ui);
                 ui.horizontal(|ui| {
@@ -96,9 +97,10 @@ impl OkCancelWindow {
                 }
             })
         });
-        
-        if !close_not_clicked { return OkCancel::Cancel };
 
-        result
+        match maybe_response {
+            None => AugmentedWindowResponse::new(result, None),
+            Some(x) => AugmentedWindowResponse::new(result, Some(InnerResponse::new(Some(()), x.response))),
+        }
     }
 }

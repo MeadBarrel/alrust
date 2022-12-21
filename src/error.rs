@@ -4,6 +4,8 @@ pub enum Error {
     CouldNotOpenFile,
     #[error("Deserialization failed")]
     DeserializationFailed,
+    #[error("{0}")]
+    GenericError(String),
 }
 
 
