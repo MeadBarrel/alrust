@@ -1,124 +1,63 @@
 use eframe::egui::Ui;
-use crate::wishes::Wishes;
-use grimoire2::grimoire::Grimoire;
-use super::character;
-use crate::widget::{OkCancelWindow, OkCancel};
+use grimoire2::grimoire::Characters;
 use crate::id::PrefixedId;
-
-
+use eframe::egui;
+use crate::widget::{SetStringWindow, OkCancel};
+use super::character;
 
 #[derive(Debug, Default)]
-pub struct State {
-    //creating_characters: Vec<(egui::Id, String)>,
+pub struct Editor {
     id: PrefixedId,
-    creating_characters: Vec<(String, OkCancelWindow)>,
+    create_windows: Vec<SetStringWindow>,
 }
 
 
-pub fn editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut State, grimoire: &mut Grimoire) {
-    egui::TopBottomPanel::top(state.id.derive_suffix("tbp"))
-        .show(ui.ctx(), |ui| {
-            top_panel(ui, state)
+impl Editor {
+    pub fn show(&mut self, ui: &mut Ui, characters: &mut Characters) {
+        egui::TopBottomPanel::top(self.id.derive_suffix("top")).show_inside(ui, |ui| {
+            self.top_panel(ui);
         });
-    
-    state.creating_characters.retain_mut(|(name, window)| {
-        window.show(ui, |ui| {
-            let text_edit_has_focus = ui.text_edit_singleline(name).lost_focus();
-            if text_edit_has_focus && ui.ctx().input().key_pressed(egui::Key::Escape) {
-                return OkCancel::Cancel
-            }        
-            OkCancel::None
-        }) == OkCancel::None
-    });
+        egui::CentralPanel::default().show_inside(ui, |ui| {
+            self.central_panel(ui, characters);
+        });
+
+        self.handle_create_windows(ui);
+    }
+
+    fn top_panel(&mut self, ui: &mut Ui) {
+        ui.horizontal(|ui| {
+            self.top_panel_right(ui);
+        });
+    }
+
+    fn top_panel_right(&mut self, ui: &mut Ui) {
+        let right_to_left = egui::Layout::right_to_left(egui::Align::Center);
+        ui.with_layout(right_to_left, |ui| {
+            self.add_character_button(ui);
+        });
+    }
+
+    fn add_character_button(&mut self, ui: &mut Ui) {
+        if ui.button("Add Character").clicked() {
+            self.create_windows.push(
+                SetStringWindow::default()
+                    .title("Create new Character")
+            )
+        };
+    }
+
+    fn central_panel(&mut self, ui: &mut Ui, characters: &mut Characters) {
+
+    }
+
+    fn handle_create_windows(&mut self, ui: &mut Ui) {
+        self.create_windows.retain_mut(|window| {
+            match window.show(ui) {
+                OkCancel::Cancel => false,
+                OkCancel::None => true,
+                OkCancel::Ok => true,
+            }
+        });
+    }
 }
 
-fn top_panel(ui: &mut Ui, state: &mut State) {
-    let layout = egui::Layout::right_to_left(egui::Align::Center);
-
-    // ui.with_layout(layout, |ui| {
-    //     ui.ctx().
-    //     if ui.button("Add Character").clicked() {
-    //         state.creating_characters.push(
-    //             ("".to_string(), 
-    //             OkCancelWindow::new("Create a new Character", state.id.derive()).resizable(true)
-    //         ));
-    //     }
-    // });
-}
-
-//     if state.id.is_none() { state.id = Some(wishes.counter()) }
-
-//     let top_panel_id = egui::Id::new(format!("character_editor_tb_{}", state.id.unwrap()));
-
-//     egui::TopBottomPanel::top(top_panel_id).show(ui.ctx(), |ui| {
-//         top_panel(ui, wishes, state);
-//     });
-
-//     state.creating_characters.retain_mut(|(id, name)| {
-//         let mut window_close_not_clicked = true;
-//         let mut window_state = OkCancelState::None;
-        
-//         egui::Window::new("Type a name for new character")
-//             .id(*id)
-//             .open(&mut window_close_not_clicked)
-//             .show(ui.ctx(), |ui| {
-//                 window_state = create_character_window(ui, name)
-//             });
-
-//             if window_state == OkCancelState::Ok {
-//                 let info = CharacterEditInfo {
-//                     id: egui::Id::new(wishes.counter()),
-//                     name: name.clone(),
-//                     type_: CharacterEditType::New,
-//                     state: character::State {
-//                         id: wishes.counter(),
-//                         character: grimoire2::grimoire::Character::default(),
-//                     }
-//                 };
-//                 state.editing_characters.push(info);
-//             }
-
-//             window_close_not_clicked && window_state != OkCancelState::None
-//     });
-
-//     state.editing_characters.retain_mut(|info| {
-//         let mut window_close_not_clicked = true;
-//         let mut open = true;
-
-//         egui::Window::new("Character editor") 
-//             .id(info.id)
-//             .open(&mut window_close_not_clicked)
-//             .show(ui.ctx(), |ui| {
-//                 edit_character_window(ui, wishes, grimoire, info)
-//             });
-
-//         window_close_not_clicked && open
-//     });
-// }
-
-
-// fn edit_character_window(ui: &mut Ui, wishes: &mut Wishes, grimoire: &mut Grimoire, info: &mut CharacterEditInfo) -> bool {
-//     let mut open = true;
-//     character::editor(ui, wishes, &mut info.state);
-//     open
-// }
-
-
-// fn create_character_window(ui: &mut Ui, name: &mut String) -> OkCancelState {
-//     ui.vertical(|ui| {
-//         let text_edit_has_focus = ui.text_edit_singleline(name).lost_focus();
-//         if text_edit_has_focus && ui.ctx().input().key_pressed(egui::Key::Escape) {
-//             return OkCancelState::Cancel
-//         }        
-
-//         ui.horizontal(|ui| {
-//             if ui.button("Add").clicked() {
-//                 return OkCancelState::Ok;
-//             }
-//             if ui.button("Cancel").clicked() {
-//                 return OkCancelState::Cancel;
-//             }
-//             OkCancelState::None
-//         }).inner
-//     }).inner
-// }

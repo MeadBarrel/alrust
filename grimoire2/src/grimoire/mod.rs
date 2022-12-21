@@ -8,9 +8,9 @@ pub use skill::*;
 
 use indexmap::IndexMap;
 
-type Skills = IndexMap<String, Skill>;
-type Ingredients = IndexMap<String, Ingredient>;
-type Characters = IndexMap<String, Character>;
+pub type Skills = IndexMap<String, Skill>;
+pub type Ingredients = IndexMap<String, Ingredient>;
+pub type Characters = IndexMap<String, Character>;
 
 #[derive(Default, Debug, Clone, PartialEq)]
 pub struct Grimoire {

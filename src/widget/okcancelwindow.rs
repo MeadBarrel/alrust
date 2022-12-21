@@ -1,6 +1,7 @@
 use eframe::egui;
 use egui::Ui;
 use crate::id::PrefixedId;
+use tracing::*;
 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -14,7 +15,6 @@ pub enum OkCancel {
 #[derive(Debug)]
 pub struct OkCancelWindow {
     id: PrefixedId,
-    panel_id: egui::Id,
     title: String,
     ok_button: String,
     cancel_button: String,
@@ -23,26 +23,38 @@ pub struct OkCancelWindow {
 }
 
 
-impl OkCancelWindow {
-    pub fn new(title: &str, mut id: PrefixedId) -> Self {
-        Self { 
-            panel_id: id.derive().id(),
-            id, 
-            title: title.to_string(),
-            ok_button: "Ok".to_string(),
-            cancel_button: "Cancel".to_string(),
+impl Default for OkCancelWindow {
+    fn default() -> Self {
+        Self {
+            id: PrefixedId::default(),
+            title: "Yes or nah?".into(),
+            ok_button: "Ok".into(),
+            cancel_button: "Cancel".into(),
             close_button: true,
             resizable: false,
         }
     }
+}
 
-    pub fn ok_button(mut self, name: &str) -> Self {
-        self.ok_button = name.to_string();
+
+impl OkCancelWindow {
+    pub fn id(mut self, id: PrefixedId) -> Self {
+        self.id = id;
         self
     }
 
-    pub fn cancel_button(mut self, name: &str) -> Self {
-        self.cancel_button = name.to_string();
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.title = title.into();
+        self
+    }
+
+    pub fn ok_button(mut self, name: impl Into<String>) -> Self {
+        self.ok_button = name.into();
+        self
+    }
+
+    pub fn cancel_button(mut self, name: impl Into<String>) -> Self {
+        self.cancel_button = name.into();
         self
     }
 
@@ -68,17 +80,21 @@ impl OkCancelWindow {
         }
 
         window.show(ui.ctx(), |ui| {            
-            egui::TopBottomPanel::bottom(self.id.derive_suffix("bp").id()).show_inside(ui, |ui| {
-                if ui.button(&self.ok_button).clicked() {
-                    result = OkCancel::Ok;
+            ui.vertical(|ui| {
+                let func_result = func(ui);
+                ui.horizontal(|ui| {
+                    if ui.button(&self.ok_button).clicked() {
+                        result = OkCancel::Ok;
+                    }
+                    if ui.button(&self.cancel_button).clicked() {
+                        result = OkCancel::Cancel;
+                    }                    
+                });
+
+                if result == OkCancel::None {
+                    result = func_result;
                 }
-                if ui.button(&self.cancel_button).clicked() {
-                    result = OkCancel::Cancel;
-                }
-            });            
-            egui::CentralPanel::default().show_inside(ui, |ui| {
-                result = func(ui);
-            });
+            })
         });
         
         if !close_not_clicked { return OkCancel::Cancel };

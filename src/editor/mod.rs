@@ -1,9 +1,11 @@
-pub mod characters;
-pub mod character;
+mod character;
+mod characters;
 
 use eframe::egui::Ui;
-use crate::wishes::Wishes;
-use grimoire2::grimoire::Grimoire;
+use grimoire2::prelude::Grimoire;
+
+use crate::id::PrefixedId;
+
 
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
 pub enum Tab {
@@ -13,26 +15,70 @@ pub enum Tab {
     Ingredients,
 }
 
+
 #[derive(Debug, Default)]
-pub struct State {
+pub struct Editor {
     pub grimoire: Grimoire,
-    pub current_tab: Tab,
+    pub tab: Tab,
+    pub id: PrefixedId,
 
-    pub characters_editor_state: characters::State,
+    pub characters_editor: characters::Editor,
 }
 
-pub fn editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut State) {
-    match state.current_tab {
-        Tab::Characters => characters::editor(ui, wishes, &mut state.characters_editor_state, &mut state.grimoire),
-        Tab::Skills => skills_editor(ui, wishes, &mut state.grimoire),
-        Tab::Ingredients => ingredients_editor(ui, wishes, &mut state.grimoire),
+
+impl Editor {
+    pub fn new(grimoire: Grimoire) -> Self {
+        Self {
+            grimoire: grimoire,
+            ..Default::default()
+        }
     }
-}
 
-fn skills_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut Grimoire) {
-    ui.label("This is skills editor");
-}
+    pub fn show(&mut self, ui: &mut Ui) {        
+        eframe::egui::TopBottomPanel::top(self.id.derive_suffix("top_panel")).show_inside(ui, |ui| {
+                self.top_panel(ui);
+            });
+        eframe::egui::CentralPanel::default().show_inside(ui, |ui| {
+            self.central_panel(ui);
+        });
+    }
 
-fn ingredients_editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut Grimoire) { 
-    ui.label("This is ingredients editor");
+    fn central_panel(&mut self, ui: &mut Ui) {
+        match self.tab {
+            Tab::Characters => self.characters_editor.show(ui, &mut self.grimoire.characters),
+            Tab::Skills => { ui.heading("Work in Progress..."); },
+            Tab::Ingredients => { ui.heading("Work in Progress..."); },
+        }
+        
+    }
+
+    fn top_panel(&mut self, ui: &mut Ui) {
+        ui.horizontal(|ui| {
+            self.tabs_panel(ui);
+        });
+        
+    }
+
+    fn tabs_panel(&mut self, ui: &mut Ui) {
+        self.tab_button(ui, "Characters", Tab::Characters);
+        self.tab_button(ui, "Skills", Tab::Skills);
+        self.tab_button(ui, "Ingredients", Tab::Ingredients);
+    }
+
+    fn tab_button(&mut self, ui: &mut Ui, text: &str, tab: Tab) {
+        use egui::widgets::Button;
+        use egui::widgets::Widget;
+    
+        let selected = self.tab == tab;
+        
+        let mut button = Button::new(text);
+        
+        if selected {
+            button = button.fill(egui::Color32::from_rgb_additive(0, 0, 64));
+        }
+    
+        if button.ui(ui).clicked() {
+            self.tab = tab;
+        };        
+    }
 }

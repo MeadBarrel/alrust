@@ -1,16 +1,16 @@
 use eframe::egui::Ui;
 use grimoire2::grimoire::Character;
-use crate::wishes::Wishes;
+use crate::id::PrefixedId;
 
 
-#[derive(Debug, Clone)]
-pub struct State {
-    pub id: usize,    
-    pub character: Character,
+#[derive(Debug, Default)]
+pub struct CharacterEditor {
+    id: PrefixedId,
 }
 
 
-pub fn editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut State) {
-
+impl CharacterEditor {
+    pub fn show(&mut self, ui: &mut Ui, character: &mut Character) {
+        
+    }
 }
-

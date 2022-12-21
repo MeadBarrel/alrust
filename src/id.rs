@@ -7,7 +7,7 @@ static COUNTER: AtomicUsize = AtomicUsize::new(0);
 
 #[derive(Debug)]
 pub struct PrefixedId {
-    counter: usize,
+    counter: AtomicUsize,
     id_string: String
 }
 
@@ -22,7 +22,7 @@ impl Default for PrefixedId {
 
 impl PrefixedId {
     pub fn new(prefix: &str, counter: usize) -> Self {
-        Self { counter: 0, id_string: format!("{}_{}", prefix, counter) }
+        Self { counter: AtomicUsize::new(counter), id_string: format!("{}_{}", prefix, counter) }
     }
 
     pub fn id(&self) -> Id {
@@ -30,14 +30,14 @@ impl PrefixedId {
     }
 
     pub fn derive(&mut self) -> Self {
-        self.counter += 1;
-        Self::new(&self.id_string, self.counter)
+        Self::new(&self.id_string, self.counter.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
     }
 
     pub fn derive_suffix(&self, suffix: &str) -> Self {
         Self::new(&format!("{}_{}", &self.id_string, suffix), 0)
     }
 }
+
 
 
 impl From<PrefixedId> for Id {
