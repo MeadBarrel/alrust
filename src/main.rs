@@ -17,15 +17,6 @@ pub fn main() {
         .with_env_filter(EnvFilter::new("alrust=debug"))
         .finish();
     tracing::subscriber::set_global_default(subs).unwrap();
-        
-
-    //simple_logger::SimpleLogger::default().init().unwrap();
-
 
     app::main()
 }
-
-// let grimoire = GrimoireSqlite::connect("../backups/db.sqlite").unwrap().load().unwrap();
-// let grimoire_ser: GrimoireVersioned = grimoire.into();
-// let f = File::create("grimoire.json").unwrap();
-// to_writer_pretty(f, &grimoire_ser).unwrap();
