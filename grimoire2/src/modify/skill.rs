@@ -81,6 +81,20 @@ impl Commands<Skill, SkillUpdateCommand> for SkillUpdate {
         update
     }
 
+    fn diff(c1: &Skill, c2: &Skill) -> Self {
+        let mut result = Self::default();
+        if c2.parent_2 != c1.parent_2 {
+            result.commands.push(SkillUpdateCommand::SetParent2(c2.parent_2.clone()))
+        };
+        if c1.effectiveness != c2.effectiveness {
+            result.set_effectiveness(c2.effectiveness);
+        };
+        if c2.parent != c1.parent {
+            result.commands.push(SkillUpdateCommand::SetParent(c2.parent.clone()))
+        }
+        result
+    }
+
     fn update(&self, skill: &mut Skill) {
         for command in &self.commands {
             match command {
@@ -234,11 +248,23 @@ pub mod versioned {
 
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use crate::{grimoire::Skill, prelude::{Known, Theory}};
 
     use super::SkillUpdate;
     use super::Commands;
+    use proptest::prelude::*;
+    use crate::grimoire::skill::tests::skill_strategy;
+
+    proptest! {
+        #[test]
+        fn test_diff(s1 in skill_strategy(), s2 in skill_strategy()) {            
+            let mut s1_ = s1.clone();
+            let diff = SkillUpdate::diff(&s1, &s2);
+            diff.update(&mut s1_);
+            prop_assert_eq!(s1_, s2);
+        }
+    }    
 
     #[test]
     fn test_skill_update_set_effectiveness() {

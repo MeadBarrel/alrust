@@ -204,3 +204,19 @@ pub mod versioned {
         }
     }
 }
+
+
+#[cfg(test)]
+pub mod tests {
+    use proptest::strategy::Strategy;
+    use proptest::sample::select;
+    use super::*;
+    
+    pub fn theoretical_f64_strategy() -> impl Strategy<Value=Theoretical<f64>> {
+        select(vec![
+            Theoretical::Known(0.),
+            Theoretical::Known(0.5),
+            Theoretical::Known(1.0),
+        ])
+    }
+}

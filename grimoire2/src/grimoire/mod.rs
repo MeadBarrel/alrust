@@ -12,7 +12,7 @@ type Skills = IndexMap<String, Skill>;
 type Ingredients = IndexMap<String, Ingredient>;
 type Characters = IndexMap<String, Character>;
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, PartialEq)]
 pub struct Grimoire {
     pub skills: Skills,
     pub ingredients: Ingredients,
@@ -89,5 +89,30 @@ pub mod versioned {
                 characters: value.characters.into_iter().map(|(n, x)| (n, x.into())).collect(),
             }            
         }
+    }
+}
+
+
+#[cfg(test)]
+pub mod tests {
+    use proptest::strategy::Strategy;
+    use proptest::sample::select;
+    use proptest::collection::hash_map;
+    use super::*;
+    use crate::grimoire::character::tests::character_strategy;
+    use crate::grimoire::skill::tests::skill_strategy;
+    use crate::grimoire::ingredient::tests::ingredient_strategy;
+    
+    pub fn grimoire_strategy() -> impl Strategy<Value=Grimoire> {
+        let name = select(vec!["a", "b", "c"]);
+        let characters = hash_map(name.clone(), character_strategy(), 3);
+        let skills = hash_map(name.clone(), skill_strategy(), 3);
+        let ingredients = hash_map(name, ingredient_strategy(), 3);
+
+        (characters, skills, ingredients).prop_map(|(c, s, i)| Grimoire {
+            characters: c.into_iter().map(|(n, v)| (n.to_string(), v)).collect(),
+            skills: s.into_iter().map(|(n, v)| (n.to_string(), v)).collect(),
+            ingredients: i.into_iter().map(|(n, v)| (n.to_string(), v)).collect(),
+        } )
     }
 }

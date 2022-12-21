@@ -102,6 +102,61 @@ impl Commands<Grimoire, GrimoireUpdateCommand> for GrimoireUpdate {
         result
     }
 
+    fn diff(c1: &Grimoire, c2: &Grimoire) -> Self {
+        let mut result = Self::default();
+
+        for (name, c2_v) in &c2.characters {
+            let maybe_c1_v = c1.characters.get(name);
+
+            match maybe_c1_v {
+                None => { result.character(name.as_str(), c2_v.into()); },
+                Some(c1_v) if c1_v == c2_v => {},
+                Some(c1_v) => { result.character(name.as_str(), character::CharacterUpdate::diff(c1_v, c2_v)); },
+            }
+        }
+
+        for name in c1.characters.keys() {
+            if !c2.characters.contains_key(name) {
+                result.remove_character(name.as_str());
+            }
+        }
+
+
+        for (name, c2_v) in &c2.skills {
+            let maybe_c1_v = c1.skills.get(name);
+
+            match maybe_c1_v {
+                None => { result.skill(name.as_str(), c2_v.into()); },
+                Some(c1_v) if c1_v == c2_v => {},
+                Some(c1_v) => { result.skill(name.as_str(), skill::SkillUpdate::diff(c1_v, c2_v)); },
+            }
+        }
+
+        for name in c1.skills.keys() {
+            if !c2.skills.contains_key(name) {
+                result.remove_skill(name.as_str());
+            }
+        }
+
+        for (name, c2_v) in &c2.ingredients {
+            let maybe_c1_v = c1.ingredients.get(name);
+
+            match maybe_c1_v {
+                None => { result.ingredient(name.as_str(), c2_v.into()); },
+                Some(c1_v) if c1_v == c2_v => {},
+                Some(c1_v) => { result.ingredient(name.as_str(), ingredient::IngredientUpdate::diff(c1_v, c2_v)); },
+            }
+        }
+
+        for name in c1.ingredients.keys() {
+            if !c2.ingredients.contains_key(name) {
+                result.remove_ingredient(name.as_str());
+            }
+        }
+
+        result
+    }
+
     fn create(&self) -> Grimoire {
         let mut result = Grimoire::default();
         self.update(&mut result);
@@ -208,6 +263,19 @@ mod tests {
     use super::Commands;
     use super::GrimoireUpdateCommand;
 
+
+    use proptest::prelude::*;
+    use crate::grimoire::tests::grimoire_strategy;
+
+    proptest! {
+        #[test]
+        fn test_diff(v1 in grimoire_strategy(), v2 in grimoire_strategy()) {            
+            let mut v1_ = v1.clone();
+            let diff = GrimoireUpdate::diff(&v1, &v2);
+            diff.update(&mut v1_);
+            prop_assert_eq!(v1_, v2);
+        }
+    }    
 
     #[test]
     fn test_create() {

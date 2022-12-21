@@ -5,7 +5,7 @@ use strum::{EnumCount, IntoEnumIterator};
 
 use crate::{effect::Effect, modifier::Modifier};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ModifierMap(Vec<Modifier>);
 
 impl ModifierMap {
@@ -103,5 +103,35 @@ pub mod versioned {
                 ModifierMapVersioned::V0(x) => x.into()
             }
         }
+    }
+}
+
+
+#[cfg(test)]
+pub mod tests {
+    use proptest::strategy::Strategy;
+    use crate::modifier::tests::modifier_strategy;
+    use super::*;
+    
+    pub fn modifier_map_strategy() -> impl Strategy<Value=ModifierMap> {
+        (
+            modifier_strategy(),
+            modifier_strategy(),
+            modifier_strategy(),
+            modifier_strategy(),
+            modifier_strategy(),
+            modifier_strategy(),
+            modifier_strategy(),
+        ).prop_map(|mods| 
+            vec![
+                (Effect::DirectHealing, mods.0),
+                (Effect::DirectPoison, mods.1),
+                (Effect::HealingOverTime, mods.2),
+                (Effect::PoisonOverTime, mods.3),
+                (Effect::HealingLength, mods.4),
+                (Effect::PoisonLength, mods.5),
+                (Effect::Alcohol, mods.6),
+            ].into()
+        )
     }
 }

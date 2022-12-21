@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 
 use crate::modifiermap::ModifierMap;
 
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Ingredient {
     pub skill: Option<String>,
     pub weight: bool,
@@ -76,5 +76,31 @@ pub mod versioned {
                 modifiers: value.modifiers.into()
             }
         }
+    }
+}
+
+
+#[cfg(test)]
+pub mod tests {
+    use proptest::strategy::Strategy;
+    use proptest::sample::select;
+    use super::*;
+    use crate::modifiermap::tests::modifier_map_strategy;
+    
+    pub fn ingredient_strategy() -> impl Strategy<Value = Ingredient> {
+        let skill = select(vec![
+            Some("a".to_string()),
+            Some("b".to_string()),
+            Some("c".to_string()),
+            None,
+        ]);
+        let weight = select(vec![true, false]);
+        let modifiers = modifier_map_strategy();
+
+        (skill, weight, modifiers).prop_map(|(s, w, m)| Ingredient {
+            skill: s,
+            weight: w,
+            modifiers: m
+        })
     }
 }

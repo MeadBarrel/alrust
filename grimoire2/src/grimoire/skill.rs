@@ -1,6 +1,6 @@
 use crate::theoretical::Theoretical;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Skill {
     pub effectiveness: Theoretical<f64>,
     pub parent: Option<String>,
@@ -85,4 +85,35 @@ pub mod versioned {
             }            
         }
     }
+}
+
+
+#[cfg(test)]
+pub mod tests {
+    use proptest::strategy::Strategy;
+    use proptest::sample::select;
+    use crate::theoretical::tests::theoretical_f64_strategy;
+    use super::*;
+
+    pub fn skill_strategy() -> impl Strategy<Value = Skill> {
+        let effectiveness = theoretical_f64_strategy();
+        let parent = select(vec![
+            Some("a"),
+            Some("b"),
+            None
+        ]);
+        let parent_2 = select(vec![
+            Some("a"),
+            Some("b"),
+            None
+        ]);        
+
+        (effectiveness, parent, parent_2).prop_map(|(e, p, p2)| {
+            Skill { 
+                effectiveness: e, 
+                parent: p.map(|x| x.to_string()), 
+                parent_2: p2.map(|x| x.to_string()), 
+            }
+        })
+    }    
 }

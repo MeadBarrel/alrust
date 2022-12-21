@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 
 use crate::theoretical::Theoretical;
 
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Modifier {
     pub term: Theoretical<f64>,
     pub multiplier: Theoretical<f64>,
@@ -70,5 +70,20 @@ pub mod versioned {
                 ModifierVersioned::V0(x) => x.into()
             }
         }
+    }
+}
+
+
+#[cfg(test)]
+pub mod tests {
+    use proptest::strategy::Strategy;
+    use crate::theoretical::tests::theoretical_f64_strategy;
+    use super::*;
+    
+    pub fn modifier_strategy() -> impl Strategy<Value=Modifier> {
+        (
+            theoretical_f64_strategy(),
+            theoretical_f64_strategy(),
+        ).prop_map(|(term, multiplier)| Modifier { term, multiplier })
     }
 }

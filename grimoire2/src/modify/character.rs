@@ -18,7 +18,8 @@ pub enum ModifyClade {
 pub enum CharacterUpdateCommand {
     AddClade(String),
     RemoveClade(String),
-    SetSkill(String, u8)
+    SetSkill(String, u8),
+    RemoveSkill(String),
 }
 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -49,7 +50,7 @@ impl CharacterUpdate {
     }
 
     pub fn remove_skill(&mut self, skill: &str) -> &mut Self {
-        self.commands.push(CharacterUpdateCommand::SetSkill(skill.to_string(), 0));
+        self.commands.push(CharacterUpdateCommand::RemoveSkill(skill.to_string()));
         self
     }
 }
@@ -74,17 +75,44 @@ impl Commands<Character, CharacterUpdateCommand> for CharacterUpdate {
         update
     }
 
+    fn diff(c1: &Character, c2: &Character) -> Self {
+        let mut result = Self::default();
+
+        let clades_added = c2.clades.difference(&c1.clades);
+        let clades_removed = c1.clades.difference(&c2.clades);
+        
+        clades_added.into_iter().for_each(|x| {result.add_clade(x.as_str());});
+        clades_removed.into_iter().for_each(|x| { result.remove_clade(x.as_str()); });
+
+        for (name, value) in &c2.skills {
+            match c1.skills.get(name) {
+                None => { result.set_skill(name.as_str(), *value); },
+                Some(_) => {}
+            }
+        }
+
+        for (name, value) in &c1.skills {
+            match c2.skills.get(name) {
+                Some(x) if x != value => { result.set_skill(name.as_str(), *x); },
+                None => { result.remove_skill(name.as_str()); },
+                Some(_) =>  {}
+            }
+        }
+
+        result
+    }
+
     fn update(&self, character: &mut Character) {
         self.commands.iter().for_each(|command|
             match command {
                 CharacterUpdateCommand::AddClade(clade) => { character.clades.insert(clade.clone()); },
                 CharacterUpdateCommand::RemoveClade(clade) => { character.clades.remove(clade.as_str()); },
-                CharacterUpdateCommand::SetSkill(skill, value) => match value {
-                    0 => { character.skills.remove(skill.as_str()); },
-                    x => { 
-                        let v = character.skills.entry(skill.clone()).or_default();
-                        *v = *x;
-                    }
+                CharacterUpdateCommand::SetSkill(skill, x) => {
+                    let v = character.skills.entry(skill.clone()).or_default();
+                    *v = *x;
+                },
+                CharacterUpdateCommand::RemoveSkill(skill) => {
+                    character.skills.remove(skill.as_str());
                 }
             }
         );
@@ -108,9 +136,10 @@ impl Commands<Character, CharacterUpdateCommand> for CharacterUpdate {
         let last = &self.commands[self.len()-1];
 
         match (prev, last) {
-            (AddClade(a), RemoveClade(b)) => if a == b { self._replace_last_two_with(last.clone()); },
-            (RemoveClade(a), AddClade(b)) => if a == b { self._replace_last_two_with(last.clone()); },
-            (SetSkill(a, _), SetSkill(b, _)) => if a == b { self._replace_last_two_with(last.clone()); },
+            (AddClade(a), RemoveClade(b)) if a == b => { self._replace_last_two_with(last.clone()); },
+            (RemoveClade(a), AddClade(b)) if a == b => { self._replace_last_two_with(last.clone()); },
+            (SetSkill(a, _), SetSkill(b, _)) if a == b => { self._replace_last_two_with(last.clone()); },
+            (SetSkill(a, _), RemoveSkill(b)) if a == b => { self._replace_last_two_with(last.clone()); }
             (_, _) => {},
         }
 
@@ -181,6 +210,18 @@ mod tests {
     use crate::grimoire::Character;
     use super::*;
     use maplit::{hashmap, hashset};
+    use proptest::prelude::*;
+    use crate::grimoire::character::tests::character_strategy;
+
+    proptest! {
+        #[test]
+        fn test_diff(c1 in character_strategy(), c2 in character_strategy()) {            
+            let mut c1_ = c1.clone();
+            let diff = CharacterUpdate::diff(&c1, &c2);
+            diff.update(&mut c1_);
+            prop_assert_eq!(c1_, c2);
+        }
+    }
 
     #[test]
     fn test_from_character() {

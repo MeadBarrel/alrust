@@ -35,15 +35,15 @@ pub fn editor(ui: &mut Ui, wishes: &mut Wishes, state: &mut State, grimoire: &mu
 fn top_panel(ui: &mut Ui, state: &mut State) {
     let layout = egui::Layout::right_to_left(egui::Align::Center);
 
-    ui.with_layout(layout, |ui| {
-        ui.ctx().
-        if ui.button("Add Character").clicked() {
-            state.creating_characters.push(
-                ("".to_string(), 
-                OkCancelWindow::new("Create a new Character", state.id.derive()).resizable(true)
-            ));
-        }
-    });
+    // ui.with_layout(layout, |ui| {
+    //     ui.ctx().
+    //     if ui.button("Add Character").clicked() {
+    //         state.creating_characters.push(
+    //             ("".to_string(), 
+    //             OkCancelWindow::new("Create a new Character", state.id.derive()).resizable(true)
+    //         ));
+    //     }
+    // });
 }
 
 //     if state.id.is_none() { state.id = Some(wishes.counter()) }

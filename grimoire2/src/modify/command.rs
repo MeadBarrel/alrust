@@ -2,6 +2,7 @@ use std::ops::Index;
 
 pub trait Commands<T, C>: From<T> + Into<T> + Clone + Index<usize, Output = C> {
     fn create_from(value: &T) -> Self;
+    fn diff(c1: &T, c2: &T) -> Self;
     fn create(&self) -> T where T: Default {
         let mut result = T::default();
         self.update(&mut result);

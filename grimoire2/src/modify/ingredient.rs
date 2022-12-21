@@ -6,6 +6,7 @@ use super::command::Commands;
 use crate::grimoire::Ingredient;
 use crate::theoretical::Theoretical;
 use crate::effect::Effect;
+use strum::IntoEnumIterator;
 
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -85,6 +86,31 @@ impl Commands<Ingredient, IngredientUpdateCommand> for IngredientUpdate {
         };
 
         result.set_weight(ingredient.weight);
+        result
+    }
+
+    fn diff(c1: &Ingredient, c2: &Ingredient) -> Self {
+        let mut result = Self::default();
+
+        for effect in Effect::iter() {
+            let c2_term = c2.modifiers[effect].term;
+            let c2_multiplier = c2.modifiers[effect].multiplier;
+            if c1.modifiers[effect].term != c2_term {
+                result.set_term(effect, c2_term);
+            }
+            if c1.modifiers[effect].multiplier != c2_multiplier {
+                result.set_multiplier(effect, c2_multiplier);
+            }
+        }
+
+        if c1.weight != c2.weight {
+            result.set_weight(c2.weight);
+        }
+
+        if c1.skill != c2.skill {
+            result.commands.push(IngredientUpdateCommand::SetSkill(c2.skill.clone()));
+        }
+
         result
     }
 
@@ -201,6 +227,19 @@ mod tests {
 
     use super::IngredientUpdate;
     use super::Commands;
+
+    use proptest::prelude::*;
+    use crate::grimoire::ingredient::tests::ingredient_strategy;
+
+    proptest! {
+        #[test]
+        fn test_diff(v1 in ingredient_strategy(), v2 in ingredient_strategy()) {            
+            let mut v1_ = v1.clone();
+            let diff = IngredientUpdate::diff(&v1, &v2);
+            diff.update(&mut v1_);
+            prop_assert_eq!(v1_, v2);
+        }
+    }    
 
     #[test]
     fn test_from_ingredient() {
