@@ -20,7 +20,7 @@ impl EditCharacterWindows {
                 Some(x) => window.show(ui, x).augment,
                 None => {
                     handle_error(
-                        Report::new(Error::GenericError(
+                        Report::new(Error::Generic(
                             "Character deleted, but character edition window was open, closing".to_string()
                         ))
                     );

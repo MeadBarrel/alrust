@@ -1,7 +1,6 @@
 use eframe::egui::Ui;
-use egui_extras::{TableBuilder, TableRow, TableBody, Column};
+use egui_extras::{TableBuilder, TableRow, Column};
 use grimoire2::prelude::{Characters, Character};
-use crate::editor::Tab;
 
 use super::edit::EditCharacterWindows;
 

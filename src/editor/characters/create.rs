@@ -1,7 +1,6 @@
 use eframe::egui::Ui;
 use grimoire2::prelude::{Characters, Character};
 use crate::widget::{SetStringWindow, OkCancel};
-use crate::id::PrefixedId;
 
 #[derive(Debug, Default)]
 pub struct CreateCharacterWindows {

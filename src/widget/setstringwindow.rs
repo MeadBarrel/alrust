@@ -1,4 +1,3 @@
-use crate::id::PrefixedId;
 use eframe::egui::Ui;
 use super::{OkCancelWindow, OkCancel};
 use crate::types::*;
@@ -6,7 +5,6 @@ use crate::types::*;
 
 #[derive(Default, Debug)]
 pub struct SetStringWindow {
-    id: PrefixedId,
     value: String,
     ok_cancel_window: OkCancelWindow,
 }

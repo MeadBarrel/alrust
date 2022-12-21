@@ -29,7 +29,7 @@ pub struct GrimoireEditor {
 impl GrimoireEditor {
     pub fn new(grimoire: Grimoire) -> Self {
         Self {
-            grimoire: grimoire,
+            grimoire,
             ..Default::default()
         }
     }

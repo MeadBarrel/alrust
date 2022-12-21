@@ -5,7 +5,7 @@ pub enum Error {
     #[error("Deserialization failed")]
     DeserializationFailed,
     #[error("{0}")]
-    GenericError(String),
+    Generic(String),
 }
 
 

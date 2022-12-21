@@ -39,11 +39,6 @@ impl Default for OkCancelWindow {
 
 
 impl OkCancelWindow {
-    pub fn id(mut self, id: PrefixedId) -> Self {
-        self.id = id;
-        self
-    }
-
     pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = title.into();
         self

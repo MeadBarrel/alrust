@@ -37,10 +37,7 @@ fn open_button(ui: &mut Ui, maybe_editor: &mut Option<editor::GrimoireEditor>) {
 
     match load_grimoire(path) {
         Ok(grimoire) => { 
-            *maybe_editor = Some(editor::GrimoireEditor { 
-                grimoire,
-                ..Default::default()
-            })
+            *maybe_editor = Some(editor::GrimoireEditor::new(grimoire))
         },
         Err(err) => handle_error(err)
     }

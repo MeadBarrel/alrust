@@ -8,14 +8,14 @@ pub struct AlrustApp {
 
 
 impl AlrustApp {
-    fn new(cc: &eframe::CreationContext<'_>) -> Self {
+    fn new(_: &eframe::CreationContext<'_>) -> Self {
         Self::default()
     }
 }
 
 
 impl eframe::App for AlrustApp {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
         egui::TopBottomPanel::top("ar_top_panel").show(ctx, |ui| {
             crate::toppanel::top_panel(ui, self)
         });
