@@ -1,5 +1,8 @@
 mod character;
 mod characters;
+mod create;
+mod edit;
+mod editor;
 
 use eframe::egui::Ui;
 use grimoire2::prelude::Grimoire;

@@ -9,6 +9,8 @@ pub mod modify;
 pub mod grimoire;
 pub mod standalone;
 
+pub use indexmap;
+
 pub mod prelude {
     pub use super::{effect::*, modifier::*, modifiermap::*, theoretical::*};
 
