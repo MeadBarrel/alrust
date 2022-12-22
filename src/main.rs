@@ -2,9 +2,7 @@ mod app;
 mod error;
 mod toppanel;
 mod editor;
-mod widget;
 mod id;
-mod types;
 
 
 use tracing_subscriber::*;

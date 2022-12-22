@@ -1,9 +1,7 @@
 use std::marker::PhantomData;
 
-use eframe::egui::Ui;
+use eframe::egui::{Ui, Window};
 use crate::id::PrefixedId;
-use crate::widget::CloseableWindow;
-use crate::types::AugmentedWindowResponse;
 use crate::error::{Report, Error, handle_error};
 use grimoire2::indexmap::IndexMap;
 use super::editor::ItemEditor;
@@ -26,19 +24,18 @@ impl<T, E> ItemEditionWindows<T, E>
 {
     pub fn show(&mut self, ui: &mut Ui, items: &mut Items<T>) {
         self.windows.retain_mut(|window| {
-            let character = items.get_mut(&window.name);
-            match character {
-                Some(x) => window.show(ui, x).augment,
+            let item = items.get_mut(&window.name);
+            match item {
+                Some(ok_item) => window.show(ui, ok_item),
                 None => {
                     handle_error(
                         Report::new(Error::Generic(
-                            "Character deleted, but character edition window was open, closing".to_string()
+                            "Item deleted, but an edition window was open, closing".to_string()
                         ))
                     );
                     false
                 }
             }
-            
         })
     }
 
@@ -57,7 +54,6 @@ struct EditWindow<T, E>
     pub name: String,
     pub editor: E,
     pub id: PrefixedId,
-    pub default_pos: Option<egui::Pos2>,
     type_: PhantomData<T>
 }
 
@@ -72,31 +68,28 @@ impl<T, E> EditWindow<T, E>
             name: name.into(),
             editor,
             id: PrefixedId::default(),
-            default_pos: None,
             type_: PhantomData
         }
     }
 
-    pub fn default_pos(mut self, pos: impl Into<egui::Pos2>) -> Self {
-        self.default_pos = Some(pos.into());
-        self
-    }
+    pub fn show(&mut self, ui: &mut Ui, character: &mut T) -> bool {
+        let mut open = true;
 
-    pub fn show(&mut self, ui: &mut Ui, character: &mut T) -> AugmentedWindowResponse<bool, ()> {
-        let mut window = CloseableWindow::default()
-            .id(self.id.derive_suffix("character_edit_window"))
+        let mut window = Window::new(&self.name)
+            .id(self.id.derive_suffix("character_edit_window").id())
+            .open(&mut open)
             .auto_sized()
-            .collabsible(true)
-            .title(&self.name);
-        
-        if let Some(x) = self.default_pos {
-            window = window.default_pos(x)
-        }
+            .collapsible(true);
 
-        window
-            .show(ui, |ui| {
+        let window_result = window
+            .show(ui.ctx(), |ui| {
                 self.editor.show(ui, character);
                 true
-            })
+            });
+
+        match window_result {
+            Some(x) => open,
+            None => false,
+        }
     }
 }
