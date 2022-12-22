@@ -78,7 +78,6 @@ impl<T, E> EditWindow<T, E>
         let mut window = Window::new(&self.name)
             .id(self.id.derive_suffix("character_edit_window").id())
             .open(&mut open)
-            .auto_sized()
             .collapsible(true);
 
         let window_result = window
