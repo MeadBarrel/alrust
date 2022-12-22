@@ -15,7 +15,10 @@ impl CreateCladeButton {
         match &mut self.value {
             Some(value) => {
                 let editor_id = self.id.derive_suffix("new_clade_name_edit").id();
-                let mut editor = TextEdit::singleline(value).desired_width(100.).id(editor_id);
+                let mut editor = TextEdit::singleline(value)
+                    .desired_width(100.)
+                    .hint_text("Enter to confirm")
+                    .id(editor_id);
                 ui.ctx().memory().request_focus(editor_id);
                 if editor.ui(ui).lost_focus() {
                     if ui.ctx().input().key_down(Key::Enter) {

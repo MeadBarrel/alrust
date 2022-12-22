@@ -18,6 +18,14 @@ impl CharacterClade {
     }
 
     pub fn show(&mut self, ui: &mut Ui, clades: &mut HashSet<String>, clade: &String) {
-        ui.label(clade);
+        let label = egui::Label::new(clade).sense(egui::Sense::click());
+        ui.add(label)
+            .on_hover_cursor(egui::CursorIcon::ContextMenu)
+            .context_menu(|ui| {
+                if ui.button("Remove").clicked() {
+                    clades.remove(clade);
+                    ui.close_menu();
+                }
+            });
     }
 }

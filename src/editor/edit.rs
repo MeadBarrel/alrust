@@ -4,6 +4,7 @@ use eframe::egui::{Ui, Window};
 use crate::id::PrefixedId;
 use crate::error::{Report, Error, handle_error};
 use grimoire2::indexmap::IndexMap;
+use grimoire2::prelude::Grimoire;
 use super::editor::ItemEditor;
 
 
@@ -72,7 +73,7 @@ impl<T, E> EditWindow<T, E>
         }
     }
 
-    pub fn show(&mut self, ui: &mut Ui, character: &mut T) -> bool {
+    pub fn show(&mut self, ui: &mut Ui, item: &mut T) -> bool {
         let mut open = true;
 
         let mut window = Window::new(&self.name)
@@ -82,7 +83,7 @@ impl<T, E> EditWindow<T, E>
 
         let window_result = window
             .show(ui.ctx(), |ui| {
-                self.editor.show(ui, character);
+                self.editor.show(ui, item);
                 true
             });
 

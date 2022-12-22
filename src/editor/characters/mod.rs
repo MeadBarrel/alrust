@@ -6,6 +6,7 @@ use eframe::egui::Ui;
 use grimoire2::grimoire::Characters;
 use crate::id::PrefixedId;
 use eframe::egui;
+use grimoire2::prelude::Grimoire;
 use super::character;
 
 

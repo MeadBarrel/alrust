@@ -52,7 +52,6 @@ impl GrimoireEditor {
             Tab::Skills => { ui.heading("Work in Progress..."); },
             Tab::Ingredients => { ui.heading("Work in Progress..."); },
         }
-        
     }
 
     fn top_panel(&mut self, ui: &mut Ui) {
