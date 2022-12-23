@@ -117,6 +117,7 @@ dependencies = [
  "error-stack",
  "genetic",
  "geneticalchemy",
+ "grimoire-index",
  "grimoire-sqlite",
  "grimoire2",
  "indexmap",
@@ -1104,6 +1105,10 @@ dependencies = [
  "libc",
  "system-deps",
 ]
+
+[[package]]
+name = "grimoire-index"
+version = "0.1.0"
 
 [[package]]
 name = "grimoire-sqlite"

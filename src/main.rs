@@ -3,6 +3,7 @@ mod error;
 mod toppanel;
 mod editor;
 mod id;
+mod grimoire;
 
 
 use tracing_subscriber::*;

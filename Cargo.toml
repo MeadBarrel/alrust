@@ -23,13 +23,14 @@ genetic = { path="genetic" }
 geneticalchemy = { path="geneticalchemy" }
 grimoire2 = { path="grimoire2" }
 grimoire-sqlite = { path="grimoire-sqlite" }
-
+grimoire-index = { version = "0.1.0", path = "grimoire-index" }
 
 [workspace]
 members = [
     'genetic',
     'geneticalchemy',
     'grimoire-sqlite',
+    'grimoire-index',
 ]
 
 

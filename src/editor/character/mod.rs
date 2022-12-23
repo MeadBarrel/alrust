@@ -10,6 +10,7 @@ use indexmap::IndexMap;
 use grimoire2::grimoire::Character;
 use crate::id::PrefixedId;
 use super::editor::ItemEditor;
+use crate::grimoire::IndexCharacter;
 
 
 use clades::CharacterCladesEditor;

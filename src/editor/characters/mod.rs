@@ -6,8 +6,9 @@ use eframe::egui::Ui;
 use grimoire2::grimoire::Characters;
 use crate::id::PrefixedId;
 use eframe::egui;
-use grimoire2::prelude::Grimoire;
+use grimoire2::prelude::{Character, Grimoire};
 use super::character;
+use crate::grimoire::IndexGrimoireStruct;
 
 
 #[derive(Debug, Default)]
@@ -20,17 +21,19 @@ pub struct CharactersEditor {
 
 
 impl CharactersEditor {
-    pub fn show(&mut self, ui: &mut Ui, characters: &mut Characters) {
+    pub fn show(&mut self, ui: &mut Ui, grimoire: &mut IndexGrimoireStruct) {
         egui::TopBottomPanel::top(self.id.derive_suffix("top")).show_inside(ui, |ui| {
             self.top_panel(ui);
         });
         egui::CentralPanel::default().show_inside(ui, |ui| {
-            self.central_panel(ui, characters);
+            self.central_panel(ui, grimoire.characters_mut());
         });
 
-        self.create_windows.show(ui, characters);
-        self.edit_windows.show(ui, characters);
+        self.create_windows.show(ui, grimoire.characters_mut());
+        self.edit_windows.show(ui, grimoire.characters_mut());
     }
+
+    pub fn tf(&mut self, character: &Character) {}
 
     fn top_panel(&mut self, ui: &mut Ui) {
         ui.horizontal(|ui| {

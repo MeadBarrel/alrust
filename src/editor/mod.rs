@@ -5,8 +5,8 @@ mod edit;
 mod editor;
 
 use eframe::egui::Ui;
-use grimoire2::prelude::Grimoire;
-
+use grimoire2::prelude::{Characters, Grimoire, Skills};
+use crate::grimoire::{IndexGrimoireStruct, IndexSkill};
 use crate::id::PrefixedId;
 
 
@@ -47,8 +47,10 @@ impl GrimoireEditor {
     }
 
     fn central_panel(&mut self, ui: &mut Ui) {
+        let mut index = IndexGrimoireStruct::new(&mut self.grimoire);
+        
         match self.tab {
-            Tab::Characters => self.characters_editor.show(ui, &mut self.grimoire.characters),
+            Tab::Characters => self.characters_editor.show(ui, &mut index),
             Tab::Skills => { ui.heading("Work in Progress..."); },
             Tab::Ingredients => { ui.heading("Work in Progress..."); },
         }
