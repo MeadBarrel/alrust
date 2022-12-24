@@ -1,3 +1,4 @@
+import { invoke_open_grimoire_dialog } from './snippets/grimoire-yew-bf0451a021b18512/public/glue.js';
 
 let wasm;
 
@@ -219,6 +220,14 @@ function __wbg_adapter_19(arg0, arg1, arg2) {
     }
 }
 
+function handleError(f, args) {
+    try {
+        return f.apply(this, args);
+    } catch (e) {
+        wasm.__wbindgen_exn_store(addHeapObject(e));
+    }
+}
+
 function isLikeNone(x) {
     return x === undefined || x === null;
 }
@@ -240,14 +249,6 @@ function getArrayJsValueFromWasm0(ptr, len) {
         result.push(takeObject(slice[i]));
     }
     return result;
-}
-
-function handleError(f, args) {
-    try {
-        return f.apply(this, args);
-    } catch (e) {
-        wasm.__wbindgen_exn_store(addHeapObject(e));
-    }
 }
 
 async function load(module, imports) {
@@ -284,6 +285,10 @@ async function load(module, imports) {
 function getImports() {
     const imports = {};
     imports.wbg = {};
+    imports.wbg.__wbg_invokeopengrimoiredialog_87577e77a8aae1e7 = function() { return handleError(function () {
+        const ret = invoke_open_grimoire_dialog();
+        return addHeapObject(ret);
+    }, arguments) };
     imports.wbg.__wbg_listenerid_12315eee21527820 = function(arg0, arg1) {
         const ret = getObject(arg1).__yew_listener_id;
         getInt32Memory0()[arg0 / 4 + 1] = isLikeNone(ret) ? 0 : ret;
@@ -551,6 +556,10 @@ function getImports() {
         const ret = getObject(arg0).then(getObject(arg1));
         return addHeapObject(ret);
     };
+    imports.wbg.__wbg_then_cedad20fbbd9418a = function(arg0, arg1, arg2) {
+        const ret = getObject(arg0).then(getObject(arg1), getObject(arg2));
+        return addHeapObject(ret);
+    };
     imports.wbg.__wbg_globalThis_7f206bda628d5286 = function() { return handleError(function () {
         const ret = globalThis.globalThis;
         return addHeapObject(ret);
@@ -581,12 +590,12 @@ function getImports() {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper3449 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 218, __wbg_adapter_16);
+    imports.wbg.__wbindgen_closure_wrapper3560 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 233, __wbg_adapter_16);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper3558 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 237, __wbg_adapter_19);
+    imports.wbg.__wbindgen_closure_wrapper3689 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 252, __wbg_adapter_19);
         return addHeapObject(ret);
     };
 
@@ -624,7 +633,7 @@ function initSync(module) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('grimoire-yew-bfe8807695861b84_bg.wasm', import.meta.url);
+        input = new URL('grimoire-yew-62edeb11f95ac596_bg.wasm', import.meta.url);
     }
     const imports = getImports();
 

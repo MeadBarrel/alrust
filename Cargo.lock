@@ -1892,6 +1892,8 @@ dependencies = [
 name = "grimoire-tauri"
 version = "0.1.0"
 dependencies = [
+ "grimoire2",
+ "rfd",
  "serde",
  "serde_json",
  "tauri",
@@ -1902,6 +1904,10 @@ dependencies = [
 name = "grimoire-yew"
 version = "0.1.0"
 dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
  "yew",
 ]
 

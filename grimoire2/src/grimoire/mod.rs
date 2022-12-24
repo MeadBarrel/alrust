@@ -7,12 +7,13 @@ pub use ingredient::*;
 pub use skill::*;
 
 use indexmap::IndexMap;
+use serde::{Deserialize, Serialize};
 
 pub type Skills = IndexMap<String, Skill>;
 pub type Ingredients = IndexMap<String, Ingredient>;
 pub type Characters = IndexMap<String, Character>;
 
-#[derive(Default, Debug, Clone, PartialEq)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Grimoire {
     pub skills: Skills,
     pub ingredients: Ingredients,

@@ -1,6 +1,7 @@
+use serde::{Deserialize, Serialize};
 use crate::theoretical::Theoretical;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Skill {
     pub effectiveness: Theoretical<f64>,
     pub parent: Option<String>,
