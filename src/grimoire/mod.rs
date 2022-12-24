@@ -19,7 +19,6 @@ pub trait IndexElement {
     fn get(&self) -> Option<&Self::Item>;
 }
 
-pub trait CharactersIndex
 
 pub trait GrimoireBackLink {
     type Item: IndexElement<Item=Grimoire>;
