@@ -1,15 +1,12 @@
 mod app;
 mod error;
 mod toppanel;
-mod editor;
+mod editors;
 mod id;
-mod grimoire;
-
+mod widgets;
+mod global;
 
 use tracing_subscriber::*;
-
-
-
 
 pub fn main() {
     let subs = fmt()

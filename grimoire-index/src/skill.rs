@@ -1,10 +1,10 @@
-use super::{UnboundIndex, UnboundGrimoireBacklink, grimoire::UnboundGrimoire};
+use super::{UnboundIndex, GrimoireBacklink, grimoire::GrimoireIndex};
 
 use grimoire2::grimoire::{Grimoire, Skill};
 
-pub struct UnboundSkill(pub UnboundGrimoire, pub String);
+pub struct SkillIndex(pub GrimoireIndex, pub String);
 
-impl UnboundIndex for UnboundSkill {
+impl UnboundIndex for SkillIndex {
     type Item = Skill;
 
     fn get<'a>(&self, source: &'a Grimoire) -> Option<&'a Self::Item> {
@@ -16,8 +16,8 @@ impl UnboundIndex for UnboundSkill {
     }
 }
 
-impl UnboundGrimoireBacklink for UnboundSkill {
-    type Backlink = UnboundGrimoire;
+impl GrimoireBacklink for SkillIndex {
+    type Backlink = GrimoireIndex;
 
     fn grimoire(&self) -> &Self::Backlink {
         &self.0

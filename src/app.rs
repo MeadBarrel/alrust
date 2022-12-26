@@ -1,9 +1,11 @@
-use crate::editor;
+use crate::editors::grimoire::editor::GrimoireEditor;
+use grimoire2::grimoire::Grimoire;
 
 
 #[derive(Default)]
 pub struct AlrustApp {
-    pub grimoire_editor: Option<editor::GrimoireEditor>,
+    pub grimoire_editor: GrimoireEditor,
+    pub grimoire: Option<Grimoire>,
 }
 
 
@@ -19,10 +21,13 @@ impl eframe::App for AlrustApp {
         egui::TopBottomPanel::top("ar_top_panel").show(ctx, |ui| {
             crate::toppanel::top_panel(ui, self)
         });
+
         egui::CentralPanel::default().show(ctx, |ui| {
-            match &mut self.grimoire_editor {
-                Some(x) => x.show(ui),
-                None => { ui.heading("Grimoire not Loaded"); }
+            self.grimoire = match std::mem::take(&mut self.grimoire) {
+                Some(x) => {
+                    Some(self.grimoire_editor.show(ui, x))
+                },
+                None => { ui.heading("Load grimoire first"); None }
             }
         });
     }

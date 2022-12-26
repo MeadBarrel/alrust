@@ -2,13 +2,15 @@ mod table;
 mod create;
 mod edit;
 
+use std::cell::Cell;
 use eframe::egui::Ui;
 use grimoire2::grimoire::Characters;
 use crate::id::PrefixedId;
 use eframe::egui;
-use grimoire2::prelude::{Character, Grimoire};
+use indexmap::IndexMap;
+use grimoire2::prelude::Character;
+use crate::grimoire::CellGrimoire;
 use super::character;
-use crate::grimoire::IndexGrimoireStruct;
 
 
 #[derive(Debug, Default)]
@@ -21,7 +23,7 @@ pub struct CharactersEditor {
 
 
 impl CharactersEditor {
-    pub fn show(&mut self, ui: &mut Ui, grimoire: &mut IndexGrimoireStruct) {
+    pub fn show(&mut self, ui: &mut Ui, grimoire: &CellGrimoire, characters: IndexMap<String, Cell<Character>>) {
         egui::TopBottomPanel::top(self.id.derive_suffix("top")).show_inside(ui, |ui| {
             self.top_panel(ui);
         });

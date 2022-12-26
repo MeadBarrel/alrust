@@ -4,7 +4,6 @@ use error_stack::*;
 use grimoire2::grimoire::versioned::GrimoireVersioned;
 use grimoire2::grimoire::Grimoire;
 use crate::error::{Error, Result, handle_error};
-use crate::editor;
 
 
 pub fn top_panel(ui: &mut Ui, app: &mut AlrustApp) {
@@ -18,16 +17,16 @@ pub fn top_panel(ui: &mut Ui, app: &mut AlrustApp) {
 
 pub fn menu(ui: &mut Ui, app: &mut AlrustApp) {
     ui.menu_button("File", |ui| {
-        open_button(ui, &mut app.grimoire_editor);
-        if app.grimoire_editor.is_some() { 
-            close_button(ui, &mut app.grimoire_editor)
+        open_button(ui, &mut app.grimoire);
+        if app.grimoire.is_some() {
+            close_button(ui, &mut app.grimoire)
          }
     });
 }
 
 
 
-fn open_button(ui: &mut Ui, maybe_editor: &mut Option<editor::GrimoireEditor>) {
+fn open_button(ui: &mut Ui, maybe_grimoire: &mut Option<Grimoire>) {
     if !ui.button("Open").clicked() { return }
 
     ui.close_menu();
@@ -37,14 +36,14 @@ fn open_button(ui: &mut Ui, maybe_editor: &mut Option<editor::GrimoireEditor>) {
 
     match load_grimoire(path) {
         Ok(grimoire) => { 
-            *maybe_editor = Some(editor::GrimoireEditor::new(grimoire))
+            *maybe_grimoire = Some(grimoire)
         },
         Err(err) => handle_error(err)
     }
 }
 
 
-fn close_button(ui: &mut Ui, maybe_editor: &mut Option<editor::GrimoireEditor>) {
+fn close_button(ui: &mut Ui, maybe_editor: &mut Option<Grimoire>) {
     if !ui.button("Close").clicked() { return; }
 
     ui.close_menu();

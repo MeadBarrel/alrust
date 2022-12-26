@@ -1,17 +1,17 @@
 use grimoire2::grimoire::Grimoire;
 use grimoire2::prelude::Character;
-use crate::unbound::UnboundCharacterBacklink;
+use crate::CharacterBacklink;
 
-use super::{UnboundIndex, UnboundGrimoireBacklink};
-use super::grimoire::UnboundGrimoire;
-
-#[derive(Clone)]
-pub struct UnboundCharacter(pub UnboundGrimoire, pub String);
+use super::{UnboundIndex, GrimoireBacklink};
+use super::grimoire::GrimoireIndex;
 
 #[derive(Clone)]
-pub struct UnboundCharacterSkill(pub UnboundCharacter, pub String);
+pub struct CharacterIndex(pub GrimoireIndex, pub String);
 
-impl UnboundIndex for UnboundCharacter {
+#[derive(Clone)]
+pub struct CharacterSkillIndex(pub CharacterIndex, pub String);
+
+impl UnboundIndex for CharacterIndex {
     type Item = Character;
 
     fn get<'a>(&self, source: &'a grimoire2::prelude::Grimoire) -> Option<&'a Self::Item> {
@@ -23,26 +23,30 @@ impl UnboundIndex for UnboundCharacter {
     }
 }
 
-impl UnboundGrimoireBacklink for UnboundCharacter {
-    type Backlink = UnboundGrimoire;
+impl GrimoireBacklink for CharacterIndex {
+    type Backlink = GrimoireIndex;
 
     fn grimoire(&self) -> &Self::Backlink {
         &self.0
     }
 }
 
-impl UnboundCharacter {
-    pub fn skill(&self, name: impl Into<String>) -> UnboundCharacterSkill {
-        UnboundCharacterSkill(self.clone(), name.into())
+impl CharacterIndex {
+    pub fn skill(&self, name: impl Into<String>) -> CharacterSkillIndex {
+        CharacterSkillIndex(self.clone(), name.into())
     }
 
-    pub fn skills<'a>(&self, source: &'a Grimoire) -> Option<impl Iterator<Item = UnboundCharacterSkill> + 'a> {
+    pub fn skills<'a>(&self, source: &'a Grimoire) -> Option<impl Iterator<Item =CharacterSkillIndex> + 'a> {
         let s = self.clone();
-        Some(self.get(source)?.skills.keys().map(move |x| UnboundCharacterSkill(s.clone(), x.clone())))
+        Some(self.get(source)?.skills.keys().map(move |x| CharacterSkillIndex(s.clone(), x.clone())))
+    }
+
+    pub fn name(&self) -> &str {
+        &self.1
     }
 }
 
-impl UnboundIndex for UnboundCharacterSkill {
+impl UnboundIndex for CharacterSkillIndex {
     type Item = u8;
 
     fn get<'a>(&self, source: &'a Grimoire) -> Option<&'a Self::Item> {
@@ -54,8 +58,8 @@ impl UnboundIndex for UnboundCharacterSkill {
     }
 }
 
-impl UnboundCharacterBacklink for UnboundCharacterSkill {
-    type Backlink = UnboundCharacter;
+impl CharacterBacklink for CharacterSkillIndex {
+    type Backlink = CharacterIndex;
 
     fn character(&self) -> &Self::Backlink {
         &self.0

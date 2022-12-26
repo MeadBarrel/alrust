@@ -23,7 +23,7 @@ impl<T, E> ItemEditionWindows<T, E>
         T: Default,
         E: ItemEditor<Item=T> + Default,
 {
-    pub fn show(&mut self, ui: &mut Ui, items: &mut Items<T>) {
+    pub fn show(&mut self, ui: &mut Ui, grimoire: Grimoire, index: &mut Items<T>) {
         self.windows.retain_mut(|window| {
             let item = items.get_mut(&window.name);
             match item {

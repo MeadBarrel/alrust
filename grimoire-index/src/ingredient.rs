@@ -1,10 +1,10 @@
-use super::{UnboundIndex, UnboundGrimoireBacklink};
+use super::{UnboundIndex, GrimoireBacklink};
 use grimoire2::grimoire::{Grimoire, Ingredient};
-use crate::unbound::grimoire::UnboundGrimoire;
+use crate::grimoire::GrimoireIndex;
 
-pub struct UnboundIngredient(pub UnboundGrimoire, pub String);
+pub struct IngredientIndex(pub GrimoireIndex, pub String);
 
-impl UnboundIndex for UnboundIngredient {
+impl UnboundIndex for IngredientIndex {
     type Item = Ingredient;
 
     fn get<'a>(&self, source: &'a Grimoire) -> Option<&'a Self::Item> {
@@ -16,8 +16,8 @@ impl UnboundIndex for UnboundIngredient {
     }
 }
 
-impl UnboundGrimoireBacklink for UnboundIngredient {
-    type Backlink = UnboundGrimoire;
+impl GrimoireBacklink for IngredientIndex {
+    type Backlink = GrimoireIndex;
 
     fn grimoire(&self) -> &Self::Backlink {
         &self.0
