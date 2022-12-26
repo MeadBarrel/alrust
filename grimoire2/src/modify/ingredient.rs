@@ -1,97 +1,42 @@
-use std::collections::HashMap;
+use std::ops::Index;
 
-use strum::IntoEnumIterator;
+use serde::{Serialize, Deserialize};
 
+use super::command::Commands;
 use crate::grimoire::Ingredient;
 use crate::theoretical::Theoretical;
-use crate::effect::{Effect, self};
+use crate::effect::Effect;
+use strum::IntoEnumIterator;
 
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum IngredientUpdateCommand {
+    ChangeMultiplier(Effect, Theoretical<f64>),
+    ChangeTerm(Effect, Theoretical<f64>),
+    SetSkill(Option<String>),
+    SetWeight(bool)
+}
 
-#[derive(Default, Clone, Debug)]
+
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IngredientUpdate {
-    multiplier_actions: HashMap<Effect, Theoretical<f64>>,
-    term_actions: HashMap<Effect, Theoretical<f64>>,
-    skill: Option<Option<String>>,
-    weight: Option<bool>,
+    commands: Vec<IngredientUpdateCommand>
 }
 
 
 impl IngredientUpdate {
-    pub fn create(&self) -> Ingredient {
-        let mut ingredient = Ingredient::default();
-        self.update(&mut ingredient);
-        ingredient
-    }
-
-    pub fn from_ingredient(ingredient: &Ingredient) -> Self {
-        let mut result = Self::default();
-        ingredient.modifiers.iter().for_each(
-            |(effect, modifier)|
-            { result.set_modifier(effect, modifier.term, modifier.multiplier); }
-        );
-        match &ingredient.skill {
-            Some(x) => result.set_skill(x),
-            None => result.remove_skill(),
-        };
-
-        result.set_weight(ingredient.weight);
-        result
-    }
-
-    pub fn update(&self, ingredient: &mut Ingredient) {
-        if let Some(x) = &self.skill {
-            ingredient.skill = x.clone();
-        }
-
-        if let Some(x) = self.weight {
-            ingredient.weight = x;
-        }
-
-        self.term_actions.iter().for_each(
-            |(effect, value)|
-            { ingredient.modifiers[*effect].term = *value }
-        );
-
-        self.multiplier_actions.iter().for_each(
-            |(effect, value)|
-            { ingredient.modifiers[*effect].multiplier = *value }
-        );       
-
-        // self.term_actions.iter().for_each(|(effect, action)|
-        //     match action {
-        //         ModifierUpdate::To(to) => ingredient.modifiers[*effect].term = *to,
-        //         ModifierUpdate::ToKnown => ingredient.modifiers[*effect].term = 
-        //             ingredient.modifiers[*effect].term.to_known(),
-        //         ModifierUpdate::ToUnknown => ingredient.modifiers[*effect].term =
-        //             ingredient.modifiers[*effect].term.to_unknown(),
-        //     }
-        // );
-
-        // self.multiplier_actions.iter().for_each(|(effect, action)|
-        //     match action {
-        //         ModifierUpdate::To(to) => ingredient.modifiers[*effect].multiplier = *to,
-        //         ModifierUpdate::ToKnown => ingredient.modifiers[*effect].multiplier = 
-        //             ingredient.modifiers[*effect].multiplier.to_known(),
-        //         ModifierUpdate::ToUnknown => ingredient.modifiers[*effect].multiplier =
-        //             ingredient.modifiers[*effect].multiplier.to_unknown(),
-        //     }
-        // );
-
-    }
-
     pub fn set_skill(&mut self, skill: &str) -> &mut Self {
-        self.skill = Some(Some(skill.to_string()));
+        self.commands.push(IngredientUpdateCommand::SetSkill(Some(skill.to_string())));
         self
     }
 
     pub fn remove_skill(&mut self) -> &mut Self {
-        self.skill = Some(None);
+        self.commands.push(IngredientUpdateCommand::SetSkill(None));
         self
     }
 
     pub fn set_weight(&mut self, weight: bool) -> &mut Self {
-        self.weight = Some(weight);
+        self.commands.push(IngredientUpdateCommand::SetWeight(weight));
         self
     }
 
@@ -107,44 +52,169 @@ impl IngredientUpdate {
     }
 
     pub fn set_term(&mut self, effect: Effect, value: Theoretical<f64>) -> &mut Self {        
-        self.term_actions.insert(effect, value);
+        self.commands.push(IngredientUpdateCommand::ChangeTerm(effect, value));
         self
     }
 
     pub fn set_multiplier(&mut self, effect: Effect, value: Theoretical<f64>) -> &mut Self {
-        self.multiplier_actions.insert(effect, value);        
+        self.commands.push(IngredientUpdateCommand::ChangeMultiplier(effect, value));
         self
     }    
 
-    pub fn will_set_skill(&self) -> Option<Option<String>> {
-        self.skill.clone()
+}
+
+
+impl Index<usize> for IngredientUpdate {
+    type Output = IngredientUpdateCommand;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.commands[index]
+    }
+}
+
+
+impl Commands<Ingredient, IngredientUpdateCommand> for IngredientUpdate {
+    fn create_from(ingredient: &Ingredient) -> Self {
+        let mut result = Self::default();
+        ingredient.modifiers.iter().for_each(
+            |(effect, modifier)|
+            { result.set_modifier(effect, modifier.term, modifier.multiplier); }
+        );
+        match &ingredient.skill {
+            Some(x) => result.set_skill(x),
+            None => result.remove_skill(),
+        };
+
+        result.set_weight(ingredient.weight);
+        result
     }
 
-    pub fn will_set_weight(&self) -> Option<bool> {
-        self.weight
+    fn diff(c1: &Ingredient, c2: &Ingredient) -> Self {
+        let mut result = Self::default();
+
+        for effect in Effect::iter() {
+            let c2_term = c2.modifiers[effect].term;
+            let c2_multiplier = c2.modifiers[effect].multiplier;
+            if c1.modifiers[effect].term != c2_term {
+                result.set_term(effect, c2_term);
+            }
+            if c1.modifiers[effect].multiplier != c2_multiplier {
+                result.set_multiplier(effect, c2_multiplier);
+            }
+        }
+
+        if c1.weight != c2.weight {
+            result.set_weight(c2.weight);
+        }
+
+        if c1.skill != c2.skill {
+            result.commands.push(IngredientUpdateCommand::SetSkill(c2.skill.clone()));
+        }
+
+        result
     }
 
-    pub fn will_set_term(&self, effect: Effect) -> Option<Theoretical<f64>> {
-        self.term_actions.get(&effect).copied()
+    fn create(&self) -> Ingredient {
+        let mut ingredient = Ingredient::default();
+        self.update(&mut ingredient);
+        ingredient
     }
 
-    pub fn will_set_multiplier(&self, effect: Effect) -> Option<Theoretical<f64>> {
-        self.multiplier_actions.get(&effect).copied()
+    fn update(&self, ingredient: &mut Ingredient) {
+        for command in &self.commands {
+            match command {
+                IngredientUpdateCommand::ChangeMultiplier(effect, value) => {
+                    ingredient.modifiers[*effect].multiplier = *value;
+                },
+                IngredientUpdateCommand::ChangeTerm(effect, value) => {
+                    ingredient.modifiers[*effect].term = *value;
+                },
+                IngredientUpdateCommand::SetSkill(value) => {
+                    ingredient.skill = value.clone()
+                },
+                IngredientUpdateCommand::SetWeight(value) => {
+                    ingredient.weight = *value
+                }
+            }
+        }
     }
 
+    fn add(&mut self, command: IngredientUpdateCommand) -> &mut Self {
+        self.commands.push(command);
+        self
+    }
+
+    fn len(&self) -> usize {
+        self.commands.len()
+    }
+
+    fn combine_last(&mut self) -> &mut Self {
+        use IngredientUpdateCommand::*;
+
+        if self.len() < 2 { return  self; }
+
+        let prev = &self.commands[self.len()-2];
+        let last = &self.commands[self.len()-1];
+
+        match (prev, last) {
+            (ChangeTerm(a, _), ChangeTerm(b, _)) => if a == b {
+                self._replace_last_two_with(last.clone());
+            },
+            (ChangeMultiplier(a, _), ChangeMultiplier(b, _)) => if a == b {
+                self._replace_last_two_with(last.clone())
+            },
+            (SetWeight(_), SetWeight(_)) => {
+                self._replace_last_two_with(last.clone())
+            },
+            (SetSkill(_), SetSkill(_)) => {
+                self._replace_last_two_with(last.clone())
+            },
+            (_, _) => {},
+        }
+
+        self
+    }
+
+    fn truncate(&mut self, index: usize) -> &mut Self {
+        self.commands.truncate(index);
+        self
+    }        
+
+    fn extend(&mut self, other: &Self) {
+        self.commands.extend(other.commands.iter().cloned())
+    }    
 }
 
 
 impl From<Ingredient> for IngredientUpdate {
     fn from(ingredient: Ingredient) -> Self {
-        Self::from_ingredient(&ingredient)
+        let mut result = Self::default();
+        ingredient.modifiers.iter().for_each(
+            |(effect, modifier)|
+            { result.set_modifier(effect, modifier.term, modifier.multiplier); }
+        );
+        match &ingredient.skill {
+            Some(x) => result.set_skill(x),
+            None => result.remove_skill(),
+        };
+
+        result.set_weight(ingredient.weight);
+        result
     }
+    
 }
 
 
 impl From<IngredientUpdate> for Ingredient {
     fn from(value: IngredientUpdate) -> Self {
         value.create()
+    }
+}
+
+
+impl From<&Ingredient> for IngredientUpdate {
+    fn from(value: &Ingredient) -> Self {
+        Self::create_from(value)
     }
 }
 
@@ -156,11 +226,25 @@ mod tests {
     use crate::theoretical::Theoretical;
 
     use super::IngredientUpdate;
+    use super::Commands;
+
+    use proptest::prelude::*;
+    use crate::grimoire::ingredient::tests::ingredient_strategy;
+
+    proptest! {
+        #[test]
+        fn test_diff(v1 in ingredient_strategy(), v2 in ingredient_strategy()) {            
+            let mut v1_ = v1.clone();
+            let diff = IngredientUpdate::diff(&v1, &v2);
+            diff.update(&mut v1_);
+            prop_assert_eq!(v1_, v2);
+        }
+    }    
 
     #[test]
     fn test_from_ingredient() {
         let ingredient = ingredient_updater().create();
-        let update = IngredientUpdate::from_ingredient(&ingredient);
+        let update = IngredientUpdate::create_from(&ingredient);
         let new_ingredient = update.create();
 
         assert_eq!( new_ingredient.modifiers[Effect::DirectHealing].term, (1.0).into() );
@@ -236,5 +320,178 @@ mod tests {
             .set_skill("some_skill").create();
         IngredientUpdate::default().remove_skill().update(&mut ingredient);
         assert!( ingredient.skill.is_none() )
+    }
+
+    #[test]
+    fn test_combine_last_set_remove_skill() {
+        let update = IngredientUpdate::default()
+            .set_skill("a")
+            .remove_skill()
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 1);
+        assert!(ingredient.skill.is_none());
+    }
+
+    #[test]
+    fn test_combine_last_remove_set_skill() {
+        let update = IngredientUpdate::default()
+            .remove_skill()
+            .set_skill("a")
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 1);
+        assert_eq!(ingredient.skill, Some("a".to_string()));        
+    }
+
+    #[test]
+    fn test_combine_last_set_term() {
+        let update = IngredientUpdate::default()
+            .set_term(Effect::Alcohol, Theoretical::Known(1.))
+            .set_term(Effect::Alcohol, Theoretical::Known(2.))
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 1);
+        assert_eq!(ingredient.modifiers[Effect::Alcohol].term, Theoretical::Known(2.));        
+    }
+
+    #[test]
+    fn test_combine_last_set_multiplier() {
+        let update = IngredientUpdate::default()
+            .set_multiplier(Effect::Alcohol, Theoretical::Known(1.))
+            .set_multiplier(Effect::Alcohol, Theoretical::Known(2.))
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 1);
+        assert_eq!(ingredient.modifiers[Effect::Alcohol].multiplier, Theoretical::Known(2.));        
+    }    
+
+    #[test]
+    fn test_combine_last_set_term_diff_effects() {
+        let update = IngredientUpdate::default()
+            .set_term(Effect::Alcohol, Theoretical::Known(1.))
+            .set_term(Effect::DirectHealing, Theoretical::Known(2.))
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 2);
+        assert_eq!(ingredient.modifiers[Effect::Alcohol].term, Theoretical::Known(1.));
+        assert_eq!(ingredient.modifiers[Effect::DirectHealing].term, Theoretical::Known(2.));
+    }
+
+    #[test]
+    fn test_combine_last_set_multiplier_diff_effects() {
+        let update = IngredientUpdate::default()
+            .set_multiplier(Effect::Alcohol, Theoretical::Known(1.))
+            .set_multiplier(Effect::DirectHealing, Theoretical::Known(2.))
+            .combine_last()
+            .clone();
+        let ingredient = &mut IngredientUpdate::default().set_skill("b").create();
+        update.update(ingredient);
+        assert_eq!(update.len(), 2);
+        assert_eq!(ingredient.modifiers[Effect::Alcohol].multiplier, Theoretical::Known(1.));
+        assert_eq!(ingredient.modifiers[Effect::DirectHealing].multiplier, Theoretical::Known(2.));
+    }
+}
+
+
+
+pub mod versioned {
+    use serde::{Serialize, Deserialize};
+    use super::{IngredientUpdate, IngredientUpdateCommand};
+
+    #[derive(Clone, Debug, Serialize, Deserialize)]
+    pub enum IngredientUpdateVersioned {
+        #[serde(rename="0")]
+        V0(v0::IngredientUpdateV0)
+    }
+
+    impl From<IngredientUpdate> for IngredientUpdateVersioned {
+        fn from(value: IngredientUpdate) -> Self {
+            Self::V0(value.into())
+        }
+    }
+
+    impl From<IngredientUpdateVersioned> for IngredientUpdate {
+        fn from(value: IngredientUpdateVersioned) -> Self {
+            match value {
+                IngredientUpdateVersioned::V0(x) => x.into()
+            }
+        }
+    }
+
+    pub mod v0 {
+        use super::*;
+
+        use crate::theoretical::versioned::TheoreticalVersioned;
+        use crate::effect::Effect;
+
+        #[derive(Clone, Debug, Serialize, Deserialize)]
+        pub struct IngredientUpdateV0 {
+            commands: Vec<IngredientUpdateCommandV0>
+        }
+
+        impl From<IngredientUpdate> for IngredientUpdateV0 {
+            fn from(value: IngredientUpdate) -> Self {
+                Self {
+                    commands: value.commands.into_iter().map(|x| x.into()).collect(),
+                }
+            }
+        }
+
+        impl From<IngredientUpdateV0> for IngredientUpdate {
+            fn from(value: IngredientUpdateV0) -> Self {
+                Self {
+                    commands: value.commands.into_iter().map(|x| x.into()).collect(),
+                }                
+            }
+        }
+
+        #[derive(Clone, Debug, Serialize, Deserialize)]
+        pub enum IngredientUpdateCommandV0 {
+            ChangeMultiplier(Effect, TheoreticalVersioned<f64>),
+            ChangeTerm(Effect, TheoreticalVersioned<f64>),
+            SetSkill(Option<String>),
+            SetWeight(bool)
+        }
+
+        impl From<IngredientUpdateCommand> for IngredientUpdateCommandV0 {
+            fn from(value: IngredientUpdateCommand) -> Self {
+                match value {
+                    IngredientUpdateCommand::ChangeMultiplier(n, v) => 
+                        IngredientUpdateCommandV0::ChangeMultiplier(n, v.into()),
+                    IngredientUpdateCommand::ChangeTerm(n, v) =>
+                        IngredientUpdateCommandV0::ChangeTerm(n, v.into()),
+                    IngredientUpdateCommand::SetSkill(n) => 
+                        IngredientUpdateCommandV0::SetSkill(n),
+                    IngredientUpdateCommand::SetWeight(n) =>
+                        IngredientUpdateCommandV0::SetWeight(n)
+                }
+            }
+        }
+
+        impl From<IngredientUpdateCommandV0> for IngredientUpdateCommand {
+            fn from(value: IngredientUpdateCommandV0) -> Self {
+                match value {
+                    IngredientUpdateCommandV0::ChangeMultiplier(n, v) => 
+                        IngredientUpdateCommand::ChangeMultiplier(n, v.into()),
+                    IngredientUpdateCommandV0::ChangeTerm(n, v) =>
+                        IngredientUpdateCommand::ChangeTerm(n, v.into()),
+                    IngredientUpdateCommandV0::SetSkill(n) => 
+                        IngredientUpdateCommand::SetSkill(n),
+                    IngredientUpdateCommandV0::SetWeight(n) =>
+                        IngredientUpdateCommand::SetWeight(n)
+                }                
+            }
+        }
     }
 }

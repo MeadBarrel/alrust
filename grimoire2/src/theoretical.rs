@@ -1,6 +1,8 @@
 use std::ops::{Add, Mul, Sub};
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Debug, Copy, PartialEq, Eq)]
+
+#[derive(Clone, Debug, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Theoretical<T> {
     Known(T),
     Theory(T),
@@ -50,6 +52,22 @@ where
             Self::Known(_) => true,
             Self::Theory(_) => false,
             Self::Unknown => false,
+        }
+    }
+
+    pub fn is_theory(&self) -> bool {
+        match self {
+            Self::Known(_) => false,
+            Self::Theory(_) => true,
+            Self::Unknown => false
+        }
+    }
+
+    pub fn is_unknown(&self) -> bool {
+        match self {
+            Self::Known(_) => false,
+            Self::Theory(_) => false,
+            Self::Unknown => true
         }
     }
 
@@ -171,5 +189,50 @@ impl<T> From<T> for Theoretical<T> {
     #[inline(always)]
     fn from(x: T) -> Self {
         Self::Known(x)
+    }
+}
+
+
+
+pub mod versioned {
+    use serde::{Serialize, Deserialize};
+
+    use super::Theoretical;
+    
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum TheoreticalVersioned<T> {
+        #[serde(rename="0")]
+        V0(Theoretical<T>)
+    }
+
+    impl<T> From<Theoretical<T>> for TheoreticalVersioned<T> {
+        fn from(value: Theoretical<T>) -> Self {
+            TheoreticalVersioned::V0(value)
+        }
+    }
+
+    impl<T> From<TheoreticalVersioned<T>> for Theoretical<T> {
+        fn from(value: TheoreticalVersioned<T>) -> Self {
+            match value {
+                TheoreticalVersioned::V0(x) => x
+            }
+        }
+    }
+}
+
+
+#[cfg(test)]
+pub mod tests {
+    use proptest::strategy::Strategy;
+    use proptest::sample::select;
+    use super::*;
+    
+    pub fn theoretical_f64_strategy() -> impl Strategy<Value=Theoretical<f64>> {
+        select(vec![
+            Theoretical::Known(0.),
+            Theoretical::Known(0.5),
+            Theoretical::Known(1.0),
+        ])
     }
 }

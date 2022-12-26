@@ -6,12 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = {version = "1.0.149", features = ["derive"]}
-serde_derive = "1.0.151"
-chrono = { version="0.4.23", features = ["serde"] }
-thiserror = "1.0.38"
-
-grimoire2 = { path="../grimoire2" }
+chrono = { version = "0.4.23", features = ["serde"] }
+grimoire2 = { version = "0.1.0", path = "../grimoire2" }
+indexmap = { version = "1.9.2", features = ["serde-1"] }
+serde = { version = "1.0.151", features = ["derive"] }
 
 [dev-dependencies]
 serde_yaml = "0.9.14"

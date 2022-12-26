@@ -9,6 +9,7 @@ use crate::mix::MixIngredients;
 
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct PotionSerializable {
     #[serde(skip_serializing_if = "Option::is_none")]
     volume: Option<f64>,
@@ -178,5 +179,3 @@ impl PotionSerializableConfig {
         }
     }    
 }
-
-

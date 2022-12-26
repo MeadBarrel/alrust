@@ -27,6 +27,10 @@ impl TheoreticalWrapper {
             Self::Unknown => Theoretical::Unknown,
         }
     }
+
+    pub fn is_unknown(&self) -> bool {
+        *self == TheoreticalWrapper::Unknown
+    }
 }
 
 

@@ -1,101 +1,114 @@
+mod fs;
+mod update;
+mod explore;
+mod mix;
+mod optimize;
+
+use std::path::Path;
+use tracing_subscriber::*;
 use clap::*;
-use experiment::ExperimentConfig;
-use std::fs::File;
-use serde::{Serialize, Deserialize, de::DeserializeOwned};
-use serde_yaml::{to_writer, from_reader};
-use std::io::stdout;
-
-mod experiment;
-mod grimoiredb;
-mod guess;
-mod optimization;
-mod serializable;
-mod theoretical;
-
-use crate::serializable::PotionSerializable;
+use grimoire2::grimoire::versioned::GrimoireVersioned;
+use grimoire2::grimoire::Grimoire;
 
 
-fn run_genetic(config: &str) {
-    // geneticalchemy::builder::GAConfig::load(config).run().unwrap();
-    optimization::build::Optimizator::load(config)
-        .unwrap()
-        .run()
-        .unwrap();
-}
+pub fn main() {
+    let subs = fmt()
+        .with_env_filter(EnvFilter::new("alrust=debug"))
+        .finish();
+    tracing::subscriber::set_global_default(subs).unwrap();
 
-fn run_experiment(config: &str) {
-    let experiment = load_yaml::<ExperimentConfig>(config);
-    let result = experiment.run().unwrap();
-    print_yaml(&result);
-}
-
-fn run_db(filename: &str) {
-    use grimoire_sqlite::GrimoireSqlite;
-    GrimoireSqlite::connect(filename).unwrap().load().unwrap();
-}
-
-fn run_update(from: &str, to: &str) {
-    use grimoiredb::GrimoireConfig;
-    use grimoire_sqlite::GrimoireSqlite;
-
-    let grimoire = GrimoireConfig::load(from).unwrap().build().unwrap();
-    GrimoireSqlite::connect(to).unwrap().write(&grimoire).unwrap();
-}
-
-
-fn load_yaml<T: DeserializeOwned>(filename: &str) -> T {
-    let f = File::open(filename).unwrap();
-    from_reader(f).unwrap()
-}
-
-
-fn save_yaml<T: Serialize>(filename: &str, value: &T) {
-    let f = File::create(filename).unwrap();
-    to_writer(f, value).unwrap();
-}
-
-
-fn print_yaml<T: Serialize>(value: &T) {
-    to_writer(stdout(), value).unwrap();
-}
-
-
-fn main() {
-    let matches = Command::new("MO2 Alchemy Tools")
-        .subcommand(
-            Command::new("genetic").arg(arg!(--config <VALUE>).default_value("config.yaml")),
+    let update_subcommand = Command::new("update")
+        .arg(
+            Arg::new("from")
+                .index(1)
+                .value_name("from")
+                .required(true)
+                .help("Grimoire update file")
+                .long_help(
+                    "Grimoire update file\n\
+                     ====================\n\
+                    Format of the file:\n\n\
+                    remove_characters:\n\t<name>\n\t...\n\n\
+                    remove_skills:\n\t<name>\n\t...\n\n\
+                    remove_ingredients:\n\t<name>\n\t...\n\n\
+                    characters:\n\
+                    \t<character name>:\n\
+                    \t\tremove_clades:\n\t\t\t- <clade>\n\t\t\t...\n\n\
+                    \t\tremove_skills:\n\t\t\t- <skill>\n\t\t\t...\n\n\
+                    \t\tadd_clades:\n\t\t\t- <clade>\n\t\t\t...\n\n\
+                    \t\tskills:\n\t\t\t<skill>:<value>\n\t\t\t...\n\n\
+                    skills:\n\
+                    \t<skill name>:\n\
+                    \t\teffectiveness: (effectiveness, theoretical*)\n\
+                    \t\tparent: <name of parent 1>\n\
+                    \t\tparent_2: <name of parent 2>\n\
+                    \t\tremove_parent: bool\n\
+                    \t\tremove_parent_2: bool\n\n\
+                    ingredients:\n\
+                    \t\t<name of ingredient>:\n\
+                    \t\t\tskill: <lore of ingredient>\n\
+                    \t\t\tremove_skill: bool  # remove lore\n\
+                    \t\t\tweight: bool  # whether the ingredient has alchemical weight\n\
+                    \t\t\tdh: (direct healing, theoretical*)\n\
+                    \t\t\tmdh: (direct healing multiplier, theoretical*)\n\
+                    \t\t\t<... dp, mdp, hot, mhot, pot, mpot, hl, mhl, pl, mpl, a, ma>\
+                    \n\n\
+                    * theoretical format is either:\n\
+                    \t<floating point value (5, 0.4, 3.1 etc)> - Known value\n\
+                    \t!?<floating point value> - Theoretical value\n\
+                    \t?? - Value is unknown" 
+                )
         )
-        .subcommand(Command::new("experiment").arg(arg!(--config <VALUE>).required(true)))
-        .subcommand(Command::new("guess"))
-        .subcommand(Command::new("db").arg(arg!(--filename <VALUE>).required(true)))
-        .subcommand(
-            Command::new("update")
-                .arg(arg!(--from <VALUE>).required(true))
-                .arg(arg!(--to <VALUE>).required(true)),
+        .arg(
+            Arg::new("to")
+                .index(2)
+                .value_name("to")
+                .required(true)
         )
-        .get_matches();
+        .arg_required_else_help(true);
+
+    let grimoire_arg = Arg::new("grimoire")
+        .index(1)
+        .value_name("grimoire")
+        .required(true);
+
+    let app = Command::new("Alrust")
+        .arg(grimoire_arg)
+        .subcommand(update_subcommand)
+        .subcommand(explore::list::command())
+        .subcommand(explore::view::command())
+        .subcommand(mix::command())
+        .subcommand(optimize::command())
+        .subcommand_required(true)
+        .arg_required_else_help(true);
+
+
+    let matches = app.get_matches();
+    let grimoire_path = Path::new(matches.get_one::<String>("grimoire").unwrap());
+    let grimoire_versioned: GrimoireVersioned = fs::load(grimoire_path).unwrap();
+    let grimoire: Grimoire = grimoire_versioned.into();
 
     match matches.subcommand() {
-        Some(("genetic", args)) => {
-            let config_fn = args.get_one::<String>("config").unwrap();
-            run_genetic(config_fn);
-        }
-        Some(("experiment", args)) => {
-            let config_fn = args.get_one::<String>("config").unwrap();
-            run_experiment(config_fn);
-        }
-        Some(("guess", _)) => guess::greet(),
-        Some(("db", args)) => {
-            let filename = args.get_one::<String>("filename").unwrap();
-            run_db(filename);
-        }
         Some(("update", args)) => {
-            let from = args.get_one::<String>("from").unwrap();
-            let to = args.get_one::<String>("to").unwrap();
-            run_update(from, to);
+            update::update_grimoire(
+                grimoire, 
+                Path::new(args.get_one::<String>("from").unwrap()), 
+                Path::new(args.get_one::<String>("to").unwrap()),
+            ).unwrap();
+        },
+        Some(("list", args)) => {
+            explore::list::matched_command(grimoire, args)
+        },
+        Some(("view", args)) => {
+            explore::view::matched_command(grimoire, args)
+        },
+        Some(("mix", args)) => {
+            mix::matched_command(grimoire, args)
+        },
+        Some(("optimize", args)) => {
+            optimize::matched_command(grimoire, args)
         }
-        Some((_, _)) => {}
-        None => {}
+        None | Some(_) => {}
     }
-    //geneticalchemy::builder::GAConfig::load("config.yaml").run().unwrap();
+        
 }

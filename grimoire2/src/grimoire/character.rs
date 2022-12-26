@@ -2,11 +2,12 @@ use std::{
     cmp::min,
     collections::{HashMap, HashSet},
 };
+use serde::{Serialize, Deserialize};
 
 use super::Skills;
 use crate::theoretical::Theoretical;
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Character {
     pub clades: HashSet<String>,
     pub skills: HashMap<String, u8>,
@@ -58,6 +59,24 @@ pub mod tests {
     use crate::grimoire::Skill;
 
     use float_cmp::approx_eq;
+
+    use proptest::strategy::Strategy;
+    use proptest::collection::{hash_set, hash_map};
+    use proptest::sample::select;
+
+    pub fn character_strategy() -> impl Strategy<Value = Character> {
+        let clades = hash_set(select(vec!["a", "b", "c", "d", "e"]), 3);
+        let skills = hash_map(
+            select(vec!["a", "b", "c", "d"]), 
+            select(vec![0, 50, 25]), 
+            3
+        );
+        (clades, skills)
+            .prop_map(|(c, s)| Character { 
+                clades: c.into_iter().map(|x| x.to_string()).collect(), 
+                skills: s.into_iter().map(|(n, v)| (n.to_string(), v as u8)).collect()
+            } )
+    }
 
     #[test]
     fn test_skill_no_parents() {
@@ -193,5 +212,32 @@ pub mod tests {
             "{:?}",
             actual
         )
+    }
+}
+
+
+pub mod versioned {
+    use serde::{Serialize, Deserialize};
+
+    use super::Character;
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum CharacterVersioned {
+        #[serde(rename="0")]
+        V0(Character)
+    }
+
+    impl From<Character> for CharacterVersioned {
+        fn from(value: Character) -> Self {
+            Self::V0(value)
+        }
+    }
+
+    impl From<CharacterVersioned> for Character {
+        fn from(value: CharacterVersioned) -> Self {
+            match value {
+                CharacterVersioned::V0(x) => x
+            }
+        }
     }
 }

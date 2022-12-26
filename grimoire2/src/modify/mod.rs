@@ -1,132 +1,254 @@
 pub mod character;
 pub mod skill;
 pub mod ingredient;
+pub mod command;
+
+use std::ops::Index;
+use command::Commands;
+
+use serde::{Serialize, Deserialize};
+
+use crate::{grimoire::{Grimoire, Ingredient}, prelude::{Character, Skill}};
 
 
-use std::process::Command;
-
-use crate::grimoire::Grimoire;
-
-use self::ingredient::IngredientUpdate;
-
-
-#[derive(Debug, Clone)]
-pub enum UpdateCommand<T> {
-    Update(T),
-    Remove,
-    Replace,
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum GrimoireUpdateCommand {
+    Character(String, character::CharacterUpdate),
+    Skill(String, skill::SkillUpdate),
+    Ingredient(String, ingredient::IngredientUpdate),
+    RemoveCharacter(String),
+    RemoveSkill(String),
+    RemoveIngredient(String),
 }
 
 
-#[derive(Debug, Clone)]
-pub enum CharacterUpdateCommand {
-    Update(String, character::CharacterUpdate),
-    Remove(String),
-}
-
-
-#[derive(Debug, Clone)]
-pub enum SkillUpdateCommand {
-    Update(String, skill::SkillUpdate),
-    Remove(String)
-}
-
-
-#[derive(Debug, Clone)]
-pub enum IngredientUpdateCommand {
-    Update(String, ingredient::IngredientUpdate),
-    Remove(String)
-}
-
-
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct GrimoireUpdate {
-    characters: Vec<CharacterUpdateCommand>,
-    skills: Vec<SkillUpdateCommand>,
-    ingredients: Vec<IngredientUpdateCommand>,
+    commands: Vec<GrimoireUpdateCommand>,
 }
 
 
 impl GrimoireUpdate {
-    pub fn create(&self) -> Grimoire {
+    pub fn character(&mut self, name: &str, update: character::CharacterUpdate) -> &mut Self {
+        self.commands.push(GrimoireUpdateCommand::Character(name.to_string(), update));
+        self
+    }
+
+    pub fn skill(&mut self, name: &str, update: skill::SkillUpdate) -> &mut Self {
+        self.commands.push(GrimoireUpdateCommand::Skill(name.to_string(), update));
+        self
+    }
+
+    pub fn ingredient(&mut self, name: &str, update: ingredient::IngredientUpdate) -> &mut Self {
+        self.commands.push(GrimoireUpdateCommand::Ingredient(name.to_string(), update));
+        self
+    }
+
+    pub fn remove_character(&mut self, name: &str) -> &mut Self {
+        self.commands.push(GrimoireUpdateCommand::RemoveCharacter(name.to_string()));
+        self
+    }
+
+    pub fn remove_skill(&mut self, name: &str) -> &mut Self {
+        self.commands.push(GrimoireUpdateCommand::RemoveSkill(name.to_string()));
+        self
+    }
+    pub fn remove_ingredient(&mut self, name: &str) -> &mut Self {
+        self.commands.push(GrimoireUpdateCommand::RemoveIngredient(name.to_string()));
+        self    
+    }
+}
+
+
+impl From<Grimoire> for GrimoireUpdate {
+    fn from(value: Grimoire) -> Self {
+        Self::create_from(&value)
+    }
+}
+
+
+impl From<GrimoireUpdate> for Grimoire {
+    fn from(value: GrimoireUpdate) -> Self {
+        value.create()
+    }
+}
+
+
+impl Index<usize> for GrimoireUpdate {
+    type Output = GrimoireUpdateCommand;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.commands[index]
+    }
+}
+
+
+impl Commands<Grimoire, GrimoireUpdateCommand> for GrimoireUpdate {
+    fn create_from(value: &Grimoire) -> Self {
+        let mut result = Self::default();
+
+        for (name, character) in value.characters.iter() {
+            result.character(name.as_str(), character.into());
+        };
+
+        for (name, skill) in value.skills.iter() {
+            result.skill(name.as_str(), skill.into());
+        };
+
+        for (name, ingredient) in value.ingredients.iter() {
+            result.ingredient(name.as_str(), ingredient.into());
+        };
+
+        result
+    }
+
+    fn diff(c1: &Grimoire, c2: &Grimoire) -> Self {
+        let mut result = Self::default();
+
+        for (name, c2_v) in &c2.characters {
+            let maybe_c1_v = c1.characters.get(name);
+
+            match maybe_c1_v {
+                None => { result.character(name.as_str(), c2_v.into()); },
+                Some(c1_v) if c1_v == c2_v => {},
+                Some(c1_v) => { result.character(name.as_str(), character::CharacterUpdate::diff(c1_v, c2_v)); },
+            }
+        }
+
+        for name in c1.characters.keys() {
+            if !c2.characters.contains_key(name) {
+                result.remove_character(name.as_str());
+            }
+        }
+
+
+        for (name, c2_v) in &c2.skills {
+            let maybe_c1_v = c1.skills.get(name);
+
+            match maybe_c1_v {
+                None => { result.skill(name.as_str(), c2_v.into()); },
+                Some(c1_v) if c1_v == c2_v => {},
+                Some(c1_v) => { result.skill(name.as_str(), skill::SkillUpdate::diff(c1_v, c2_v)); },
+            }
+        }
+
+        for name in c1.skills.keys() {
+            if !c2.skills.contains_key(name) {
+                result.remove_skill(name.as_str());
+            }
+        }
+
+        for (name, c2_v) in &c2.ingredients {
+            let maybe_c1_v = c1.ingredients.get(name);
+
+            match maybe_c1_v {
+                None => { result.ingredient(name.as_str(), c2_v.into()); },
+                Some(c1_v) if c1_v == c2_v => {},
+                Some(c1_v) => { result.ingredient(name.as_str(), ingredient::IngredientUpdate::diff(c1_v, c2_v)); },
+            }
+        }
+
+        for name in c1.ingredients.keys() {
+            if !c2.ingredients.contains_key(name) {
+                result.remove_ingredient(name.as_str());
+            }
+        }
+
+        result
+    }
+
+    fn create(&self) -> Grimoire {
         let mut result = Grimoire::default();
         self.update(&mut result);
         result
     }
 
-    pub fn update(&self, grimoire: &mut Grimoire) {
-        self.characters.iter().for_each(|action| {
-            match action {
-                CharacterUpdateCommand::Update(name, update) => 
-                    { 
-                        update.update(grimoire.characters.entry(name.clone()).or_default());
-                    },
-                CharacterUpdateCommand::Remove(name) => 
-                    { grimoire.characters.remove(name); }
+    fn update(&self, grimoire: &mut Grimoire) {
+        for command in &self.commands {
+            match command {
+                GrimoireUpdateCommand::Character(name, update) => {
+                    let character = grimoire.characters.entry(name.clone()).or_insert(Character::default());
+                    update.update(character);
+                }
+                GrimoireUpdateCommand::Skill(name, update) => {
+                    let skill = grimoire.skills.entry(name.clone()).or_insert(Skill::default());
+                    update.update(skill);
+                }
+                GrimoireUpdateCommand::Ingredient(name, update) => {
+                    let ingredient = grimoire.ingredients.entry(name.clone()).or_insert(Ingredient::default());
+                    update.update(ingredient);
+                },
+                GrimoireUpdateCommand::RemoveCharacter(name) => {
+                    grimoire.characters.remove(name);
+                },
+                GrimoireUpdateCommand::RemoveSkill(name) => {
+                    grimoire.skills.remove(name);
+                },
+                GrimoireUpdateCommand::RemoveIngredient(name) => {
+                    grimoire.ingredients.remove(name);
+                }
             }
-        });
+        }
+    }
 
-        self.skills.iter().for_each(|action| {
-            match action {
-                SkillUpdateCommand::Update(name, update) => 
-                    { update.update(grimoire.skills.entry(name.clone()).or_default()); },
-                SkillUpdateCommand::Remove(name) => 
-                    { grimoire.skills.remove(name); }
+    fn add(&mut self, command: GrimoireUpdateCommand) -> &mut Self {
+        self.commands.push(command);
+        self
+    }
+
+    fn len(&self) -> usize {
+        self.commands.len()
+    }
+
+    fn combine_last(&mut self) -> &mut Self {
+        use GrimoireUpdateCommand::*;
+
+        if self.len() < 2 { return  self; }
+
+        let len = self.len();
+
+        let last = self.commands.remove(len-1);
+        let mut prev = &mut self.commands[len-2];
+
+        match (&mut prev, &last) {
+            (Character(a, ca), Character(b, cb)) if a==b
+                => if a == b {
+                ca.extend(cb);
+                ca.combine_last();
+            },
+
+            (Skill(a, ca), Skill(b, cb)) if a == b
+                => if a == b {
+                ca.extend(cb);
+                ca.combine_last();
+            },
+
+            (Ingredient(a, ca), Ingredient(b, cb)) if a == b
+                => if a == b {
+                ca.extend(cb);
+                ca.combine_last();
             }
-        });
 
-        self.ingredients.iter().for_each(|action| {
-            match action {
-                IngredientUpdateCommand::Update(name, update) => 
-                    { update.update(grimoire.ingredients.entry(name.clone()).or_default()); },
-                IngredientUpdateCommand::Remove(name) => 
-                    { grimoire.ingredients.remove(name); }
-            }
-        })
-    }
+            (Character(a, _), RemoveCharacter(b))
+            | (Skill(a, _), RemoveSkill(b))
+            | (Ingredient(a, _), RemoveIngredient(b)) if a == b => {
+                *prev = last
+            },
+            _ => { self.commands.push(last) }
+        }
 
-    pub fn character(&mut self, name: &str, update: character::CharacterUpdate) -> &mut Self {
-        self.characters.push(
-            CharacterUpdateCommand::Update(name.to_string(), update)
-        );
         self
     }
 
-    pub fn skill(&mut self, name: &str, update: skill::SkillUpdate) -> &mut Self {
-        self.skills.push(
-            SkillUpdateCommand::Update(name.to_string(), update)
-        );
+    fn truncate(&mut self, index: usize) -> &mut Self {
+        self.commands.truncate(index);
         self
     }
 
-    pub fn ingredient(&mut self, name: &str, update: ingredient::IngredientUpdate) -> &mut Self {
-        self.ingredients.push(
-            IngredientUpdateCommand::Update(name.to_string(), update)
-        );
-        self
-    }
-
-    pub fn remove_character(&mut self, name: &str) -> &mut Self {
-        self.characters.push(
-            CharacterUpdateCommand::Remove(name.to_string())
-        );
-        self
-    }
-
-    pub fn remove_skill(&mut self, name: &str) -> &mut Self {
-        self.skills.push(
-            SkillUpdateCommand::Remove(name.to_string())
-        );
-        self
-    }
-    pub fn remove_ingredient(&mut self, name: &str) -> &mut Self {
-        self.ingredients.push(
-            IngredientUpdateCommand::Remove(name.to_string())
-        );
-        self    
+    fn extend(&mut self, other: &Self) {
+        self.commands.extend(other.commands.iter().cloned())
     }
 }
-
 
 
 #[cfg(test)]
@@ -137,6 +259,23 @@ mod tests {
     use super::ingredient::IngredientUpdate;
     use crate::theoretical::Theoretical;
     use crate::effect::Effect;
+    use crate::prelude::Grimoire;
+    use super::Commands;
+    use super::GrimoireUpdateCommand;
+
+
+    use proptest::prelude::*;
+    use crate::grimoire::tests::grimoire_strategy;
+
+    proptest! {
+        #[test]
+        fn test_diff(v1 in grimoire_strategy(), v2 in grimoire_strategy()) {            
+            let mut v1_ = v1.clone();
+            let diff = GrimoireUpdate::diff(&v1, &v2);
+            diff.update(&mut v1_);
+            prop_assert_eq!(v1_, v2);
+        }
+    }    
 
     #[test]
     fn test_create() {
@@ -236,6 +375,75 @@ mod tests {
 
     }
 
+    #[test]
+    fn test_combine_last_add_remove_character() {
+        let update = GrimoireUpdate::default()
+            .character("a", CharacterUpdate::default())
+            .remove_character("a")
+            .combine_last()
+            .clone();
+        let grimoire = &mut GrimoireUpdate::default().character("a", CharacterUpdate::default()).create();
+        update.update(grimoire);
+        assert_eq!(update.len(), 1);
+        assert!(grimoire.characters.is_empty())
+    }
+
+    #[test]
+    fn test_combine_last_add_remove_skill() {
+        let update = GrimoireUpdate::default()
+            .skill("a", SkillUpdate::default())
+            .remove_skill("a")
+            .combine_last()
+            .clone();
+        let grimoire = &mut GrimoireUpdate::default().skill("a", SkillUpdate::default()).create();
+        update.update(grimoire);
+        assert_eq!(update.len(), 1);
+        assert!(grimoire.skills.is_empty());
+    }
+
+    #[test]
+    fn test_combine_last_add_remove_ingredient() {
+        let update = GrimoireUpdate::default()
+            .ingredient("a", IngredientUpdate::default())
+            .remove_ingredient("a")
+            .combine_last()
+            .clone();
+        let grimoire = &mut GrimoireUpdate::default().ingredient("a", IngredientUpdate::default()).create();
+        update.update(grimoire);
+        assert_eq!(update.len(), 1);
+        assert!(grimoire.ingredients.is_empty());
+    }
+
+    #[test]
+    fn test_combine_last_add_remove_diff_characters() {
+        let update = GrimoireUpdate::default()
+            .character("a", CharacterUpdate::default())
+            .remove_character("b")
+            .combine_last()
+            .clone();
+        assert_eq!(update.len(), 2);
+    }
+
+    #[test]
+    fn test_combine_last_add_remove_diff_skills() {
+        let update = GrimoireUpdate::default()
+            .skill("a", SkillUpdate::default())
+            .remove_skill("b")
+            .combine_last()
+            .clone();
+        assert_eq!(update.len(), 2);
+    }
+
+    #[test]
+    fn test_combine_last_add_remove_diff_ingredients() {
+        let update = GrimoireUpdate::default()
+            .ingredient("a", IngredientUpdate::default())
+            .remove_ingredient("b")
+            .combine_last()
+            .clone();
+        assert_eq!(update.len(), 2);
+    }
+
     fn grimoire_update() -> GrimoireUpdate {
         GrimoireUpdate::default()
             .character(
@@ -251,7 +459,7 @@ mod tests {
                     .add_clade("B")
                     .clone()
             )
-            .character("ShallRemove", CharacterUpdate::default().clone())
+            .character("ShallRemove", CharacterUpdate::default())
             .skill(
                 "a", SkillUpdate::default()
                     .set_effectiveness(Theoretical::Known(0.5))
@@ -263,7 +471,7 @@ mod tests {
                     .set_effectiveness(Theoretical::Theory(0.3))
                     .clone()
             )
-            .skill("ShallRemove", SkillUpdate::default().clone())
+            .skill("ShallRemove", SkillUpdate::default())
             .ingredient(
                 "A", IngredientUpdate::default()
                     .set_term(Effect::Alcohol, Theoretical::Known(0.5))
@@ -274,7 +482,110 @@ mod tests {
                     .set_skill("a")
                     .clone()
             )
-            .ingredient("ShallRemove", IngredientUpdate::default().clone())
+            .ingredient("ShallRemove", IngredientUpdate::default())
             .clone()
+    }
+}
+
+
+pub mod versioned {
+    use serde::{Serialize, Deserialize};
+
+    use super::{GrimoireUpdate, GrimoireUpdateCommand};
+    use super::character::versioned::CharacterUpdateVersioned;
+    use super::skill::versioned::SkillUpdateVersioned;
+    use super::ingredient::versioned::IngredientUpdateVersioned;
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum GrimoireUpdateVersioned {
+        #[serde(rename="0")]
+        V0(v0::GrimoireUpdateV0)
+    }
+
+    impl From<GrimoireUpdate> for GrimoireUpdateVersioned {
+        fn from(value: GrimoireUpdate) -> Self {
+            Self::V0(value.into())
+        }
+    }
+
+    impl From<GrimoireUpdateVersioned> for GrimoireUpdate {
+        fn from(value: GrimoireUpdateVersioned) -> Self {
+            match value {
+                GrimoireUpdateVersioned::V0(x) => x.into()
+            }
+        }
+    }
+
+    pub mod v0 {
+        use super::*;
+
+        #[derive(Debug, Clone, Serialize, Deserialize)]
+        pub struct GrimoireUpdateV0 {
+            commands: Vec<GrimoireUpdateCommandV0>
+        }
+
+        impl From<GrimoireUpdate> for GrimoireUpdateV0 {
+            fn from(value: GrimoireUpdate) -> Self {
+                Self {
+                    commands: value.commands.into_iter().map(|x| x.into()).collect(),
+                }
+            }
+        }
+
+        impl From<GrimoireUpdateV0> for GrimoireUpdate {
+            fn from(value: GrimoireUpdateV0) -> Self {
+                Self {
+                    commands: value.commands.into_iter().map(|x| x.into()).collect(),
+                }                
+            }
+        }
+
+        #[derive(Debug, Clone, Serialize, Deserialize)]
+        pub enum GrimoireUpdateCommandV0 {
+            Character(String, CharacterUpdateVersioned),
+            Skill(String, SkillUpdateVersioned),
+            Ingredient(String, IngredientUpdateVersioned),
+            RemoveCharacter(String),
+            RemoveSkill(String),
+            RemoveIngredient(String),                   
+        }
+
+        impl From<GrimoireUpdateCommand> for GrimoireUpdateCommandV0 {
+            fn from(value: GrimoireUpdateCommand) -> Self {
+                match value {
+                    GrimoireUpdateCommand::Character(n, c) => 
+                        GrimoireUpdateCommandV0::Character(n, c.into()),
+                    GrimoireUpdateCommand::Skill(n, c) => 
+                        GrimoireUpdateCommandV0::Skill(n, c.into()),
+                    GrimoireUpdateCommand::Ingredient(n, c) => 
+                        GrimoireUpdateCommandV0::Ingredient(n, c.into()),
+                    GrimoireUpdateCommand::RemoveCharacter(n) =>
+                        GrimoireUpdateCommandV0::RemoveCharacter(n),
+                    GrimoireUpdateCommand::RemoveSkill(n) =>
+                        GrimoireUpdateCommandV0::RemoveSkill(n),
+                    GrimoireUpdateCommand::RemoveIngredient(n) =>
+                        GrimoireUpdateCommandV0::RemoveIngredient(n),
+                }
+            }
+        }
+
+        impl From<GrimoireUpdateCommandV0> for GrimoireUpdateCommand {
+            fn from(value: GrimoireUpdateCommandV0) -> Self {
+                match value {
+                    GrimoireUpdateCommandV0::Character(n, c) => 
+                        GrimoireUpdateCommand::Character(n, c.into()),
+                    GrimoireUpdateCommandV0::Skill(n, c) => 
+                        GrimoireUpdateCommand::Skill(n, c.into()),
+                    GrimoireUpdateCommandV0::Ingredient(n, c) => 
+                        GrimoireUpdateCommand::Ingredient(n, c.into()),
+                    GrimoireUpdateCommandV0::RemoveCharacter(n) =>
+                        GrimoireUpdateCommand::RemoveCharacter(n),
+                    GrimoireUpdateCommandV0::RemoveSkill(n) =>
+                        GrimoireUpdateCommand::RemoveSkill(n),
+                    GrimoireUpdateCommandV0::RemoveIngredient(n) =>
+                        GrimoireUpdateCommand::RemoveIngredient(n),
+                }               
+            }
+        }
     }
 }
