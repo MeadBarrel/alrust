@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::io::stdout;
 use evalexpr::*;
 use grimoire2::effect::Effect;
@@ -7,7 +6,6 @@ use grimoire_serde::grimoire::ingredient::IngredientHumanReadable;
 use indexmap::IndexMap;
 use serde_yaml::to_writer;
 use clap::*;
-use serde::Serialize;
 
 pub fn command() -> Command {
     Command::new("ingredients")
