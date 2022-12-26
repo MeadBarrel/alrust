@@ -6,6 +6,7 @@ use grimoire2::modify::character::CharacterUpdate;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
+#[serde(deny_unknown_fields)]
 pub struct CharacterUpdateSerializable {
     remove_clades: Vec<String>,
     add_clades: Vec<String>,

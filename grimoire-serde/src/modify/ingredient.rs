@@ -8,6 +8,7 @@ use crate::theoretical::TheoreticalWrapper;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
+#[serde(deny_unknown_fields)]
 pub struct IngredientUpdateSerializable {
     skill: Option<String>,
     remove_skill: bool,

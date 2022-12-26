@@ -6,25 +6,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-egui = "0.20.1"
-eframe = "0.20.1"
-egui_extras = "0.20.0"
 serde_json = "1.0.91"
-rfd = "0.10.0"
 thiserror = "1.0.38"
 error-stack = "0.2.4"
 tracing = { version="0.1.37", features=["log", "log-always"]}
 tracing-subscriber = {version = "0.3.16", features=["tracing-log", "env-filter"]}
 indexmap = { version = "1.9.2", features=["serde-1"] }
-#log = "0.4.17"
-#simple_logger = "4.0.0"
 
 genetic = { path="genetic" }
 geneticalchemy = { path="geneticalchemy" }
 grimoire2 = { path="grimoire2" }
 grimoire-sqlite = { path="grimoire-sqlite" }
 grimoire-index = { version = "0.1.0", path = "grimoire-index" }
-grimoire-cli = { version = "0.1.0", path = "grimoire-cli" }
 grimoire-serde = { version = "0.1.0", path = "grimoire-serde" }
 
 
@@ -34,7 +27,6 @@ members = [
     'geneticalchemy',
     'grimoire-sqlite',
     'grimoire-index',
-    'grimoire-cli',
     'grimoire-serde',
 ]
 

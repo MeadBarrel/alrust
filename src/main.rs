@@ -1,11 +1,3 @@
-mod app;
-mod error;
-mod toppanel;
-mod editors;
-mod id;
-mod widgets;
-mod global;
-
 use tracing_subscriber::*;
 
 pub fn main() {
@@ -14,5 +6,5 @@ pub fn main() {
         .finish();
     tracing::subscriber::set_global_default(subs).unwrap();
 
-    app::main()
+    
 }

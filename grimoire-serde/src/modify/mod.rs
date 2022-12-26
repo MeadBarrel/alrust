@@ -16,6 +16,7 @@ use grimoire2::modify::GrimoireUpdate;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
+#[serde(deny_unknown_fields)]
 pub struct GrimoireUpdateSerializable {
     remove_characters: Vec<String>,
     remove_skills: Vec<String>,

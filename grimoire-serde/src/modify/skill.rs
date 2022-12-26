@@ -7,6 +7,7 @@ use crate::theoretical::TheoreticalWrapper;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
+#[serde(deny_unknown_fields)]
 pub struct SkillUpdateSerializable {
     effectiveness: Option<TheoreticalWrapper>,
     parent: Option<String>,
