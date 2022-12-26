@@ -1,6 +1,7 @@
 mod fs;
 mod update;
 mod explore;
+mod mix;
 
 use std::path::Path;
 use tracing_subscriber::*;
@@ -40,6 +41,7 @@ pub fn main() {
         .subcommand(update_subcommand)
         .subcommand(explore::list::command())
         .subcommand(explore::view::command())
+        .subcommand(mix::command())
         .subcommand_required(true)
         .arg_required_else_help(true);
 
@@ -62,6 +64,9 @@ pub fn main() {
         },
         Some(("view", args)) => {
             explore::view::matched_command(grimoire, args)
+        },
+        Some(("mix", args)) => {
+            mix::matched_command(grimoire, args)
         }
         None | Some(_) => {}
     }
