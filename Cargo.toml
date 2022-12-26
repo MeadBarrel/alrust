@@ -25,6 +25,7 @@ grimoire2 = { path="grimoire2" }
 grimoire-sqlite = { path="grimoire-sqlite" }
 grimoire-index = { version = "0.1.0", path = "grimoire-index" }
 grimoire-cli = { version = "0.1.0", path = "grimoire-cli" }
+grimoire-serde = { version = "0.1.0", path = "grimoire-serde" }
 
 
 [workspace]
@@ -34,6 +35,7 @@ members = [
     'grimoire-sqlite',
     'grimoire-index',
     'grimoire-cli',
+    'grimoire-serde',
 ]
 
 

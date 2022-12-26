@@ -1,0 +1,15 @@
+[package]
+name = "grimoire-serde"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = { version = "0.4.23", features = ["serde"] }
+grimoire2 = { version = "0.1.0", path = "../grimoire2" }
+serde = { version = "1.0.151", features = ["derive"] }
+
+[dev-dependencies]
+serde_yaml = "0.9.14"
+rstest = "0.16.0"
