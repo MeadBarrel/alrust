@@ -19,6 +19,10 @@ grimoire2 = { path="grimoire2" }
 grimoire-sqlite = { path="grimoire-sqlite" }
 grimoire-index = { version = "0.1.0", path = "grimoire-index" }
 grimoire-serde = { version = "0.1.0", path = "grimoire-serde" }
+clap = "4.0.32"
+serde_yaml = "0.9.16"
+serde = { version = "1.0.151", features = ["derive"] }
+evalexpr = { version = "8.1.0", features = ["serde_support"] }
 
 
 [workspace]

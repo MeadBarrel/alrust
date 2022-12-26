@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use crate::theoretical::Theoretical;
 
+use super::Grimoire;
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Skill {
     pub effectiveness: Theoretical<f64>,
@@ -19,6 +21,32 @@ impl Skill {
             parent,
             parent_2,
         }
+    }
+
+    pub fn is_child(&self, grimoire: &Grimoire, skill: &str) -> bool {
+        let is_child_from_parent = match &self.parent {
+            Some(x) if x == skill => { true },
+            Some(x) => { 
+                match grimoire.skills.get(x) {
+                    Some(x) => { x.is_child(grimoire, skill) }
+                    None => false
+                }
+            },
+            None => false,
+        };
+
+        let is_child_from_parent2 = match &self.parent_2 {
+            Some(x) if x == skill => { true },
+            Some(x) => { 
+                match grimoire.skills.get(x) {
+                    Some(x) => { x.is_child(grimoire, skill) }
+                    None => false
+                }
+            },
+            None => false,
+        };
+
+        is_child_from_parent || is_child_from_parent2
     }
 }
 

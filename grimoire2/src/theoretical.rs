@@ -55,6 +55,22 @@ where
         }
     }
 
+    pub fn is_theory(&self) -> bool {
+        match self {
+            Self::Known(_) => false,
+            Self::Theory(_) => true,
+            Self::Unknown => false
+        }
+    }
+
+    pub fn is_unknown(&self) -> bool {
+        match self {
+            Self::Known(_) => false,
+            Self::Theory(_) => false,
+            Self::Unknown => true
+        }
+    }
+
     pub fn known_or(&self, or_: impl Fn(T) -> T) -> T 
         where T: Default
     {
