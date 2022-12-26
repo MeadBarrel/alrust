@@ -4,7 +4,7 @@ use grimoire2::prelude::Character;
 use crate::id::PrefixedId;
 
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CharacterClade {
     id: PrefixedId
 }
