@@ -32,10 +32,12 @@ pub enum MixError {
 
 pub fn command() -> Command {
     Command::new("mix")
+        .before_help("Calculate a potion")
         .arg(
             Arg::new("mixfile")
                 .index(1)
                 .help("Mix configuration file")
+                .env("ALRUST_MIX")
                 .required(true)
                 .long_help(
                     "Path to mix configuration file\n\

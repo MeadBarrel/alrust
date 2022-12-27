@@ -17,12 +17,13 @@ genetic = { path="genetic" }
 geneticalchemy = { path="geneticalchemy" }
 grimoire2 = { path="grimoire2" }
 grimoire-serde = { version = "0.1.0", path = "grimoire-serde" }
-clap = "4.0.32"
+clap = { version = "4.0.32", features = ["env"] }
 serde_yaml = "0.9.16"
 serde = { version = "1.0.151", features = ["derive"] }
 evalexpr = { version = "8.1.0", features = ["serde_support"] }
 chrono = "0.4.23"
 rand = "0.8.5"
+dotenv = "0.15.0"
 
 
 [workspace]

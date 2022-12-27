@@ -12,6 +12,8 @@ use grimoire2::grimoire::Grimoire;
 
 
 pub fn main() {
+    dotenv::dotenv().ok();
+
     let subs = fmt()
         .with_env_filter(EnvFilter::new("alrust=debug"))
         .finish();
@@ -21,9 +23,10 @@ pub fn main() {
         .arg(
             Arg::new("from")
                 .index(1)
+                .env("ALRUST_FROM")
                 .value_name("from")
-                .required(true)
-                .help("Grimoire update file")
+                .required(true)                
+                .help("Grimoire update file")                
                 .long_help(
                     "Grimoire update file\n\
                      ====================\n\
@@ -61,6 +64,7 @@ pub fn main() {
         )
         .arg(
             Arg::new("to")
+                .env("ALRUST_TO")
                 .index(2)
                 .value_name("to")
                 .required(true)
@@ -69,6 +73,7 @@ pub fn main() {
 
     let grimoire_arg = Arg::new("grimoire")
         .index(1)
+        .env("ALRUST_GRIMOIRE")
         .value_name("grimoire")
         .required(true);
 
