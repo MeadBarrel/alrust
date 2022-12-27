@@ -41,6 +41,7 @@ num_children: int  # Number of children
 
 pub fn command_run() -> Command {
     Command::new("optimize")
+        .before_help("Run genetic optimization algorithm to find best potions")
         .arg(
             Arg::new("config")
                 .index(1)
@@ -74,13 +75,14 @@ pub fn matched_command_run(grimoire: Grimoire, args: &ArgMatches) {
 
     repl::run_repl(populations);
 
-    sender.send(message::Message::Stop);
+    sender.send(message::Message::Stop).unwrap();
 
     handle.join().unwrap();
 }
 
 pub fn command_explore() -> Command {
     Command::new("explore")
+        .before_help("Explore the previously saved results of a genetic algorithm optimization")
         .arg(
             Arg::new("filename")
                 .index(1)
