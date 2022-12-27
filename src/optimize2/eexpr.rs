@@ -71,10 +71,8 @@ impl EvalExpressionFitnessElement {
             _ => Err(UnknownIdentifierError::new(identifier)),
         }
     }
-}
 
-impl AlchemyFitnessElement for EvalExpressionFitnessElement {
-    fn fitness(&self, mix: &Mix) -> f64 {
+    fn context(&self, mix: &Mix) -> HashMapContext {
         let mut context = HashMapContext::new();
         for identifier in self.expression.iter_identifiers() {
             context
@@ -83,8 +81,14 @@ impl AlchemyFitnessElement for EvalExpressionFitnessElement {
                     Value::Float(self.get_identifier_value(identifier, mix).unwrap()),
                 )
                 .unwrap();
-        }
+        };
+        context        
+    }
+}
 
+impl AlchemyFitnessElement for EvalExpressionFitnessElement {
+    fn fitness(&self, mix: &Mix) -> f64 {
+        let context = self.context(mix);
         self.expression.eval_float_with_context(&context).unwrap()
     }
 }
