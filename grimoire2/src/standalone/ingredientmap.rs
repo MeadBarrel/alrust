@@ -2,8 +2,9 @@ use std::{ops::Index, collections::HashMap};
 
 use super::StandaloneIngredient;
 use crate::error::{Result, Error};
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IngredientMap {
     ingredients: Vec<StandaloneIngredient>,
     names: Vec<String>,

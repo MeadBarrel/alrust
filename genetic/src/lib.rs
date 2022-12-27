@@ -13,6 +13,8 @@ pub mod printer;
 pub mod moga;
 pub mod operators;
 
+pub use ordered_float::NotNan;
+
 pub mod prelude {
     pub use super::{
         algorithm::*, error::*, genetic::*, individual::*, operators::*, population::*, printer::*,

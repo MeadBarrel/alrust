@@ -3,6 +3,7 @@ mod update;
 mod explore;
 mod mix;
 mod optimize;
+mod optimize2;
 
 use std::path::Path;
 use tracing_subscriber::*;
@@ -83,7 +84,7 @@ pub fn main() {
         .subcommand(explore::list::command())
         .subcommand(explore::view::command())
         .subcommand(mix::command())
-        .subcommand(optimize::command())
+        .subcommand(optimize2::command())
         .subcommand_required(true)
         .arg_required_else_help(true);
 
@@ -111,7 +112,7 @@ pub fn main() {
             mix::matched_command(grimoire, args)
         },
         Some(("optimize", args)) => {
-            optimize::matched_command(grimoire, args)
+            optimize2::matched_command(grimoire, args)
         }
         None | Some(_) => {}
     }

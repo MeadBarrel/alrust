@@ -5,10 +5,11 @@ pub mod mix;
 pub use ingredient::*;
 pub use ingredientmap::*;
 pub use mix::*;
+use serde::{Serialize, Deserialize};
 
 use crate::grimoire::{Character, Grimoire};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OptimizedGrimoire {
     pub alvarin_clade: bool,
     pub advanced_potion_making_mod: f64,

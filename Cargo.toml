@@ -24,6 +24,8 @@ evalexpr = { version = "8.1.0", features = ["serde_support"] }
 chrono = "0.4.23"
 rand = "0.8.5"
 dotenv = "0.15.0"
+ctrlc = "3.2.4"
+crossterm = "0.25.0"
 
 
 [workspace]

@@ -1,6 +1,7 @@
 use crate::{modifiermap::ModifierMap, theoretical::Theoretical};
+use serde::{Serialize, Deserialize};
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct StandaloneIngredient {
     pub weight: u8,
     pub lore_multiplier: Theoretical<f64>,
