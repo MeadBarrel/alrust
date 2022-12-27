@@ -87,7 +87,8 @@ pub fn main() {
         .subcommand(explore::list::command())
         .subcommand(explore::view::command())
         .subcommand(mix::command())
-        .subcommand(optimize2::command())
+        .subcommand(optimize2::command_run())
+        .subcommand(optimize2::command_explore())
         .subcommand_required(true)
         .arg_required_else_help(true);
 
@@ -115,7 +116,10 @@ pub fn main() {
             mix::matched_command(grimoire, args)
         },
         Some(("optimize", args)) => {
-            optimize2::matched_command(grimoire, args)
+            optimize2::matched_command_run(grimoire, args)
+        },
+        Some(("explore", args)) => {
+            optimize2::matched_command_explore(args)
         }
         None | Some(_) => {}
     }

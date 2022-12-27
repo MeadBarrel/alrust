@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use serde::Deserialize;
 use grimoire_serde::modify::GrimoireUpdateSerializable;
 use genetic::operators::TournamentSelector;
@@ -24,6 +26,7 @@ pub struct OptimizatorConfig {
     pub volume: f64,
     pub effects: Vec<Node>,
     pub include_ingredients: Option<Node>,
+    pub exclude_ingredients: Vec<String>,
     pub unknown_multiplier: f64,
 }
 
@@ -49,6 +52,7 @@ impl Default for OptimizatorConfig {
             include_ingredients: None,
             unknown_multiplier: 1.,
             num_children: 2,
+            exclude_ingredients: Vec::default(),
         }
     }    
 }

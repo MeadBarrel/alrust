@@ -28,13 +28,18 @@ effects:  # what will the algorithm optimize for
 
 include_ingredients: expression  # Not required, expression that returns bool to determine whether ingredient will be included
 
+exclude_ingredients:
+
+    - <ingredient name>
+    - <ingredient name>
+
 unknown_multiplier: float  # Theoretical values will be multiplied by this factor during evaluation
 
 num_children: int  # Number of children
 
 ";
 
-pub fn command() -> Command {
+pub fn command_run() -> Command {
     Command::new("optimize")
         .arg(
             Arg::new("config")
@@ -52,7 +57,7 @@ pub fn command() -> Command {
         )
 }
 
-pub fn matched_command(grimoire: Grimoire, args: &ArgMatches) {
+pub fn matched_command_run(grimoire: Grimoire, args: &ArgMatches) {
     let config_filename = std::path::Path::new(args.get_one::<String>("config").unwrap());
     let config: config::OptimizatorConfig = crate::fs::load(config_filename).unwrap();
 
@@ -72,4 +77,26 @@ pub fn matched_command(grimoire: Grimoire, args: &ArgMatches) {
     sender.send(message::Message::Stop);
 
     handle.join().unwrap();
+}
+
+pub fn command_explore() -> Command {
+    Command::new("explore")
+        .arg(
+            Arg::new("filename")
+                .index(1)
+                .required(true)
+        )
+}
+
+
+pub fn matched_command_explore(args: &ArgMatches) {
+    use std::path::Path;
+    use crate::fs::load;
+    use printer::PopulationsSerializable;
+    use std::sync::{Arc, Mutex};
+
+    let filename = args.get_one::<String>("filename").unwrap();
+    let populations: PopulationsSerializable = load(Path::new(filename)).unwrap();
+    let arched_populations = Arc::new(Mutex::new(populations));
+    repl::run_repl(arched_populations);
 }

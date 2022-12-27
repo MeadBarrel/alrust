@@ -171,6 +171,8 @@ impl Optimizator {
                 .retain(|_, ingredient| Self::should_include_ingredient(node, ingredient).unwrap())
         }
 
+        grimoire.ingredients.retain(|name, _| !config.exclude_ingredients.contains(name));
+
         let optimized_grimoire: OptimizedGrimoire = (&character, &grimoire).into();
 
         let populations = Arc::new(

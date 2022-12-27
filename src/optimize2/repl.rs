@@ -78,7 +78,7 @@ pub fn run_repl(populations: Arc<Mutex<PopulationsSerializable>>) {
         .with_command(Command::new("table"), table)
         .with_command(Command::new("sort").arg(Arg::new("value").index(1)), set_sort)
         .with_command(Command::new("truncate").arg(Arg::new("value").index(1)), truncate)
-        .with_command(Command::new("show").arg(Arg::new("index").index(1)), show)
+        .with_command(Command::new("show").arg(Arg::new("index").index(1).required(true)), show)
         .run().unwrap();
 }
 
