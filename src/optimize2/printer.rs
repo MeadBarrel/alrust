@@ -3,22 +3,22 @@ use serde::{Serialize, Deserialize};
 use grimoire2::standalone::OptimizedGrimoire;
 use genetic::prelude::ParettoPopulation;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct IndividualSerializable {
-    fitness: Vec<f64>,
-    genome: Vec<(usize, u64)>
+    pub fitness: Vec<f64>,
+    pub genome: Vec<(usize, u64)>
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct PopulationSerializable {
-    generation: usize,
-    individuals: Vec<IndividualSerializable>
+    pub generation: usize,
+    pub individuals: Vec<IndividualSerializable>
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct PopulationsSerializable {
-    grimoire: OptimizedGrimoire,
-    populations: Vec<PopulationSerializable>,
+    pub grimoire: OptimizedGrimoire,
+    pub populations: Vec<PopulationSerializable>,
 }
 
 impl PopulationsSerializable {

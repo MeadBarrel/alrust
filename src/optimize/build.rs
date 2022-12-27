@@ -1,4 +1,3 @@
-use error_stack::*;
 use evalexpr::{context_map, Node};
 
 use rand::{rngs::ThreadRng, thread_rng};
@@ -43,9 +42,7 @@ impl Optimizator {
         loop {
             generation += 1;
 
-            self.ga
-                .advance_evolution()
-                .change_context(OptimizationError::OptimizationError)?;
+            self.ga.advance_evolution()?;
 
             if generation % self.output_every != 0 {
                 continue;
@@ -69,10 +66,7 @@ impl Optimizator {
                 .retain(|_, ingredient| Self::should_include_ingredient(&node, ingredient).unwrap())
         }
 
-        let character = grimoire.characters.get(&config.character).ok_or_else(|| {
-            Report::new(OptimizationError::LoadError)
-                .attach_printable(format!("Character not found: {}", config.character))
-        })?;
+        let character = grimoire.characters.get(&config.character).ok_or_else(|| {OptimizationError::LoadError})?;
         let optimized_grimoire: OptimizedGrimoire = (character, &grimoire).into();
 
         let mutate = AlchemyMutator::new(
@@ -151,14 +145,8 @@ impl Optimizator {
             "ma" => ingredient.modifiers[Effect::Alcohol].multiplier.inner(),
 
             "w" => ingredient.weight as i64,
-        }
-        .into_report()
-        .change_context(OptimizationError::LoadError)
-        .attach_printable("Failed to determine wether to include an ingredient")?;
+        }?;
 
-        node.eval_boolean_with_context(&context)
-            .into_report()
-            .change_context(OptimizationError::LoadError)
-            .attach_printable("Failed to determine wether to include an ingredient")
+        Ok(node.eval_boolean_with_context(&context)?)
     }
 }

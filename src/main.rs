@@ -2,8 +2,9 @@ mod fs;
 mod update;
 mod explore;
 mod mix;
-mod optimize;
+//mod optimize;
 mod optimize2;
+mod repl;
 
 use std::path::Path;
 use tracing_subscriber::*;
@@ -14,6 +15,8 @@ use grimoire2::grimoire::Grimoire;
 
 pub fn main() {
     dotenv::dotenv().ok();
+
+    //repl::main();
 
     let subs = fmt()
         .with_env_filter(EnvFilter::new("alrust=debug"))

@@ -26,6 +26,7 @@ rand = "0.8.5"
 dotenv = "0.15.0"
 ctrlc = "3.2.4"
 crossterm = "0.25.0"
+reedline-repl-rs = "1.0.2"
 
 
 [workspace]

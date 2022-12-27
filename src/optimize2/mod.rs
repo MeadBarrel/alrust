@@ -3,7 +3,10 @@ mod printer;
 mod build;
 mod error;
 mod eexpr;
-mod explore;
+mod repl;
+mod message;
+
+use std::{sync::mpsc, thread};
 
 use grimoire2::grimoire::Grimoire;
 use clap::*;
@@ -47,13 +50,13 @@ pub fn command() -> Command {
                 .env("ALRUST_CHARACTER")
                 .required(true)
         )
-        .arg(
-            Arg::new("output")
-                .short('o')
-                .long("output")
-                .env("ALRUST_OPTIMIZE_OUTPUT")
-                .required(true)
-        )
+        // .arg(
+        //     Arg::new("output")
+        //         .short('o')
+        //         .long("output")
+        //         .env("ALRUST_OPTIMIZE_OUTPUT")
+        //         .required(true)
+        // )
 }
 
 pub fn matched_command(grimoire: Grimoire, args: &ArgMatches) {
@@ -63,9 +66,14 @@ pub fn matched_command(grimoire: Grimoire, args: &ArgMatches) {
     let character_name = args.get_one::<String>("character").unwrap();
     let character = grimoire.characters.get(character_name.as_str()).expect("Character not found").clone();
 
-    let mut optimizator = build::Optimizator::new(grimoire, character, config);
+    let optimizator = build::Optimizator::new(grimoire, character, config);
+    // let populations = optimizator.populations.clone();
 
-    let output_filename = args.get_one::<String>("output").unwrap();
+    // //let output_filename = args.get_one::<String>("output").unwrap();
+    // let (sender, receiver) = mpsc::channel();
 
-    optimizator.run(output_filename.clone()).unwrap();
+    // thread::spawn(move || optimizator.run(receiver).unwrap());
+
+    repl::run_repl(optimizator);
+    
 }

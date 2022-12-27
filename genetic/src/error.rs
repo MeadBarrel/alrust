@@ -1,4 +1,3 @@
-use error_stack;
 use thiserror;
 
 #[derive(thiserror::Error, Debug)]
@@ -11,4 +10,4 @@ pub enum Error {
     GenericError(String),
 }
 
-pub type Result<T> = error_stack::Result<T, Error>;
+pub type Result<T> = std::result::Result<T, Error>;

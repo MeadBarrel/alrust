@@ -26,7 +26,6 @@
 
 use std::cell::*;
 
-use error_stack::*;
 use rand::Rng;
 
 use crate::{
@@ -144,10 +143,11 @@ impl PrecedencePreservativeCrossover {
             let gene = match maybe_gene {
                 Some(x) => x,
                 None => {
-                    return Err(Report::new(Error::GeneticError)).attach_printable_lazy(|| {
-                        "PrecedencePreservativeCrossover received \
-                        a parent that had non-unique genes"
-                    })
+                    return Err(
+                        Error::GenericError(
+                            "PrecedencePreservativeCrossover received a parent \
+                            that had non-unique genes".to_string())
+                    )
                 }
             };
 

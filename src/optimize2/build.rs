@@ -1,12 +1,12 @@
 use std::{sync::{Arc, Mutex}, time::Duration};
 
-use error_stack::*;
 use evalexpr::{context_map, Node};
 use rand::{rngs::ThreadRng, thread_rng};
 use geneticalchemy::{prelude::*};
 use grimoire2::prelude::*;
 use tracing::info;
 use crate::fs::save;
+use std::sync::mpsc::Receiver;
 use crossterm::event::{poll, read, Event, KeyEvent, KeyCode, KeyModifiers, KeyEventKind, KeyEventState};
 
 use genetic::{
@@ -21,72 +21,85 @@ use super::{
     config::OptimizatorConfig,
     eexpr::EvalExpressionFitnessElement,
     error::{OptimizationError, Result},
-    printer::PopulationsSerializable,
+    printer::PopulationsSerializable, message::Message,
 };
 
 pub struct Optimizator {
     grimoire: Grimoire,
     optimized_grimoire: OptimizedGrimoire,
     config: OptimizatorConfig,
+    pub populations: Arc<Mutex<PopulationsSerializable>>,
 }
 
 impl Optimizator {
-    pub fn run(&mut self, output_filename: String) -> Result<()> {
+    pub fn run(&mut self, receiver: Receiver<Message>) -> Result<()> {
         let mut ga = self.algorithm();
-        let mut printer =  PopulationsSerializable::new(self.optimized_grimoire.clone());
+        //let mut printer =  PopulationsSerializable::new(self.optimized_grimoire.clone());
         let mut generation = 0;
 
         loop {
             generation += 1;
 
-            ga.advance_evolution().change_context(OptimizationError::OptimizationError)?;
+            ga.advance_evolution()?;
 
-            let poll_result = poll(Duration::ZERO)
-                .into_report()
-                .change_context(OptimizationError::OutputError)
-                .attach_printable("Error while reading terminal event")?;
-
-            if poll_result {                
-
-                let read_result = read()
-                .into_report()
-                .change_context(OptimizationError::OutputError)
-                .attach_printable("Error while reading terminal event")?;
-
-                if let Event::Key(
-                    KeyEvent {
-                        code: KeyCode::Esc,
-                        modifiers: KeyModifiers::NONE,
-                        kind: KeyEventKind::Press,
-                        state: KeyEventState::NONE,
-                    }
-                ) = read_result {
-                    info!("ESC pressed, stopping");
-                    return Ok(())
-                }
-
+            if let Ok(Message::Stop) = receiver.try_recv() {
+                return Ok(())
             }
+
+            // match receiver.try_recv() {
+            //     Ok(value) => match value {
+            //         Message::Stop => return Ok(()),
+            //         _ => {},
+            //     }
+            //     Err(_) => {}
+            // };
+
+            // let poll_result = poll(Duration::ZERO)
+            //     .into_report()
+            //     .change_context(OptimizationError::OutputError)
+            //     .attach_printable("Error while reading terminal event")?;
+
+            // if poll_result {                
+
+            //     let read_result = read()
+            //     .into_report()
+            //     .change_context(OptimizationError::OutputError)
+            //     .attach_printable("Error while reading terminal event")?;
+
+            //     if let Event::Key(
+            //         KeyEvent {
+            //             code: KeyCode::Esc,
+            //             modifiers: KeyModifiers::NONE,
+            //             kind: KeyEventKind::Press,
+            //             state: KeyEventState::NONE,
+            //         }
+            //     ) = read_result {
+            //         info!("ESC pressed, stopping");
+            //         return Ok(())
+            //     }
+
+            // }
 
             if generation % self.config.output_every != 0 {
                 continue;
             }
 
-            let fitnesses: Vec<ParettoFitness> = ga.last_population().clone().into_iter().map(|x| x.fitness).collect();
-            let best = fitnesses
-                .into_iter()
-                .map(|x| x.into_iter().sum::<genetic::NotNan<f64>>())
-                .max();
+            // let fitnesses: Vec<ParettoFitness> = ga.last_population().clone().into_iter().map(|x| x.fitness).collect();
+            // let best = fitnesses
+            //     .into_iter()
+            //     .map(|x| x.into_iter().sum::<genetic::NotNan<f64>>())
+            //     .max();
 
-            best.into_iter().for_each(|x| {
-                println!("Generation: {generation}; Best: {x}")
-            });
+            // best.into_iter().for_each(|x| {
+            //     println!("Generation: {generation}; Best: {x}")
+            // });
 
             let population = ga.last_population();
 
-            printer.add_population(population.clone(), generation);
+            self.populations.lock().unwrap().add_population(population.clone(), generation);
 
-            save(std::path::Path::new(&output_filename), &printer)
-                .change_context(OptimizationError::OutputError)?;
+            // save(std::path::Path::new(&output_filename), &printer)
+            //     .change_context(OptimizationError::OutputError)?;
         }
     }
 
@@ -160,10 +173,17 @@ impl Optimizator {
 
         let optimized_grimoire: OptimizedGrimoire = (&character, &grimoire).into();
 
+        let populations = Arc::new(
+            Mutex::new(
+                PopulationsSerializable::new(optimized_grimoire.clone())
+            )
+        );
+
         Self {
             grimoire,
             optimized_grimoire,
             config,
+            populations,
         }
     }
 
@@ -191,14 +211,8 @@ impl Optimizator {
             "ma" => ingredient.modifiers[Effect::Alcohol].multiplier.inner(),
 
             "w" => ingredient.weight as i64,
-        }
-        .into_report()
-        .change_context(OptimizationError::LoadError)
-        .attach_printable("Failed to determine wether to include an ingredient")?;
+        }?;
 
-        node.eval_boolean_with_context(&context)
-            .into_report()
-            .change_context(OptimizationError::LoadError)
-            .attach_printable("Failed to determine wether to include an ingredient")
+        Ok(node.eval_boolean_with_context(&context)?)
     }
 }
