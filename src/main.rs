@@ -4,7 +4,6 @@ mod explore;
 mod mix;
 //mod optimize;
 mod optimize2;
-mod repl;
 
 use std::path::Path;
 use tracing_subscriber::*;

@@ -1,7 +1,7 @@
 use std::path::Path;
 use error_stack::{Report, Result, IntoReport, ResultExt};
 use grimoire2::modify::command::Commands;
-use grimoire2::prelude::Grimoire;
+use grimoire2::prelude::{Grimoire, Character};
 use grimoire2::standalone::OptimizedGrimoire;
 use grimoire2::standalone::Mix;
 use serde::Deserialize;
@@ -16,7 +16,6 @@ use thiserror::Error;
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct MixConfig {
-    character: String,
     potion: PotionSerializableConfig,
     grimoire: GrimoireUpdateSerializable,
     mix: MixIngredients
@@ -34,8 +33,16 @@ pub fn command() -> Command {
     Command::new("mix")
         .before_help("Calculate a potion")
         .arg(
+            Arg::new("character")
+                .short('c')
+                .long("character")
+                .required(true)
+                .help("Character name")
+                .env("ALRUST_CHARACTER")            
+        )
+        .arg(
             Arg::new("mixfile")
-                .index(1)
+                .index(2)
                 .help("Mix configuration file")
                 .env("ALRUST_MIX")
                 .required(true)
@@ -63,20 +70,22 @@ pub fn command() -> Command {
 }
 
 pub fn matched_command(grimoire: Grimoire, args: &ArgMatches) {
+    let character_name = args.get_one::<String>("character").unwrap();
     let config: MixConfig = load(Path::new(args.get_one::<String>("mixfile").unwrap())).unwrap();
-    let potion = config.run(grimoire).unwrap();
+
+    let character = grimoire.characters.get(character_name.as_str()).ok_or(
+        Report::new(MixError::CharacterNotFound(character_name.clone()))
+    ).unwrap().clone();
+
+    let potion = config.run(grimoire, character).unwrap();
     serde_yaml::to_writer(std::io::stdout(), &potion).unwrap();
 }
 
 impl MixConfig {
-    pub fn run(&self, mut grimoire: Grimoire) -> Result<PotionSerializable, MixError> {
+    pub fn run(&self, mut grimoire: Grimoire, character: Character) -> Result<PotionSerializable, MixError> {
         self.grimoire.to_update().update(&mut grimoire);
-
-        let character = grimoire.characters.get(&self.character).ok_or(
-            Report::new(MixError::CharacterNotFound(self.character.clone()))
-        )?;
-        
-        let optimized = OptimizedGrimoire::from((character, &grimoire));
+      
+        let optimized = OptimizedGrimoire::from((&character, &grimoire));
 
         let mut ingredients: Vec<(usize, u64)> = Vec::default();
 
