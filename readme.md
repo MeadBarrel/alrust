@@ -112,6 +112,8 @@ ingredients:
 alrust2.exe grimoire.json update --from mygrimoire.yaml --to grimoire.json
 ```
 
+### Experimenting with potions
+
 Now our grimoire contains purified water, salvia oil, and sea dew leaves. 
 Enough for a potion! Let's create one! Create a file mix.yaml (or any name
 that you want):
@@ -204,3 +206,75 @@ ingredients:
 Now we see direct healing value as !Known. Other values are still theoretical - 
 ingredients in our database only have known values for direct healing and its
 multiplier.
+
+### Exploring your grimoire
+
+The grimoire file format is hardly human readable, so if you want to see what
+is stored in your grimoire, you need to use the cli tool
+
+Let's first check what characters we have:
+
+```powershell
+./alrust2.exe grimoire.json list characters
+Tashka
+```
+
+Ok we have the name, now let's see who Tashka is:
+
+```powershell
+./alrust2.exe grimoire.json view character Tashka
+skills:
+  Alchemy: 100
+  Botany: 100
+  Potion Making: 100
+  Herbology: 100
+  Iron-Based Alloys: 100
+  Advanced Potion Making: 100
+  Botanical Oils Lore: 100
+  Material Lore: 100
+  Steel Lore: 100
+  Metallurgy: 100
+clades:
+- Alchemist
+```
+
+Now let's see our ingredients:
+
+```powershell
+./alrust2.exe grimoire.json list ingredients
+Sea Dew Leaves
+Salvia Oil
+Purified Water
+```
+
+And view Salvia oil:
+
+```powershell
+./alrust2.exe grimoire.json view ingredient "Salvia Oil"
+weight: true
+skill: Botanical Oils Lore
+dh: 2.4
+```
+
+When you have lots and lots of ingredients, you might want to filter them out
+by certain values, for example, let's list only the ingredients that have
+direct healing base of at least 2.0:
+
+```powershell
+./alrust2.exe grimoire.json list ingredients "dh > 2"
+Salvia Oil
+```
+
+There is only one such ingredient in our grimoire, and that is Salvia Oil.
+
+The possible identifiers we can use when filtering are:
+
+<base> - base value of the ingredient - one of dh, dp, hot, pot, hl, pl, a
+<base>_known - true if the base value is known (i.e. not theoretical)
+<base>_theory - true if the base value is theoretical
+<base>_unknown - true if the base value is completely unknown, which defaults to 0
+m<base> - multiplier value
+m<base>_known
+m<base>_theory
+m<base>_unknown
+weight: true if the ingredient has alchemical weight, or false otherwise

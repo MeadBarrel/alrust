@@ -7,6 +7,8 @@ use indexmap::IndexMap;
 use serde_yaml::to_writer;
 use clap::*;
 
+use crate::explore::view::ingredient;
+
 pub fn command() -> Command {
     Command::new("ingredients")
         .arg(
@@ -54,111 +56,114 @@ pub fn list_ingredients(grimoire: Grimoire, filter: Option<String>, detailed: bo
     }
 }
 
-fn filter_ingredient(ingedient: &Ingredient, filter: &str) -> bool {
+fn filter_ingredient(ingredient: &Ingredient, filter: &str) -> bool {
     let mut context = HashMapContext::new();
+
+    context.set_value("weight".to_string(), ingredient.weight.into()).unwrap();
+
     {
         let effect = Effect::DirectHealing;
         let term = "dh";
 
-        context.set_value("dh".to_string(), ingedient.modifiers[effect].term.inner().into()).unwrap();
-        context.set_value(format!("{term}_known"), ingedient.modifiers[effect].term.is_known().into()).unwrap();
-        context.set_value(format!("{term}_theory"), ingedient.modifiers[effect].term.is_theory().into()).unwrap();
-        context.set_value(format!("{term}_unknown"), ingedient.modifiers[effect].term.is_unknown().into()).unwrap();
+        context.set_value("dh".to_string(), ingredient.modifiers[effect].term.inner().into()).unwrap();
+        context.set_value(format!("{term}_known"), ingredient.modifiers[effect].term.is_known().into()).unwrap();
+        context.set_value(format!("{term}_theory"), ingredient.modifiers[effect].term.is_theory().into()).unwrap();
+        context.set_value(format!("{term}_unknown"), ingredient.modifiers[effect].term.is_unknown().into()).unwrap();
 
-        context.set_value(format!("m{term}"), ingedient.modifiers[effect].multiplier.inner().into()).unwrap();
-        context.set_value(format!("m{term}_known"), ingedient.modifiers[effect].multiplier.is_known().into()).unwrap();
-        context.set_value(format!("m{term}_theory"), ingedient.modifiers[effect].multiplier.is_theory().into()).unwrap();
-        context.set_value(format!("m{term}_unknown"), ingedient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
+        context.set_value(format!("m{term}"), ingredient.modifiers[effect].multiplier.inner().into()).unwrap();
+        context.set_value(format!("m{term}_known"), ingredient.modifiers[effect].multiplier.is_known().into()).unwrap();
+        context.set_value(format!("m{term}_theory"), ingredient.modifiers[effect].multiplier.is_theory().into()).unwrap();
+        context.set_value(format!("m{term}_unknown"), ingredient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
     };
 
     {
         let effect = Effect::DirectPoison;
         let term = "dp";
 
-        context.set_value(term.to_string(), ingedient.modifiers[effect].term.inner().into()).unwrap();
-        context.set_value(format!("{term}_known"), ingedient.modifiers[effect].term.is_known().into()).unwrap();
-        context.set_value(format!("{term}_theory"), ingedient.modifiers[effect].term.is_theory().into()).unwrap();
-        context.set_value(format!("{term}_unknown"), ingedient.modifiers[effect].term.is_unknown().into()).unwrap();
+        context.set_value(term.to_string(), ingredient.modifiers[effect].term.inner().into()).unwrap();
+        context.set_value(format!("{term}_known"), ingredient.modifiers[effect].term.is_known().into()).unwrap();
+        context.set_value(format!("{term}_theory"), ingredient.modifiers[effect].term.is_theory().into()).unwrap();
+        context.set_value(format!("{term}_unknown"), ingredient.modifiers[effect].term.is_unknown().into()).unwrap();
 
-        context.set_value(format!("m{term}"), ingedient.modifiers[effect].multiplier.inner().into()).unwrap();
-        context.set_value(format!("m{term}_known"), ingedient.modifiers[effect].multiplier.is_known().into()).unwrap();
-        context.set_value(format!("m{term}_theory"), ingedient.modifiers[effect].multiplier.is_theory().into()).unwrap();
-        context.set_value(format!("m{term}_unknown"), ingedient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
+        context.set_value(format!("m{term}"), ingredient.modifiers[effect].multiplier.inner().into()).unwrap();
+        context.set_value(format!("m{term}_known"), ingredient.modifiers[effect].multiplier.is_known().into()).unwrap();
+        context.set_value(format!("m{term}_theory"), ingredient.modifiers[effect].multiplier.is_theory().into()).unwrap();
+        context.set_value(format!("m{term}_unknown"), ingredient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
     };    
 
     {
         let effect = Effect::HealingOverTime;
         let term = "hot";
 
-        context.set_value(term.to_string(), ingedient.modifiers[effect].term.inner().into()).unwrap();
-        context.set_value(format!("{term}_known"), ingedient.modifiers[effect].term.is_known().into()).unwrap();
-        context.set_value(format!("{term}_theory"), ingedient.modifiers[effect].term.is_theory().into()).unwrap();
-        context.set_value(format!("{term}_unknown"), ingedient.modifiers[effect].term.is_unknown().into()).unwrap();
+        context.set_value(term.to_string(), ingredient.modifiers[effect].term.inner().into()).unwrap();
+        context.set_value(format!("{term}_known"), ingredient.modifiers[effect].term.is_known().into()).unwrap();
+        context.set_value(format!("{term}_theory"), ingredient.modifiers[effect].term.is_theory().into()).unwrap();
+        context.set_value(format!("{term}_unknown"), ingredient.modifiers[effect].term.is_unknown().into()).unwrap();
 
-        context.set_value(format!("m{term}"), ingedient.modifiers[effect].multiplier.inner().into()).unwrap();
-        context.set_value(format!("m{term}_known"), ingedient.modifiers[effect].multiplier.is_known().into()).unwrap();
-        context.set_value(format!("m{term}_theory"), ingedient.modifiers[effect].multiplier.is_theory().into()).unwrap();
-        context.set_value(format!("m{term}_unknown"), ingedient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
+        context.set_value(format!("m{term}"), ingredient.modifiers[effect].multiplier.inner().into()).unwrap();
+        context.set_value(format!("m{term}_known"), ingredient.modifiers[effect].multiplier.is_known().into()).unwrap();
+        context.set_value(format!("m{term}_theory"), ingredient.modifiers[effect].multiplier.is_theory().into()).unwrap();
+        context.set_value(format!("m{term}_unknown"), ingredient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
     };    
 
     {
         let effect = Effect::PoisonOverTime;
         let term = "pot";
 
-        context.set_value(term.to_string(), ingedient.modifiers[effect].term.inner().into()).unwrap();
-        context.set_value(format!("{term}_known"), ingedient.modifiers[effect].term.is_known().into()).unwrap();
-        context.set_value(format!("{term}_theory"), ingedient.modifiers[effect].term.is_theory().into()).unwrap();
-        context.set_value(format!("{term}_unknown"), ingedient.modifiers[effect].term.is_unknown().into()).unwrap();
+        context.set_value(term.to_string(), ingredient.modifiers[effect].term.inner().into()).unwrap();
+        context.set_value(format!("{term}_known"), ingredient.modifiers[effect].term.is_known().into()).unwrap();
+        context.set_value(format!("{term}_theory"), ingredient.modifiers[effect].term.is_theory().into()).unwrap();
+        context.set_value(format!("{term}_unknown"), ingredient.modifiers[effect].term.is_unknown().into()).unwrap();
 
-        context.set_value(format!("m{term}"), ingedient.modifiers[effect].multiplier.inner().into()).unwrap();
-        context.set_value(format!("m{term}_known"), ingedient.modifiers[effect].multiplier.is_known().into()).unwrap();
-        context.set_value(format!("m{term}_theory"), ingedient.modifiers[effect].multiplier.is_theory().into()).unwrap();
-        context.set_value(format!("m{term}_unknown"), ingedient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
+        context.set_value(format!("m{term}"), ingredient.modifiers[effect].multiplier.inner().into()).unwrap();
+        context.set_value(format!("m{term}_known"), ingredient.modifiers[effect].multiplier.is_known().into()).unwrap();
+        context.set_value(format!("m{term}_theory"), ingredient.modifiers[effect].multiplier.is_theory().into()).unwrap();
+        context.set_value(format!("m{term}_unknown"), ingredient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
     };    
 
     {
         let effect = Effect::HealingLength;
         let term = "hl";
 
-        context.set_value(term.to_string(), ingedient.modifiers[effect].term.inner().into()).unwrap();
-        context.set_value(format!("{term}_known"), ingedient.modifiers[effect].term.is_known().into()).unwrap();
-        context.set_value(format!("{term}_theory"), ingedient.modifiers[effect].term.is_theory().into()).unwrap();
-        context.set_value(format!("{term}_unknown"), ingedient.modifiers[effect].term.is_unknown().into()).unwrap();
+        context.set_value(term.to_string(), ingredient.modifiers[effect].term.inner().into()).unwrap();
+        context.set_value(format!("{term}_known"), ingredient.modifiers[effect].term.is_known().into()).unwrap();
+        context.set_value(format!("{term}_theory"), ingredient.modifiers[effect].term.is_theory().into()).unwrap();
+        context.set_value(format!("{term}_unknown"), ingredient.modifiers[effect].term.is_unknown().into()).unwrap();
 
-        context.set_value(format!("m{term}"), ingedient.modifiers[effect].multiplier.inner().into()).unwrap();
-        context.set_value(format!("m{term}_known"), ingedient.modifiers[effect].multiplier.is_known().into()).unwrap();
-        context.set_value(format!("m{term}_theory"), ingedient.modifiers[effect].multiplier.is_theory().into()).unwrap();
-        context.set_value(format!("m{term}_unknown"), ingedient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
+        context.set_value(format!("m{term}"), ingredient.modifiers[effect].multiplier.inner().into()).unwrap();
+        context.set_value(format!("m{term}_known"), ingredient.modifiers[effect].multiplier.is_known().into()).unwrap();
+        context.set_value(format!("m{term}_theory"), ingredient.modifiers[effect].multiplier.is_theory().into()).unwrap();
+        context.set_value(format!("m{term}_unknown"), ingredient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
     };    
 
     {
         let effect = Effect::PoisonLength;
         let term = "pl";
 
-        context.set_value(term.to_string(), ingedient.modifiers[effect].term.inner().into()).unwrap();
-        context.set_value(format!("{term}_known"), ingedient.modifiers[effect].term.is_known().into()).unwrap();
-        context.set_value(format!("{term}_theory"), ingedient.modifiers[effect].term.is_theory().into()).unwrap();
-        context.set_value(format!("{term}_unknown"), ingedient.modifiers[effect].term.is_unknown().into()).unwrap();
+        context.set_value(term.to_string(), ingredient.modifiers[effect].term.inner().into()).unwrap();
+        context.set_value(format!("{term}_known"), ingredient.modifiers[effect].term.is_known().into()).unwrap();
+        context.set_value(format!("{term}_theory"), ingredient.modifiers[effect].term.is_theory().into()).unwrap();
+        context.set_value(format!("{term}_unknown"), ingredient.modifiers[effect].term.is_unknown().into()).unwrap();
 
-        context.set_value(format!("m{term}"), ingedient.modifiers[effect].multiplier.inner().into()).unwrap();
-        context.set_value(format!("m{term}_known"), ingedient.modifiers[effect].multiplier.is_known().into()).unwrap();
-        context.set_value(format!("m{term}_theory"), ingedient.modifiers[effect].multiplier.is_theory().into()).unwrap();
-        context.set_value(format!("m{term}_unknown"), ingedient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
+        context.set_value(format!("m{term}"), ingredient.modifiers[effect].multiplier.inner().into()).unwrap();
+        context.set_value(format!("m{term}_known"), ingredient.modifiers[effect].multiplier.is_known().into()).unwrap();
+        context.set_value(format!("m{term}_theory"), ingredient.modifiers[effect].multiplier.is_theory().into()).unwrap();
+        context.set_value(format!("m{term}_unknown"), ingredient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
     };    
 
     {
         let effect = Effect::Alcohol;
         let term = "a";
 
-        context.set_value(term.to_string(), ingedient.modifiers[effect].term.inner().into()).unwrap();
-        context.set_value(format!("{term}_known"), ingedient.modifiers[effect].term.is_known().into()).unwrap();
-        context.set_value(format!("{term}_theory"), ingedient.modifiers[effect].term.is_theory().into()).unwrap();
-        context.set_value(format!("{term}_unknown"), ingedient.modifiers[effect].term.is_unknown().into()).unwrap();
+        context.set_value(term.to_string(), ingredient.modifiers[effect].term.inner().into()).unwrap();
+        context.set_value(format!("{term}_known"), ingredient.modifiers[effect].term.is_known().into()).unwrap();
+        context.set_value(format!("{term}_theory"), ingredient.modifiers[effect].term.is_theory().into()).unwrap();
+        context.set_value(format!("{term}_unknown"), ingredient.modifiers[effect].term.is_unknown().into()).unwrap();
 
-        context.set_value(format!("m{term}"), ingedient.modifiers[effect].multiplier.inner().into()).unwrap();
-        context.set_value(format!("m{term}_known"), ingedient.modifiers[effect].multiplier.is_known().into()).unwrap();
-        context.set_value(format!("m{term}_theory"), ingedient.modifiers[effect].multiplier.is_theory().into()).unwrap();
-        context.set_value(format!("m{term}_unknown"), ingedient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
+        context.set_value(format!("m{term}"), ingredient.modifiers[effect].multiplier.inner().into()).unwrap();
+        context.set_value(format!("m{term}_known"), ingredient.modifiers[effect].multiplier.is_known().into()).unwrap();
+        context.set_value(format!("m{term}_theory"), ingredient.modifiers[effect].multiplier.is_theory().into()).unwrap();
+        context.set_value(format!("m{term}_unknown"), ingredient.modifiers[effect].multiplier.is_unknown().into()).unwrap();
     };    
 
     eval_boolean_with_context(filter, &context).unwrap()
