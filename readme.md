@@ -7,43 +7,37 @@ Alrust is a set of tools for an alchemist in Mortal Online 2.
 ### Creating your grimoire
 
 Grimoire is a collection of your knowledge about the alchemical-related knowlede
-in MO2, as well as your characters' skills. Alrust uses sqlite dabase files to
-store that knowledge. Let's first create your first empty grimoire
+in MO2, as well as your characters' skills. Alrust uses json files to
+store that knowledge. 
 
-```powershell
-alrust2.exe db --filename db.sqlite
-```
+The initial grimoire contains nothing except information about existing lore 
+skills in MO2, and even then, this information is not full (for example lore 
+"effectiveness" that is used to calculate a lore multiplier when creating a 
+potion, is not set - alrust will assume that it's 0.66666 which is true most of 
+the time).
 
-This creates a new grimoire database at db.sqlite. For now, it contains nothing
-except information about existing lore skills in MO2, and even then, this
-information is not full (for example lore "effectiveness" that is used to
-calculate a lore multiplier when creating a potion, is not set - alrust will
-assume that it's 0.66666 which is true most of the time).
-
-Now let's create our character. There are two ways to modify your grimoire - 
-you can use some 3rd party tools to modify your database (like 
-`DB Browser for SQLite`), or you can use alrust's `update` command. Let's try
-it.
+Now let's create our character. You can use alrust's `update` command to do 
+this. Let's try it.
 
 First, let's create a file called `mygrimoire.yaml`
 
 ```yaml
-db: db.sqlite
-
 characters:
 
   # A list of characters goes here
 
   Tashka:
-    advanced_potion_making: 100
-    alvarin_clade: true
-
-    # now let's define lores known to Tashka
-    lores:
+    skills:
+      Alchemy: 100
+      Potion Making: 100
+      Advanced Potion Making: 100
       Material Lore: 100
       Botany: 100
       Herbology: 100
       Steel Lore: 100
+
+    add_clades:
+      - Alchemist
 ```
 
 So, we want to create a character called Tashka with advanced potion making
@@ -55,51 +49,49 @@ since unset lores are assumed to be 0.
 Let's tell alrust to update our database:
 
 ```powershell
-alrust2.exe update --from mygrimoire.yaml --to db.sqlite
+alrust2.exe grimoire.json update --from mygrimoire.yaml --to grimoire.json
 ```
 
-There, you've added Tashka to the database. Now let's fix our mistake above and
+There, you've added Tashka to the grimoire. Now let's fix our mistake above and
 set values for Steel Lore parent skills:
 
 ```yaml
-db: db.sqlite
-
 characters:
 
   Tashka:
-    lores:
+    skills:
       Iron-Based Alloys: 100
       Metallurgy: 100
 ```
 
 ```powershell
-alrust2.exe update --from mygrimoire.yaml --to db.sqlite
+alrust2.exe grimoire.json update --from mygrimoire.yaml --to grimoire.json
 ```
 
-You don't need to keep the information that's already in the database in your
+You don't need to keep the information that's already in the grimoire in your
 config file. 
 
 Our database still lacks ingredients, so let's add some and also give Tashka
 a few more lores:
 
 ```yaml
-db: db.sqlite
-
-Tashka:
-  lores:
-    Botanical Oils Lore: 100
+characters:
+  Tashka:
+    skills:
+      Botanical Oils Lore: 100
 
 ingredients:
   Salvia Oil:
-    weight: 1 # Alchemical weight for salvia oil
-    lore: Botanical Oils Lore
+    weight: true # Alchemical weight for salvia oil
+    skill: Botanical Oils Lore
     dh: 2.4
   Sea Dew Leaves:
-    lore: Herbology
-    weight: 1
+    skill: Herbology
+    weight: true
     dh: 1.2
   Purified Water:
-    weight: 1
+    skill: 1
+    weight: true
     dh: 0    # Direct Healing
     dp: 0    # Direct Poison
     mdh: 0   # Direct Healing Multiplier
@@ -117,7 +109,7 @@ ingredients:
 ```
 
 ```powershell
-alrust2.exe update --from mygrimoire.yaml --to db.sqlite
+alrust2.exe grimoire.json update --from mygrimoire.yaml --to grimoire.json
 ```
 
 Now our grimoire contains purified water, salvia oil, and sea dew leaves. 
@@ -125,12 +117,6 @@ Enough for a potion! Let's create one! Create a file mix.yaml (or any name
 that you want):
 
 ```yaml
-grimoire:
-  db: db.sqlite
-
-character:
-  Tashka
-
 mix:
   Salvia Oil: 11
   Sea Dew Leaves: 11
@@ -139,41 +125,29 @@ mix:
 Now run
 
 ```powershell
-alrust2.exe experiment --config mix.yaml
+alrust2.exe grimoire.json mix --character Tashka mix.yaml
 ```
 
 We get this result:
 
 ```yaml
-volume: 2.1
+volume: 2.3100000000000005
 effects:
-  dh: !Unknown 2.6399952
-  dp: !Unknown 0.0
-  hot: !Unknown 0.0
-  hl: !Unknown 0.0
-  pot: !Unknown 0.0
-  pl: !Unknown 0.0
-  a: !Unknown 0.0
-healing:
-  direct: !Unknown 2.6399952
-  over_time: !Unknown 0.0
-  per_second: !Unknown 0.0
-  length: !Unknown 0.0
-poison:
-  direct: !Unknown 0.0
-  over_time: !Unknown 0.0
-  per_second: !Unknown 0.0
-  length: !Unknown 0.0
+  dh: !? 3.5999856
+  dp: !? 0.0
+  hot: !? 0.0
+  pot: !? 0.0
+  hl: !? 0.0
+  pl: !? 0.0
+  a: !? 0.0
 ingredients:
-- - Salvia Oil
-  - 11
-- - Sea Dew Leaves
-  - 11
+  Salvia Oil: 11
+  Sea Dew Leaves: 11
 ```
 
-What is this? Why it says !Unknown everywhere? This is because we did not
+What is this? Why it says !? everywhere? This is because we did not
 set direct healing multiplier values for Salvia Oil and Sea Dew Leaves. 
-!Unknown <value> warns you that this value may not be correct.
+!? <value> warns you that this value is only theoretical and may not be correct.
 
 Let's fix our mix.yaml and add some multiplier values
 
@@ -213,32 +187,20 @@ alrust2.exe experiment --config mix.yaml
 ```
 
 ```yaml
-volume: 2.1
+volume: 2.3100000000000005
 effects:
-  dh: !Known 2.6399952
-  dp: !Unknown 0.0
-  hot: !Unknown 0.0
-  hl: !Unknown 0.0
-  pot: !Unknown 0.0
-  pl: !Unknown 0.0
-  a: !Unknown 0.0
-healing:
-  direct: !Known 2.6399952
-  over_time: !Unknown 0.0
-  per_second: !Unknown 0.0
-  length: !Unknown 0.0
-poison:
-  direct: !Unknown 0.0
-  over_time: !Unknown 0.0
-  per_second: !Unknown 0.0
-  length: !Unknown 0.0
+  dh: 3.5999856
+  dp: !? 0.0
+  hot: !? 0.0
+  pot: !? 0.0
+  hl: !? 0.0
+  pl: !? 0.0
+  a: !? 0.0
 ingredients:
-- - Salvia Oil
-  - 11
-- - Sea Dew Leaves
-  - 11
+  Salvia Oil: 11
+  Sea Dew Leaves: 11
 ```
 
-Now we see direct healing value as !Known. Other values are still unknown - 
+Now we see direct healing value as !Known. Other values are still theoretical - 
 ingredients in our database only have known values for direct healing and its
 multiplier.

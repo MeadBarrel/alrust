@@ -35,8 +35,12 @@ pub struct IngredientUpdateSerializable {
 impl IngredientUpdateSerializable {
     pub fn to_update(&self) -> IngredientUpdate {
         let mut update = IngredientUpdate::default();
+        
+
         if let Some(x) = self.skill.clone() { update.set_skill(&x); }
         if self.remove_skill { update.remove_skill(); }
+
+        if let Some(x) = self.weight { update.set_weight(x); }
 
         if let Some(x) = self.dh { update.set_term(Effect::DirectHealing, x.into()); }
         if let Some(x) = self.mdh { update.set_multiplier(Effect::DirectHealing, x.into()); }

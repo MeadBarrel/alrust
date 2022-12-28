@@ -25,7 +25,8 @@ pub fn main() {
     let update_subcommand = Command::new("update")
         .arg(
             Arg::new("from")
-                .index(1)
+                .short('f')
+                .long("from")
                 .env("ALRUST_FROM")
                 .value_name("from")
                 .required(true)                
@@ -68,7 +69,8 @@ pub fn main() {
         .arg(
             Arg::new("to")
                 .env("ALRUST_TO")
-                .index(2)
+                .short('t')
+                .long("to")
                 .value_name("to")
                 .required(true)
         )

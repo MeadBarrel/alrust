@@ -42,7 +42,7 @@ pub fn command() -> Command {
         )
         .arg(
             Arg::new("mixfile")
-                .index(2)
+                .index(1)
                 .help("Mix configuration file")
                 .env("ALRUST_MIX")
                 .required(true)

@@ -33,12 +33,16 @@ impl<'a> Mix<'a> {
     }
 
     pub fn volume(&self) -> f64 {
-        let without_clade = (self
+        let total_weight: u64 = self
             .ingredients_iter()
             .map(|(i, a)| i.weight as u64 * a)
-            .sum::<u64>()
-            - 1) as f64
-            / 10.;
+            .sum();
+
+        if total_weight == 0 {
+            return 0.
+        }
+
+        let without_clade = (total_weight - 1) as f64 / 10.;
 
         if !self.grimoire.alvarin_clade {
             return without_clade;
@@ -179,4 +183,21 @@ mod tests {
             actual
         )
     }
+
+    #[test]
+    fn test_mix_volume_w_clade_zero() {
+        let expected = 0.;
+
+        let grimoire = create_grimoire(true, 1.0);
+        let mix = Mix::new(&grimoire, vec![(3, 11), (4, 11)]);
+
+        let actual = mix.volume();
+
+        assert!(
+            approx_eq!(f64, actual, expected, epsilon = 0.01),
+            "Volume expected {}, but got {}",
+            expected,
+            actual
+        )
+    }    
 }
