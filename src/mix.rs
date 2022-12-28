@@ -51,7 +51,6 @@ pub fn command() -> Command {
                     \n\
                     Configuration file format:\n\
                     \n\
-                    character: String  # name of the character to mix with\n\n\
                     potion: (optional)  # configure potion output\n\
                     \tvolume: bool (default true)  # show volume\n\
                     \teffects: bool (default true)  # show effects\n\
