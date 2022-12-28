@@ -17,6 +17,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build
-      run: cargo build --verbose --release
-    - name: Run tests
-      run: cargo test --verbose -p *
+      run: cargo build --verbose
+    - name: Test genetic
+      run: cargo test --verbose -p genetic
+    - name: Test grimoire2
+      run: cargo test --verbose -p grimoire2
+    - name: Test geneticalchemy
+      run: cargo test --verbose -p geneticalchemy
