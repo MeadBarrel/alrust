@@ -3,22 +3,6 @@ use rand::prelude::Rng;
 use crate::{alias::*, error::*, genetic::*, population::Population};
 
 /// The trait defines a type of interface for types that can mutate a `Genotype`.
-///
-/// ```
-/// use rand::Rng;
-/// use genetic::op::MutateOperator;
-/// use genetic::error::Result;
-///
-/// struct MyMutationOperator;
-///
-/// impl MutateOperator<MyGenotype> for MyMutationOperator {
-///     fn mutate<R: Rng>(&mut self, genome: &mut G, rng: &mut R) -> Result<()> {
-///         // Mutate the genome in some way
-///         // ...
-///         Ok(())
-///     }
-/// }
-/// ```
 pub trait MutateOperator<G>
 where
     G: Genotype,
